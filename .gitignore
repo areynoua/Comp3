@@ -1,4 +1,5 @@
 *.default
 *~
 *.swp
+*.class
 more/jflex
