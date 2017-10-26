@@ -3,3 +3,8 @@
 *.swp
 *.class
 more/jflex
+/Euclid.imp
+/Euclid.out
+/LexicalUnit.java
+/Part1.pdf
+/Symbol.java

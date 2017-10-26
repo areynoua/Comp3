@@ -12,11 +12,12 @@ import java.util.List;
 
 %%
 
-%class Main
-%standalone
-%public
-%line
+%class LexicalAnalyzer
 %column
+%int
+%line
+%public
+%yylexthrow BadTerminalContextException
 
 %{
     // A list that contains all the recognized symbols
@@ -42,6 +43,11 @@ import java.util.List;
             // method has not been implemented by default
             if (!identifiers.containsKey(symbol.hashCode())) identifiers.put(symbol.hashCode(), symbol);
         }
+    }
+
+    /* TODO */
+    public boolean isAtEOF() {
+      return this.zzAtEOF;
     }
 %}
 
@@ -123,6 +129,7 @@ Identifier     = {Alpha}{AlphaNumeric}*
     {Identifier}   { addSymbol(LexicalUnit.VARNAME); }
     {Real}         { addSymbol(LexicalUnit.NUMBER); }
     {CommentBegin} { yybegin(COMMENT);}
+    "\*\)"         { throw new BadTerminalContextException("'*)' occured without '(*'"); }
 }
 
 <COMMENT> {CommentContent} { yybegin(YYINITIAL);}

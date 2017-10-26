@@ -15,15 +15,25 @@ javadoc -quiet -d ../doc/ Comp3/*.java
 # Generate jar
 cd Comp3
 echo Generate jar
-jar cfe ../dist/impCompiler.jar Main Main.class
+jar cfe ../../dist/impCompiler.jar Main *.class
 
 # Test class
-echo Test
-java Main ../test/example.imp > /dev/null
+echo Test class
+echo ----------
+java Main ../../test/example.imp > /dev/null
 cd ..
 
 # Test jar
 echo
-echo Test
-echo ----
-java -jar ../dist/impCompiler.jar ../test/example.imp
+echo Test jar
+echo --------
+for file in ../test/*.imp; do
+	echo $file
+	java -jar ../dist/impCompiler.jar $file > /tmp/imp.out;
+	if ! diff --suppress-common-lines -b -W 85 -y /tmp/imp.out ${file%.imp}.out ; then
+		echo
+		echo vimdiff /tmp/imp.out ${file%.imp}.out
+		echo
+		exit 1;
+	fi
+done
