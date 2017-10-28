@@ -77,8 +77,8 @@ CommentContent = (\*[^\)]|[^*])*\*\)
 AlphaUpperCase = [A-Z]
 AlphaLowerCase = [a-z]
 Alpha          = {AlphaUpperCase}|{AlphaLowerCase}
-Numeric        = [0-9]
-AlphaNumeric   = {Alpha}|{Numeric}
+Digit          = [0-9]
+AlphaNumeric   = {Alpha}|{Digit}
 
 Sign           = [+-]
 Integer        = {Sign}?(([1-9][0-9]*)|0)

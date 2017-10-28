@@ -15,11 +15,8 @@
 \usepackage{float}
 \usepackage{titlesec}
 \usepackage{amssymb} 
-\usepackage{tikz} 
-\usepackage{tikz-qtree}
-\usetikzlibrary{automata,positioning}
-
-\tikzset{set/.style={draw,circle,inner sep=0pt,align=center}}
+\usepackage{makecell}
+\usepackage{color}
 
 \geometry{
  a4paper,
@@ -27,6 +24,8 @@
  left=20mm,
  top=20mm,
 }
+
+\newcommand\todo[1]{\textcolor{red}{TODO: #1}}
 
 \titleformat{\chapter}{\normalfont\huge}{\thechapter.}{20pt}{\huge}
 
@@ -50,12 +49,73 @@
 \pagenumbering{arabic}
 
 
-\chapter{Introduction}
+\chapter{Regular expressions}
 
-\chapter{Bonus}
+\section{Important regular expressions}
+
+\begin{tabular}{|c|c|c|} \hline
+\thead{CommentBegin} & \thead{\textbackslash(\textbackslash*} & \thead{Start symbol before a comment} \\ \hline
+\thead{CommentContent} & \thead{(\textbackslash*[\textasciicircum \textbackslash)]$\vert$[\textasciicircum*])*\textbackslash*\textbackslash)} & 
+\thead{Welll-formed comment, \\ containing neither a "*" nor a ")". \\ Nested comments are forbidden.}  \\ \hline
+\thead{AlphaUpperCase} & \thead{[A-Z]} & \thead{A single uppercase alphabetical character} \\ \hline
+\thead{AlphaLowerCase} & \thead{[a-z]} & \thead{A single lowercase alphabetical character} \\ \hline
+\thead{Alpha} & \thead{\{AlphaUpperCase\}$\vert$\{AlphaLowerCase\}} & \thead{A single alphabetical character} \\ \hline
+\thead{Digit} & \thead{[0-9]} & \thead{A single digit} \\ \hline
+\thead{AlphaNumeric} & \thead{\{Alpha\}$\vert$\{Numeric\}} & \thead{A digit or an alphabetical character} \\ \hline
+\thead{Sign} & \thead{[+-]} & \thead{Either the symbol "+" or "-"} \\ \hline
+\thead{Integer} & \thead{\{Sign\}?(([1-9][0-9]*)$\vert$0)} & \thead{Sequence of digits that cannot begin with a "0"} \\ \hline
+\thead{Decimal} & \thead{\textbackslash.[0-9]*} & \thead{Decimal in scientific notation, \\ with only digits after the decimal point} \\ \hline 
+\thead{Exponent} & \thead{[eE]\{Integer\}} & \thead{Exponent in scientific notation} \\ \hline
+\thead{Real} & \thead{\{Integer\}\{Decimal\}?\{Exponent\}?} & \thead{Real number in scientific notation} \\ \hline
+\thead{Identifier} & \thead{\{Alpha\}\{AlphaNumeric\}*} & \thead{Sequence of characters that does not start with a digit} \\ \hline
+\end{tabular} \\ \\
+
+\section{Trivial regular expressions}
+
+begin, end, ;, $:=$, $($, $)$, $-$, $+$, $*$, $/$, if, then, endif, else, not, and, or, $=$, $>=$, $>$, $<=$, $<$, $<>$, while, do , done, for, from, by, to, print, read
+
+\chapter{Implementation}
+
+\section{Lexical unit matching}
+
+\todo{On a deux etats, ça permet de faire les commentaires, dans l'etat initial, on parse avec toutes les regex ecrites au dessus. Et blabla...}\\ \\
+
+\noindent \todo{isAtEOF ? Pas oublier d'enlever les deux TODO dans le fichier flex}
+
+\section{Symbol table management}
+
+We used a \textit{LinkedHashMap} from the java standard library to store the different symbols. We chose this kind of data structure rather than
+a simple \textit{HashMap} because it is more convenient to keep track of the order of inserted symbols. Indeed, symbols are supposed to be
+displayed in order of appearance. \\ \\
+Each time a lexical unit is matched, its value is hashed and compared to the indexes present in the linked hashmap. The unit is added to the linked hashmap 
+if and only if its hash value is not already present. At the end of the program, the symbol table is shown by simply iterating over the hashmap's keyset. 
+The first column of the table contains tokens (unit names) and the second column contains, for each token, the number of the line where the token has
+been encountered for the first time during the program execution. This number is obtained by evaluating the variable \textit{yyline} at the moment when
+the current token is matched.
+
+\chapter{Nested comments - Bonus}
 
 Lexing should be done with regular expressions, but nested comments can not be processed by regular expressions, because they don't have
-a context-free grammar. Why ? I would say because of the pumping lemma. \\ \\
-Two solutions: implement a recursive lexer (very complicated to compile), or use counters (Java can do that because it is Turing-complete).
+a context-free grammar. More specifically, it is impossible to know at compile time the number of states required to handle nested comments.
+For any fixed number of states, one will always be able to provide a comment with a level of nesting such that it cannot be recognized by the lexer.
+This is due to the \textit{pumping lemma for regular languages}. \\ \\
+Here we propose two solutions: implement a recursive parser (very complicated to compile), or use counters (Java can do that because it is Turing-complete).
+\begin{itemize}
+\item The first solution we propose is to use a stack by calling the lex scanner recursively.
+Nested comments will still be recognized since they consist in both a left recursive grammar and a right recursive grammar. The problem is that
+the stack size must be known at compile time, which makes the problem similar to the one described earlier.
+\item The second solution is more general and also requires a memory space that is theoretically infinite, since we are dealing with Turing machines.
+The procedure is described as follows:
+      \begin{itemize}
+        \item{Initialize a counter $c$ to 0}
+        \item{Check the current symbol. If it's a "(*", increment $c$. If it's a "*)", decrement $c$. Do nothing in other cases.}
+        \item{Reject if $c$ becomes strictly negative.}
+        \item{Parse the next symbol.}
+      \end{itemize}
+\end{itemize}
+JFlex already offers a fancy way to integrate custom Java methods in the automaton states. Our preference would be to benefit from it and
+manipulate counters in the Java part of the code. This would be easier to design and to maintain.
+
+\todo{Rajouter ce que tu as à dire et s'assurer que je ne dis pas que des conneries}
 
 \end{document}
