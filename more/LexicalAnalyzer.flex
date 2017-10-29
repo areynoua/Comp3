@@ -45,7 +45,6 @@ import java.util.List;
         }
     }
 
-    /* TODO */
     public boolean isAtEOF() {
       return this.zzAtEOF;
     }
@@ -68,7 +67,7 @@ import java.util.List;
 %eof}
 
 %eofval{
-    return 0; // symbols.add(new Symbol(LexicalUnit.EOS, yyline, yycolumn)); // TODO: what to do with end of stream ?
+    return 0;
 %eofval}
 
 CommentBegin   = \(\*

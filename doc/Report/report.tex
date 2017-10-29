@@ -17,6 +17,7 @@
 \usepackage{amssymb} 
 \usepackage{makecell}
 \usepackage{color}
+\usepackage{enumerate}
 
 \geometry{
  a4paper,
@@ -48,25 +49,45 @@
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
+\chapter{Assumptions}
+
+This part of the project consists in designing and implementing a lexical analyzer for the Imp programming language, from a given list of reserved keywords 
+and a grammar for the language.
+
+\begin{itemize}
+\item As suggested in the project brief, numbers are only made up of sequences of digits, thus can only be integers. Decimal numbers are not supposed
+to be recognized by the lexer. Negative integers are handled using the rule 16 from the Imp grammar: a negative number is composed of the unary operator "-"
+followed by a positive number. Here, the lexer must only be capable of tokenizing both the unary operator "-" and positive numbers, and thus not able to infer
+the existence of a negative number. This will be implemented in the next parts of the project.
+\item Varnames are sequences of letters and digits, and necessarily start with a letter. Also they are case sensitive. Therefore, they can not contain underscores.
+\item Since no lexical units have been provided for booleans nor for strings, the lexer does not handle them. In any case, booleans could be regarded
+as simple integers, and possibly constants could be defined in the Imp environment to support them. \\
+For example: $TRUE := 1; FALSE := 0$
+\item We did not relax the assumption on token delimiters: two tokens may or may not be separated by a space/tabulation/new line.
+This allows tokens to be contiguous, for instance: \\ $FORTYTWO := 42; C = FORTYTWO$ \\ \\
+The lexical units "42" and ";" are detected as two distinct tokens. However, this behavior can induce ambiguous situations such as $2B$, which is the number
+$2$ followed by an identifier $B$. This will most likely be syntactically be not appropriate, but that is not the lexer's job to tell whether it is syntactically correct
+or not (this is one of the parser's jobs). As a result, the lexer does not raise any exception when being in this kind of situations.
+\item Non-ascii characters are not allowed, except in comment sections.
+\item Because the provided .out files do not contain EOS tokens, we decided not to insert them yet.
+\end{itemize}
 
 \chapter{Regular expressions}
 
 \section{Important regular expressions}
 
 \begin{tabular}{|c|c|c|} \hline
+\thead{\textbf{Name}} & \thead{\textbf{Unix-style notation}} & \thead{\textbf{Description}} \\ \hline
 \thead{CommentBegin} & \thead{\textbackslash(\textbackslash*} & \thead{Start symbol before a comment} \\ \hline
 \thead{CommentContent} & \thead{(\textbackslash*[\textasciicircum \textbackslash)]$\vert$[\textasciicircum*])*\textbackslash*\textbackslash)} & 
 \thead{Well-formed comment: \\ Match any charactered until first ``*)''. \\ Nested comments are forbidden.}  \\ \hline
-\thead{AlphaUpperCase} & \thead{[A-Z]} & \thead{A single uppercase alphabetical character} \\ \hline
-\thead{AlphaLowerCase} & \thead{[a-z]} & \thead{A single lowercase alphabetical character} \\ \hline
+\thead{Space} & \thead{[\textbackslash n\textbackslash r\textbackslash t]*} & \thead{Token delimiter: indentation, space or new line} \\ \hline
+\thead{AlphaUpperCase} & \thead{[A-Z]} & \thead{A single uppercase letter} \\ \hline
+\thead{AlphaLowerCase} & \thead{[a-z]} & \thead{A single lowercase letter} \\ \hline
 \thead{Alpha} & \thead{\{AlphaUpperCase\}$\vert$\{AlphaLowerCase\}} & \thead{A single alphabetical character} \\ \hline
 \thead{Digit} & \thead{[0-9]} & \thead{A single digit} \\ \hline
-\thead{AlphaNumeric} & \thead{\{Alpha\}$\vert$\{Numeric\}} & \thead{A digit or an alphabetical character} \\ \hline
-\thead{Sign} & \thead{[+-]} & \thead{Either the symbol "+" or "-"} \\ \hline
-\thead{Integer} & \thead{\{Sign\}?(([1-9][0-9]*)$\vert$0)} & \thead{Sequence of digits that cannot begin with a "0"} \\ \hline
-\thead{Decimal} & \thead{\textbackslash.[0-9]*} & \thead{Decimal in scientific notation, \\ with only digits after the decimal point} \\ \hline 
-\thead{Exponent} & \thead{[eE]\{Integer\}} & \thead{Exponent in scientific notation} \\ \hline
-\thead{Real} & \thead{\{Integer\}\{Decimal\}?\{Exponent\}?} & \thead{Real number in scientific notation} \\ \hline
+\thead{AlphaNumeric} & \thead{\{Alpha\}$\vert$\{Digit\}} & \thead{A digit or an alphabetical character} \\ \hline
+\thead{Number} & \thead{\{Digit\}+} & \thead{A sequence of digits} \\ \hline
 \thead{Identifier} & \thead{\{Alpha\}\{AlphaNumeric\}*} & \thead{Sequence of characters that does not start with a digit} \\ \hline
 \end{tabular} \\ \\
 
@@ -76,13 +97,22 @@ begin, end, ;, $:=$, $($, $)$, $-$, $+$, $*$, $/$, if, then, endif, else, not, a
 
 \chapter{Implementation}
 
-\section{Lexical unit matching}
+\section{Lexical analyzer}
 
-\todo{On a deux etats, ça permet de faire les commentaires, dans l'etat initial, on parse avec toutes les regex ecrites au dessus. Et blabla...}\\ \\
+\subsection{Lexical unit matching}
 
-\noindent \todo{isAtEOF ? Pas oublier d'enlever les deux TODO dans le fichier flex}
+Besides the JFlex-default state $YYINITIAL$, we defined a new state $COMMENT$ which is active when the opening comment symbol ($CommentBegin$) is encountered. The system goes back to $YYINITIAL$ state once a comment content is matched, according to the regex $CommentContent$.
+All the other regular expressions can be matched only in the $YYINITIAL$ state, because comment sections can also contain reserved keywords, but the latter
+must not be considered as such inside comments. \\ \\
+The main problem is that \textit{reserved keywords} can be matched with the varname regular expression as well. As a result, more than one token may be recognized at once, and JFlex uses two rules of preference to decide which one to return. JFlex selects first the longest match, and then chooses the first matched string among the longest matches. Thus, a common solution to keep the keywords "reserved" is to give priority to the keyword regular expressions (all but varname) by putting them ahead in the source code. The identifier regular expression has been added at the end. \\ \\
+Except for comment contents, each new matched regular expression induces the instanciation of a new \textit{Symbol} object.
+The matched string is stored as the \textit{value} attribute, the \textit{line} attribute is set to the current line number and the \textit{column} attribute is set
+to the current column number. The \textit{line} attribute is used by the symbol table for handling varnames (this will be explained in the next section). \\ \\
+We defined two custom exceptions, \textit{BadTerminalException} and \textit{BadTerminalContextException}. The first one occurs when the current string
+$yytext$ doesn't match any of our defined regular expressions. In other words, a \textit{BadTerminalException} is thrown when the regular expression
+[\textasciicircum] is matched. In addition, a \textit{BadTerminalContextException} is thrown when a closing comment symbol is matched inside a non-comment section. Because the lexer is not supposed to throw exceptions, we implemented a Main Java class that wraps the execution of the JFlex-generated class (called \textit{LexicalAnalyzer.java}) and catches all the potential exceptions. When an exception is catched, a dedicated message is simply displayed in the standard output.
 
-\section{Symbol table management}
+\subsection{Symbol table management}
 
 We used a \textit{LinkedHashMap} from the java standard library to store the different symbols. We chose this kind of data structure rather than
 a simple \textit{HashMap} because it is more convenient to keep track of the order of inserted symbols. Indeed, symbols are supposed to be
@@ -92,6 +122,20 @@ if and only if its hash value is not already present. At the end of the program,
 The first column of the table contains tokens (unit names) and the second column contains, for each token, the number of the line where the token has
 been encountered for the first time during the program execution. This number is obtained by evaluating the variable \textit{yyline} at the moment when
 the current token is matched.
+
+\section{Testing}
+
+\begin{enumerate}
+\item Example files provided with the project brief. Checks that the given the .imp file, the lexer generates a .out that is identical to the provided one.
+\item Same .imp file with an additional comment. The output file should remain the same.
+\item Empty code: a \textit{begin} token followed by a \textit{end} token. The symbol table should be empty.
+% \item (Removed test)
+\item Small code with a non-ascii comment. The lexer should \textbf{not} throw a \textit{BadTerminalException}.
+\item Comments, plus a single "*)" symbol. As explained it should lead to a \textit{BadTerminalContextException}.
+\item Tokens without separators between them. As explained before, "2a" should be tokenized as "2" followed by "a".
+\item Similar to the example Imp code but using negative numbers.
+\item Checks that non-ascii characters are actually not supported by our lexer. A \textit{BadTerminalException} message is expected in the output file.
+\end{enumerate}
 
 \chapter{Nested comments - Bonus}
 
