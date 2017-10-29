@@ -1,6 +1,2 @@
-token: begin	lexical unit: BEGIN
 Bad Terminal Context:
 BadTerminalContextException: '*)' occured without '(*'
-token: end	lexical unit: END
-
-Identifiers
