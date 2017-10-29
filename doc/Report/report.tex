@@ -125,6 +125,20 @@ the current token is matched.
 
 \section{Testing}
 
+Eight test .imp files have been written, as well as eight corresponding .out files, to test all the features of our lexer. In addition,
+a bash script has been written to automatically apply the following procedure:
+\begin{itemize}
+\item Generate the Java lexer class using JFlex
+\item Compile the latter using the javac command
+\item Generate the javadoc
+\item Generate an executable jar from the .class files
+\item Execute the lexer on the example .imp file and display the result
+\item For each of the test.imp files, run the lexer on the .imp and compare the output file with the corresponding predefined .out file. 
+The comparison is done with vimdiff and everything must match exactly.
+\end{itemize}
+
+Here are short descriptions of our eight pairs of test files:
+
 \begin{enumerate}
 \item Example files provided with the project brief. Checks that the given the .imp file, the lexer generates a .out that is identical to the provided one.
 \item Same .imp file with an additional comment. The output file should remain the same.
@@ -142,12 +156,15 @@ the current token is matched.
 Lexing should be done with regular expressions, but nested comments can not be processed by regular expressions, because they don't have
 a context-free grammar. More specifically, it is impossible to know at compile time the number of states required to handle nested comments.
 For any fixed number of states, one will always be able to provide a comment with a level of nesting such that it cannot be recognized by the lexer.
-This is due to the \textit{pumping lemma for regular languages}. \\ \\
-Here we propose two solutions: implement a recursive parser (very complicated to compile), or use counters (Java can do that because it is Turing-complete).
+This is due to the \textit{pumping lemma for regular languages}. More specifically, when the closing comment symbol "*)" is matched, an automaton
+would not be able to remember the number of "(*" symbols already matched. For any number of matched opening comment symbols the current state
+would be the same: this is the intuition behind the \textit{pigeonhole principle}. As a result, we need to keep track of this number. \\ \\
+Here we propose two solutions: implement a recursive parser (very complicated to compile, plus the first part of the project consists only in the implementation
+of a lexer), or use counters (Java can do that because it is Turing-complete).
 \begin{itemize}
-\item The first solution we propose is to use a stack by calling the lex scanner recursively.
+\item The first solution we propose is to use a stack and call a lex scanner recursively.
 Nested comments will still be recognized since they consist in both a left recursive grammar and a right recursive grammar. The problem is that
-the stack size must be known at compile time, which makes the problem similar to the one described earlier.
+the stack size must be known at compile time, which makes the problem similar to the one described earlier. Once again, we are not allowed to do so.
 \item The second solution is more general and also requires a memory space that is theoretically infinite, since we are dealing with Turing machines.
 The procedure is described as follows:
       \begin{itemize}
@@ -158,8 +175,7 @@ The procedure is described as follows:
       \end{itemize}
 \end{itemize}
 JFlex already offers a fancy way to integrate custom Java methods in the automaton states. Our preference would be to benefit from it and
-manipulate counters in the Java part of the code. This would be easier to design and to maintain.
-
-\todo{Rajouter ce que tu as à dire et s'assurer que je ne dis pas que des conneries}
+manipulate counters in the Java part of the code. This would be easier to design and to maintain. \\ \\
+Note: We are aware that it is preferable for efficiency purposes (when possible) to use automaton-based implementations rather than calling Java code everywhere. Indeed JFlex is designed to optimize automata through minimization.
 
 \end{document}
