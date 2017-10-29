@@ -17,7 +17,7 @@ import java.util.List;
 %int
 %line
 %public
-%yylexthrow BadTerminalContextException
+%yylexthrow BadTerminalException, BadTerminalContextException
 
 %{
     // A list that contains all the recognized symbols
@@ -73,6 +73,8 @@ import java.util.List;
 
 CommentBegin   = \(\*
 CommentContent = (\*[^\)]|[^*])*\*\)
+
+Space          = [ \n\r\t]*
 
 AlphaUpperCase = [A-Z]
 AlphaLowerCase = [a-z]
@@ -130,8 +132,9 @@ Identifier     = {Alpha}{AlphaNumeric}*
     {Real}         { addSymbol(LexicalUnit.NUMBER); }
     {CommentBegin} { yybegin(COMMENT);}
     "\*\)"         { throw new BadTerminalContextException("'*)' occured without '(*'"); }
+	{Space}        { /* ignore */ }
 }
 
 <COMMENT> {CommentContent} { yybegin(YYINITIAL);}
 
-[^] { /*ignore*/ }
+[^] { throw new BadTerminalException("Bad terminal: '" + yytext() + "'"); }

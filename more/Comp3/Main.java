@@ -42,8 +42,12 @@ public class Main {
           System.out.println("IO error scanning file \""+argv[i]+"\"");
           System.out.println(e);
         }
+        catch (BadTerminalException e) {
+          System.out.println("Unknown terminal:");
+          System.out.println(e);
+        }
         catch (BadTerminalContextException e) {
-          System.out.println("Bad Terminal Context:");
+          System.out.println("Bad terminal context:");
           System.out.println(e);
         }
         catch (Exception e) {

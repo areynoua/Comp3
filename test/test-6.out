@@ -1,2 +1,2 @@
-Bad Terminal Context:
+Bad terminal context:
 BadTerminalContextException: '*)' occured without '(*'
