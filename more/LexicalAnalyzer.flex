@@ -82,11 +82,7 @@ Alpha          = {AlphaUpperCase}|{AlphaLowerCase}
 Digit          = [0-9]
 AlphaNumeric   = {Alpha}|{Digit}
 
-Sign           = [+-]
-Integer        = {Sign}?(([1-9][0-9]*)|0)
-Decimal        = \.[0-9]*
-Exponent       = [eE]{Integer}
-Real           = {Integer}{Decimal}?{Exponent}?
+Number         = {Digit}+
 Identifier     = {Alpha}{AlphaNumeric}*
 
 %state COMMENT
@@ -129,10 +125,10 @@ Identifier     = {Alpha}{AlphaNumeric}*
     "print"        { addSymbol(LexicalUnit.PRINT); }
     "read"         { addSymbol(LexicalUnit.READ); }
     {Identifier}   { addSymbol(LexicalUnit.VARNAME); }
-    {Real}         { addSymbol(LexicalUnit.NUMBER); }
+    {Number}         { addSymbol(LexicalUnit.NUMBER); }
     {CommentBegin} { yybegin(COMMENT);}
     "\*\)"         { throw new BadTerminalContextException("'*)' occured without '(*'"); }
-	{Space}        { /* ignore */ }
+    {Space}        { /* ignore */ }
 }
 
 <COMMENT> {CommentContent} { yybegin(YYINITIAL);}

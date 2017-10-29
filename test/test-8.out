@@ -11,6 +11,7 @@ token: )	lexical unit: RPAREN
 token: ;	lexical unit: SEMICOLON
 token: c	lexical unit: VARNAME
 token: :=	lexical unit: ASSIGN
+token: -	lexical unit: MINUS
 token: 3	lexical unit: NUMBER
 token: while	lexical unit: WHILE
 token: b	lexical unit: VARNAME
