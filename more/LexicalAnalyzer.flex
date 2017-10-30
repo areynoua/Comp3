@@ -73,7 +73,7 @@ import java.util.List;
 CommentBegin   = \(\*
 CommentContent = (\*[^\)]|[^*])*\*\)
 
-Space          = [ \n\r\t]*
+Space          = [ \n\r\t\f]*
 
 AlphaUpperCase = [A-Z]
 AlphaLowerCase = [a-z]
