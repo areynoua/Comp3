@@ -62,31 +62,26 @@ from a given list of reserved keywords and a grammar for the language.
     be integers. Decimal numbers are not supposed to be recognized by the lexer. Negative integers are handled using
     the rule 16 from the Imp grammar: a negative number is an arithmetic expression composed of the unary operator
     ``\texttt{-}'' followed by a positive number. Here, the lexer must only be capable of tokenizing both the unary
-    operator ``\texttt{-}'' and positive numbers, and thus not able to infer the existence of a negative number. This
+    operator ``\texttt{-}'' and positive numbers, and thus not able to infer the existence of a negative number by itself. This
     will be implemented in the next parts of the project.
-  \item Variable identifiers (varnames) are sequences of letters and digits, and necessarily start with a letter. Also they are
-    case sensitive. Therefore, they can not contain underscores.
+  \item Variable identifiers (varnames) are sequences of letters and digits, and necessarily start with a letter.  
+    Therefore, they can not contain underscores. Also they are case sensitive.
   \item Since no lexical units have been provided for
     booleans nor for strings, the lexer does not handle them. In any case, booleans could be regarded as simple
     integers, and possibly constants could be defined in the Imp environment to support them. \\ For example:
     \texttt{TRUE := 1; FALSE := 0}
   \item We did not relax the assumption on token delimiters: two tokens may or may not be
     separated by a blank character. This allows tokens to be contiguous, \textit{i.e.} two tokens need to be separated
-    by a blank character only if the first ends with a letter and the last starts with a letter.
-    For instance one can write:\\
+    by a blank character only if the first one ends with a letter and the last one starts with a letter.
+    For instance, one can write:\\
     \texttt{begin read(a);read(b);while b<>0do c:=b;\\while a>=b do a:=a-b done;b:=a;a:=c done;print(a) end}
-
-    %However, this behavior can induce ambiguous situations such as \texttt{2b}, which is the number \texttt{2} followed
-    %by an identifier \texttt{b}. This is syntactically not appropriate (according to the given grammar), but that is not
-    %the lexer's job to tell whether it is syntactically correct or not (this is one of the parser's jobs). As a result,
-    %the lexer does not raise any exception when being in this kind of situations even if this can be easily done.
   \item Non-ASCII characters are not allowed, except in comment sections.
   \item Because the provided .out files do not contain EOS tokens, we decided not to insert them yet.
 \end{itemize}
 
 \chapter{Regular expressions}
 
-\section{Important regular expressions}
+\section{Notable regular expressions}
 
 \begin{tabular}{|l >{\ttfamily}l p{13em}|} \hline
   \textbf{Name}
@@ -94,10 +89,10 @@ from a given list of reserved keywords and a grammar for the language.
 	& \textbf{Description} \\ \hline
 CommentBegin
 	& \textbackslash(\textbackslash*
-	& Start symbol before a comment \\ \hline
+	& Opening comment symbol \\ \hline
 CommentContent
 	& (\textbackslash*[\textasciicircum \textbackslash)]$\vert$[\textasciicircum*])*\textbackslash*\textbackslash)
-    & Well-formed comment: Match any charactered until and including first ``\texttt{*)}''. (Nested comments are forbidden.)  \\ \hline
+    & Well-formed comment: Match any sequence of characteres up to and including the first ``\texttt{*)}''. (Nested comments are forbidden.)  \\ \hline
 Space
 	& [ \textbackslash n\textbackslash r\textbackslash t\textbackslash f]*
 	& Blank spaces: only space, new line,
@@ -161,10 +156,10 @@ Identifier
 \texttt{read},
 \texttt{\textbackslash{}*\textbackslash)}.
 
-The last regular expression match an ``end of comment'' token. This should never happen as this token is already
-considered as part of the comment. We add this one to raise an exception when this occurs outside any comment. Another
+The last regular expression matches ``end of comment'' tokens. This should never happen as this token is already
+considered as part of the comment. This is to raise an exception when it occurs outside any comment. Another
 option would be to consider two lexical units: \texttt{TIMES} and \texttt{RPAREN}. Since this sequence does not make sense
-according to the Imp grammar, we choose to already raise an exception in order to detected nested comment more quickly.
+according to the Imp grammar, we chose to raise an exception yet in order to detect nested comment more quickly.
 
 \chapter{Implementation}
 
@@ -179,9 +174,9 @@ must not be considered as such inside comments.
 
 The main problem is that \textit{reserved keywords} can be matched with the varname regular expression as well. As a
 result, more than one token may be recognized at once, and JFlex uses two rules of preference to decide which one to
-return. JFlex selects first the longest match, and then chooses the first matched string among the longest matches.
+return. JFlex first selects the longest match, and then chooses the first matched string among the longest matches.
 Thus, a common solution to keep the keywords ``reserved'' is to give priority to the keyword regular expressions (all
-but varname) by putting them ahead in the source code. The identifier regular expression has been added after the others.
+but varname) by putting them ahead in the source code. The identifier regular expression has been added after all the others.
 
 
 Except for comment contents, each new matched regular expression induces the instantiation of a new \textit{Symbol}
@@ -196,7 +191,7 @@ $yytext$ doesn't match any of our defined regular expressions. In other words, a
 \textit{BadTerminalContextException} is thrown when a closing comment symbol is matched inside a non-comment section.
 Because the lexer is not supposed to throw exceptions, we implemented a Main Java class that wraps the execution of the
 JFlex-generated class (called \textit{LexicalAnalyzer.java}) and catches all the potential exceptions. When an exception
-is catched, a dedicated message is simply displayed in the standard output instead of any other output.
+is catched, a dedicated message is simply displayed in the standard output instead.
 
 \subsection{Symbol table management}
 
@@ -207,7 +202,7 @@ displayed in order of appearance.
 
 Each time a lexical unit is matched, its value is hashed and compared to the indexes present in the linked hashmap. The unit is added to the linked hashmap 
 if and only if its hash value is not already present. At the end of the program, the symbol table is shown by simply iterating over the hashmap's keyset. 
-The first column of the table contains tokens (unit names) and the second column contains, for each token, the number of the line where the token has
+The first column of the table contains tokens (unit names) and the second column contains, for each token, the line number where the token has
 been encountered for the first time during the program execution. This number is obtained by evaluating the variable \textit{yyline} at the moment when
 the current token is matched.
 
@@ -225,10 +220,10 @@ In addition, a bash script has been written to automatically apply the following
 
   The comparisons stop when one output does not correspond to the expected output and the differences are displayed.
 
-  The amount and type of blank characters is ignored when comparing outputs, but not the presence or absence of a space.
+  The number and type of blank characters is ignored when comparing outputs, but not the presence or absence of a space.
 \end{itemize}
 
-Here are short descriptions of our eight pairs of test files:
+Here are short descriptions of our nine pairs of test files:
 
 \begin{enumerate}
 \item Example files provided with the project brief. Checks that the given the .imp file, the lexer generates a .out that is identical to the provided one.
@@ -251,29 +246,29 @@ Here are short descriptions of our eight pairs of test files:
 
 The role of the lexer is to split the whole .imp file into a list of tokens.
 For simplicity, we can say that this is done by matching each part of the file against regular expressions.
-This is to say that, for every file part, we are asking if it is a word that belong to a regular language.
-The regular language it belongs to give us the kind of token it is.
+This is to say that, for every file part, we ask whether it is a word that belongs to the language described by a regular language or not.
+The corresponding regular language tells us of which type of token the word is.
 
-We want comments to be deleted by the lexer so that they are not visible to the parser.
+We expect comments to be deleted by the lexer so that they are not visible to the parser.
 Thus, comments are words of a regular language that can be described informally this way: they start with an
 \stac, contain any character and end with \emph{the first} \stoc.
 This is the rule we used in the implementation.
-We need to ``stop'' the comment at the first \stoc to avoid to consider as part of the comment all the characters
-between the first \stac and the last \stoc.
+We need to ``stop'' the comment at the first \stoc to avoid considering all the characters
+between the first \stac and the last \stoc as part of the comment.
 
 Lexing should be done with regular expressions, but nested comments can not be processed by regular expressions, because
 they do not belong to regular languages. More specifically, it is impossible to know at compile time the number of states
 required to handle nested comments.  For any fixed number of states, one will always be able to provide a comment with a
 level of nesting such that it cannot be recognized by the lexer.  This is due to the \textit{pumping lemma for regular
 languages}. Another way to say this is: when the closing comment symbol \stoc is matched, a \textbf{finite} automaton would not be able to
-remember the number of \stac symbols already matched. For any number of matched opening comment symbols the current state
+remember the number of \stac symbols already matched. For any number of matched opening comment symbols, the current state
 would be the same: this is the intuition behind the \textit{pigeonhole principle}. As a result, we need to keep track of
 this number.
 
 We can think of two solutions: implement a recursive lexer (very complicated to compile),
 or use counters (Java can do that because it is Turing-complete).
 In fact these two solutions are two different point of views on the way to keep track of the ``comment level'' the lexer
-is in. This is because the nested comments belongs to the class of context-free languages (recognizable by pushdown
+is in. This is because the nested comments belong to the class of context-free languages (recognizable by pushdown
 automata).
 \begin{itemize}
   \item The first solution we propose is to use a stack and call a lex scanner recursively.
@@ -287,7 +282,7 @@ automata).
       \item{Initialize a counter $c$ to 0}
       \item{Check the current symbol. If it's a "(*", increment $c$. If it's a "*)", decrement $c$. Do nothing in other cases.}
       \item{Reject if $c$ becomes strictly negative.}
-      \item{Parse the next symbol.}
+      \item{Match the next symbol.}
     \end{itemize}
 \end{itemize}
 JFlex already offers a fancy way to integrate custom Java methods in the automaton states. Our preference would be to
