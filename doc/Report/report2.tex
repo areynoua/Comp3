@@ -1,0 +1,65 @@
+\documentclass[12pt]{report}
+
+\usepackage[english]{babel}
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage[bottom]{footmisc}
+\usepackage{chngcntr}
+\usepackage{etoolbox}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{calrsfs}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{titlesec}
+\usepackage{amssymb} 
+\usepackage{makecell}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{array}
+
+\newcommand\todo[1]{\textcolor{red}{TODO: #1}}
+
+\titleformat{\chapter}{\normalfont\huge}{\thechapter.}{20pt}{\huge}
+
+\title{Introduction to language theory and compiling \\ Project -- Part 2}
+\author{Antoine Passemiers \\ Alexis Reynouard}
+
+\pagestyle{plain}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em plus0.5em minus0.3em}
+
+\pagenumbering{Roman}
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+\setcounter{chapter}{0}
+\pagenumbering{arabic}
+
+%FIXME: does not print <> if #1 empty
+\newcommand{\varstyle}[1]{\notblank{#1}{\textsf{$<$#1$>$}}{}}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\thispagestyle{empty}
+\pagebreak
+\setcounter{page}{1}
+\clearpage
+
+Hello world
+
+\newcounter{Rule}
+\newsavebox{\varbox}
+\begin{tabular}{
+    >{\sffamily[\stepcounter{Rule}\theRule}r<{]}
+    >{\begin{lrbox}{\varbox}\sffamily}l<{\end{lrbox}\varstyle{\unhbox\varbox}}
+    @{ $\rightarrow$ } >{\ttfamily}l<{\ttfamily}
+  }
+  & Program & begin \varstyle{Code} end \\
+  & Code & $\epsilon$ \\
+  & & \varstyle{InstList}
+\end{tabular}
+\end{document}
