@@ -49,7 +49,36 @@
 \setcounter{page}{1}
 \clearpage
 
-Hello world
+\chapter{Transforming Imp grammar}
+
+This part of the project consists in implementing a $LL(k)$ parser for the Imp programming language. A $LL(k)$ parser is a recursive descent parser composed of:
+
+\begin{itemize}
+\item An input buffer, containing $k$ input tokens. Since we are considering a $LL(1)$ parser, the latter only considers one token at a time to decide how to 
+grow the syntactic tree.
+\item A stack containing the set of remaining terminals and non-terminals to process.
+\item An action table, mapping the head 
+\end{itemize}
+
+\section{Removing useless rules}
+
+\subsection{Unreachable variables}
+
+\subsection{unproductive variables}
+
+\section{Removing left-recursion and applying factorization}
+
+\subsection{Left-recursion}
+
+\subsection{Factorization}
+
+\section{Removing ambiguity}
+
+\subsection{Operator priority}
+
+\subsection{Operator associativity}
+
+\section{Resulting grammar}
 
 \newcounter{Rule}
 \newsavebox{\varbox}
