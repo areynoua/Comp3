@@ -57,26 +57,55 @@ This part of the project consists in implementing a $LL(k)$ parser for the Imp p
 \item An input buffer, containing $k$ input tokens. Since we are considering a $LL(1)$ parser, the latter only considers one token at a time to decide how to 
 grow the syntactic tree.
 \item A stack containing the set of remaining terminals and non-terminals to process.
-\item An action table, mapping the head 
+\item An action table, mapping the front of the stack and the current token to the corresponding rule.
 \end{itemize}
 
 \section{Removing useless rules}
 
 \subsection{Unreachable variables}
 
-\subsection{unproductive variables}
+Unreachable variables are variables that cannot be accessed using composed rules from grammar $G$.
 
-\section{Removing left-recursion and applying factorization}
+\begin{tabular}{|l p{35em}|} \hline
+ i & $V_i$ \\ \hline
+0 & $\{Program\}$ \\ \hline
+1 & $V_0 \cup \{Code\}$ \\ \hline
+2 & $V_1 \cup \{IntList\}$ \\ \hline
+3 & $V_2 \cup \{Instruction\}$ \\ \hline
+4 & $V_3 \cup \{Assign, If, While, For, Print, Read\}$ \\ \hline
+5 & $V_4 \cup \{ExprArithm, Cond\}$ \\ \hline
+6 & $V_5 \cup \{Op, BinOp, SimpleCond\}$ \\ \hline
+7 & $V_6 \cup \{Comp\}$ \\ \hline
+8 & $V_7$ \\ \hline
+\end{tabular}
 
-\subsection{Left-recursion}
+All variables are accessible.
 
-\subsection{Factorization}
+\subsection{Unproductive variables}
+
+\begin{tabular}{|l p{35em}|} \hline
+ i & $V_i$ \\ \hline
+0 & $\phi$ \\ \hline
+1 & $\{Code, ExprArithm, Op, BinOp, Comp, Print, Read\}$ \\ \hline
+2 & $V_1 \cup \{Program, Instruction, Assign, For, SimpleCond\}$ \\ \hline
+3 & $V_2 \cup \{IntList, Cond\}$ \\ \hline
+4 & $V_3 \cup \{While, If\}$ \\ \hline
+5 & $V_4$ \\ \hline
+\end{tabular}
+
+All variables are productive.
 
 \section{Removing ambiguity}
 
 \subsection{Operator priority}
 
 \subsection{Operator associativity}
+
+\section{Removing left-recursion and applying factorization}
+
+\subsection{Left-recursion}
+
+\subsection{Factorization}
 
 \section{Resulting grammar}
 
@@ -90,5 +119,10 @@ grow the syntactic tree.
   & Program & begin \varstyle{Code} end \\
   & Code & $\epsilon$ \\
   & & \varstyle{InstList}
+  % & ExprArithm & \varstyle{ExprArithm} + \varstyle{Priority3ExprArithm} \\
+  % & & \varstyle{ExprArithm} - \varstyle{Priority3ExprArithm} \\
+  % & & \varstyle{Priority3ExprArithm} \\
+  % & Priority3ExprArithm & $\varstyle{Priority3ExprArithm} * \varstyle{Priority4ExprArithm}$ \\
+  % & & \varstyle{Priority3ExprArithm} / \varstyle{Priority4ExprArithm} \\
 \end{tabular}
 \end{document}
