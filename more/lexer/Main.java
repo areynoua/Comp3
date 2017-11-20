@@ -1,6 +1,6 @@
 public class Main {
   /**
-   * Runs the scanner on input files.
+   * Runs the scanner and the parser on input files.
    *
    * This is a standalone scanner, it will print any unmatched
    * text to System.out unchanged.
@@ -27,6 +27,7 @@ public class Main {
       }
       for (int i = firstFilePos; i < argv.length; i++) {
         LexicalAnalyzer scanner = null;
+        LL1Parser parser = null;
 
         try {
           java.io.FileInputStream stream = new java.io.FileInputStream(argv[i]);
@@ -34,6 +35,8 @@ public class Main {
           scanner = new LexicalAnalyzer(reader);
           while ( !scanner.isAtEOF() )
             scanner.yylex();
+          parser = new LL1Parser();
+          parser.parse(scanner.getTokens());
         }
         catch (java.io.FileNotFoundException e) {
           System.out.println("File not found : \""+argv[i]+"\"");

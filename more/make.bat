@@ -2,17 +2,17 @@
 
 REM Generate java
 ECHO Generate Java
-java -jar jflex-1.6.1.jar -d Comp3 LexicalAnalyzer.flex
+java -jar jflex-1.6.1.jar -d lexer lexer/LexicalAnalyzer.flex
 
 REM Compile java
 ECHO Compile Java
-javac Comp3/*.java
+javac lexer/*.java
 
 REM Generate javadoc
 ECHO Generate javadoc
-javadoc -quiet -d ../doc/ Comp3/*.java
+javadoc -quiet -d ../doc/ lexer/*.java
 
-cd comp3
+cd lexer
 REM Generate jar
 ECHO Generate jar
 jar cfe ../../dist/impCompiler.jar Main *.class
@@ -30,4 +30,4 @@ REM Test jar
 ECHO[
 ECHO Test jar
 ECHO --------
-java -jar ../dist/impCompiler.jar ../test/example.imp
+java -jar ../dist/impCompiler.jar ../test/test-1.imp

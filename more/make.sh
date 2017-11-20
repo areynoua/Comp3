@@ -2,18 +2,18 @@ set -e
 
 # Generate java
 echo Generate Java
-java -jar jflex-1.6.1.jar -d Comp3 LexicalAnalyzer.flex
+java -jar jflex-1.6.1.jar -d lexer lexer/LexicalAnalyzer.flex
 
 # Compile java
 echo Compile Java
-javac Comp3/*.java
+javac lexer/*.java
 
 # Generate javadoc
 echo Generate javadoc
-javadoc -quiet -d ../doc/ Comp3/*.java
+javadoc -quiet -d ../doc/ lexer/*.java
 
 # Generate jar
-cd Comp3
+cd lexer
 echo Generate jar
 jar cfe ../../dist/impCompiler.jar Main *.class
 

@@ -48,6 +48,10 @@ import java.util.List;
     public boolean isAtEOF() {
       return this.zzAtEOF;
     }
+
+    public List<Symbol> getTokens() {
+        return symbols;
+    }
 %}
 
 %eof{
