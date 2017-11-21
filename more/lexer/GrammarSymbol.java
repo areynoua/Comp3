@@ -34,4 +34,12 @@ public class GrammarSymbol {
             return this.variableName.equals(other.variableName);
         }
     }
+
+    @Override
+    public int hashCode() {
+        int hash;
+        if (isTerminal) hash = lexicalUnit.hashCode();
+        else hash = variableName.hashCode();
+        return hash;
+    }
 }

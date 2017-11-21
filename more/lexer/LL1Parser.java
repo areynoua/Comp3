@@ -11,23 +11,26 @@ import java.util.Stack;
 public class LL1Parser {
 
     private Integer cursor; // Points to the current token from the input token list
-    private Stack<Symbol> stack; // PDA stack
+    private Stack<GrammarSymbol> stack; // PDA stack
     private ActionTable actionTable; // LL 1 parser's action table
 
     public LL1Parser() {
-        this.actionTable = new ActionTable();
-        this.resetPDA();
+        actionTable = new ActionTable();
+        resetPDA();
     }
 
     private void resetPDA() {
-        this.stack = new Stack<>();
-        this.cursor = 0;
+        stack = new Stack<>();
+        cursor = 0;
     }
 
     public void parse(List<Symbol> tokens) {
-        this.resetPDA();
-        System.out.println("Parsing list of tokens...");
-        // TODO: predictive parsing algorithm
+        resetPDA();
+        stack.push(new GrammarSymbol("Program")); // Pushing start variable
+        while (true) {
+            GrammarSymbol top = stack.peek();
+            // TODO: predictive parser algorithm
+        }
     }
 
     private void produce(Integer ruleId) {

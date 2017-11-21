@@ -48,7 +48,7 @@ public class ActionTable {
         // TODO: etc....
     }
 
-    public Integer getRule(Symbol token, String variable) {
+    public Integer getRule(GrammarSymbol variable, GrammarSymbol terminal) {
         // TODO: return cell M[A, u]
         // A is the variable on top of the stack
         // u is the look-ahead token

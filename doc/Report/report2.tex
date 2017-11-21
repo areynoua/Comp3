@@ -60,7 +60,7 @@ grow the syntactic tree.
 \item An action table, mapping the front of the stack and the current token to the corresponding rule.
 \end{itemize}
 
-\section{Removing useless rules}
+\section{Removing useless rules and variables}
 
 \subsection{Unreachable variables}
 
@@ -99,6 +99,31 @@ All variables are productive.
 
 \subsection{Operator priority}
 
+\begin{tabular}{lll}
+  \varstyle{CondP1} & $\rightarrow$ & \varstyle{CondP1} and \varstyle{CondP2} \\
+  & $\rightarrow$ & \varstyle{CondP2} \\
+  \varstyle{CondP2} & $\rightarrow$ & \varstyle{CondP2} or \varstyle{CondP3} \\
+  & $\rightarrow$ & \varstyle{CondP3} \\
+  \varstyle{CondP3} & $\rightarrow$ & not \varstyle{SimpleCond} \\
+  & $\rightarrow$ & \varstyle{SimpleCond} \\
+\end{tabular}
+
+\begin{tabular}{lll}
+  \varstyle{Assign} & $\rightarrow$ & [VarName] := \varstyle{ExprArithP1} \\
+  \varstyle{SimpleCond} & $\rightarrow$ & \varstyle{ExprArithmP1} \varstyle{Comp} \varstyle{ExprArithP1} \\
+  &  $\rightarrow$ & TODO ??? \\
+  \varstyle{ExprArithP1} & $\rightarrow$ & \varstyle{ExprArithP1} + \varstyle{ExprArithP2} \\
+  & $\rightarrow$ & \varstyle{ExprArithP1} - \varstyle{ExprArithP2} \\
+  & $\rightarrow$ & \varstyle{ExprArithP2} \\
+  \varstyle{ExprArithP2} & $\rightarrow$ & \varstyle{ExprArithP2} * \varstyle{ExprArithP3} \\
+  & $\rightarrow$ & \varstyle{ExprArithP2} / \varstyle{ExprArithP3} \\
+  & $\rightarrow$ & \varstyle{ExprArithP3} \\
+  \varstyle{ExprArithP3} & $\rightarrow$ & [VarName] \\
+  & $\rightarrow$ & [number] \\
+  & $\rightarrow$ & ( \varstyle{ExprArithP3} ) \\
+  & $\rightarrow$ & - \varstyle{ExprArithP3} \\
+\end{tabular}
+
 \subsection{Operator associativity}
 
 \section{Removing left-recursion and applying factorization}
@@ -106,6 +131,15 @@ All variables are productive.
 \subsection{Left-recursion}
 
 \subsection{Factorization}
+
+\begin{tabular}{lll}
+  \varstyle{If} & $\rightarrow$ & if \varstyle{Cond} then \varstyle{Code} \varstyle{IfTail} \\
+  \varstyle{IfTail} & $\rightarrow$ & endif \\
+  & $\rightarrow$ & else \varstyle{Code} endif \\
+  \varstyle{For} & $\rightarrow$ & for [VarName] from \varstyle{ExprArith} \varstyle{ForTail} \\
+  \varstyle{ForTail} & $\rightarrow$ & \varstyle{ExprArith} to \varstyle{ExprArith} do \varstyle{Code} done \\
+  & $\rightarrow$ & \varstyle{ExprArith} do \varstyle{Code} done \\
+\end{tabular}
 
 \section{Resulting grammar}
 
@@ -118,11 +152,31 @@ All variables are productive.
   }
   & Program & begin \varstyle{Code} end \\
   & Code & $\epsilon$ \\
-  & & \varstyle{InstList}
-  % & ExprArithm & \varstyle{ExprArithm} + \varstyle{Priority3ExprArithm} \\
-  % & & \varstyle{ExprArithm} - \varstyle{Priority3ExprArithm} \\
-  % & & \varstyle{Priority3ExprArithm} \\
-  % & Priority3ExprArithm & $\varstyle{Priority3ExprArithm} * \varstyle{Priority4ExprArithm}$ \\
-  % & & \varstyle{Priority3ExprArithm} / \varstyle{Priority4ExprArithm} \\
+  & & \varstyle{InstList} \\
+  & InstList & \varstyle{Instruction} \\
+  & & \varstyle{Instruction} ; \varstyle{InstList} \\
+  & Instruction & \varstyle{Assign} \\
+  & & \varstyle{If} \\
+  & & \varstyle{While} \\
+  & & \varstyle{For} \\
+  & & \varstyle{Print} \\
+  & & \varstyle{Read} \\
+  & Assign & [VarName] := \varstyle{ExprArithP1} \\
+  & If & if \varstyle{Cond} then \varstyle{Code} \varstyle{IfTail} \\
+  & IfTail & endif \\
+  & & else \varstyle{Code} endif \\
+  & For & for [VarName] from \varstyle{ExprArith} \varstyle{ForTail} \\
+  & ForTail & \varstyle{ExprArith} to \varstyle{ExprArith} do \varstyle{Code} done \\
+  & & \varstyle{ExprArith} do \varstyle{Code} done \\  
+  & Comp & = \\
+  & & >= \\
+  & & > \\
+  & & <= \\
+  & & < \\
+  & & <> \\
+  & While & while \varstyle{Cond} do \varstyle{Code} done \\
+  & Print & print ( [VarName] ) \\
+  & Read & read ( [VarName] ) \\
 \end{tabular}
+
 \end{document}
