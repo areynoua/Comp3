@@ -8,3 +8,7 @@ more/jflex
 /LexicalUnit.java
 /Part1.pdf
 /Symbol.java
+
+# Eclipse
+.project
+*.prefs

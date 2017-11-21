@@ -5,41 +5,34 @@
 * @author Alexis Reynouard
 */
 
-import java.util.List;
 
 public class GrammarSymbol {
     
-    private final boolean isTerminal;
-    private final String variableName;
-    private final LexicalUnit lexicalUnit;
+    private final boolean isTerminalSymbol;
+    private final String value;
 
-    public GrammarSymbol(String variableName) {
-        // The symbol is a variable
-        this.isTerminal = false;
-        this.variableName = variableName;
-        this.lexicalUnit = null;
+    public GrammarSymbol(String value) {
+        this.isTerminalSymbol = !((value.charAt(0) == '<') && (value.length() > 2));
+        this.value = value;
     }
 
-    public GrammarSymbol(LexicalUnit lexicalUnit) {
-        // The symbol is a terminal
-        this.isTerminal = true;
-        this.lexicalUnit = lexicalUnit;
-        this.variableName = null;
+    public boolean isTerminal() {
+        return isTerminalSymbol;
     }
 
-    public boolean equals(GrammarSymbol other) {
-        if (isTerminal == other.isTerminal) {
-            return this.lexicalUnit == other.lexicalUnit;
-        } else {
-            return this.variableName.equals(other.variableName);
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof GrammarSymbol)) return false;
+        else return this.value.equals(((GrammarSymbol) o).value);
     }
 
     @Override
     public int hashCode() {
-        int hash;
-        if (isTerminal) hash = lexicalUnit.hashCode();
-        else hash = variableName.hashCode();
-        return hash;
+        return this.value.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
     }
 }

@@ -1,0 +1,40 @@
+<Program>     -> begin <Code> end 
+<Code>        -> epsilon 
+<Code>        -> <InstList> 
+<InstList>    -> <Instruction> 
+<InstList>    -> <Instruction> ; <InstList> 
+<Instruction> -> <Assign> 
+<Instruction> -> <If> 
+<Instruction> -> <While> 
+<Instruction> -> <For> 
+<Instruction> -> <Print> 
+<Instruction> -> <Read> 
+<Assign>      -> [VarName] := <ExprArith> 
+<ExprArith>   -> [VarName] 
+<ExprArith>   -> [Number] 
+<ExprArith>   -> ( <ExprArith> ) 
+<ExprArith>   -> - <ExprArith> 
+<ExprArith>   -> <ExprArith> <Op> <ExprArith> 
+<Op>          -> + 
+<Op>          -> - 
+<Op>          -> * 
+<Op>          -> / 
+<If>          -> if <Cond> then <Code> endif 
+<If>          -> if <Cond> then <Code> else <Code> endif 
+<Cond>        -> <Cond> <BinOp> <Cond> 
+<Cond>        -> not <SimpleCond> 
+<Cond>        -> <SimpleCond> 
+<SimpleCond>  -> <ExprArith> <Comp> <ExprArith> 
+<BinOp>       -> and 
+<BinOp>       -> or 
+<Comp>        -> = 
+<Comp>        -> >= 
+<Comp>        -> > 
+<Comp>        -> <= 
+<Comp>        -> < 
+<Comp>        -> <> 
+<While>       -> while <Cond> do <Code> done 
+<For>         -> for [VarName] from <ExprArith> by <ExprArith> to <ExprArith> do <Code> done 
+<For>         -> for [VarName] from <ExprArith> to <ExprArith> do <Code> done 
+<Print>       -> print ( [VarName] ) 
+<Read>        -> read ( [VarName] ) 
