@@ -78,7 +78,7 @@ public class ActionTable {
         try {
             writer = new PrintWriter(path, "UTF-8");
             for (Rule rule : rules) {
-                writer.println(rule.toPrettyString(true, 14));
+                writer.println(rule.toPrettyString(true, 20));
             }
             writer.close();
         } catch (FileNotFoundException e) {
@@ -178,17 +178,21 @@ public class ActionTable {
         return leftSimilarRules;
     }
 
-    private Integer commonPrefixSize(final Rule baseRule, final Set<Rule> rules) {
+    private List<GrammarSymbol> commonPrefix(final Rule baseRule, final Set<Rule> rules) {
         int prefixSize = Integer.MAX_VALUE;
         for (Rule rule : this.rules) {
             int nCommonSymbols = 0;
             int nSymbols = Math.min(baseRule.getRightSymbols().size(), rule.getRightSymbols().size());
             for (int i = 0; i < nSymbols; i++) {
-                if (baseRule.getRightSymbols().get(i) == rule.getRightSymbols().get(i)) nSymbols++;
+                if (baseRule.getRightSymbols().get(i).equals(rule.getRightSymbols().get(i))) nCommonSymbols++;
             }
             prefixSize = Math.min(prefixSize, nCommonSymbols);
         }
-        return prefixSize;
+        List<GrammarSymbol> prefix = new ArrayList<>();
+        for (int i = 0; i < prefixSize; i++) {
+            prefix.add(baseRule.getRightSymbols().get(i));
+        }
+        return prefix;
     }
 
     private Rule hasRulesWithCommonPrefix() {
@@ -203,13 +207,16 @@ public class ActionTable {
         while ((baseRule = hasRulesWithCommonPrefix()) != null) {
             Set<Rule> leftSimilarRules = rulesWithCommonPrefix(baseRule);
             String newVariableName = baseRule.getLeftVariable().toString();
-            newVariableName = newVariableName.substring(0, newVariableName.length() - 1) + "Factor>";
+            newVariableName = newVariableName.substring(0, newVariableName.length() - 1) + "-Tail>";
             GrammarSymbol newVariable = new GrammarSymbol(newVariableName);
+            List<GrammarSymbol> prefix = commonPrefix(baseRule, leftSimilarRules);
 
-            // TODO: add new rules
-            // rules.add(new Rule(baseRule.getLeftVariable(), []));
+            // leftSimilarRules.add(baseRule);
 
+            prefix.add(newVariable);
+            this.rules.add(new Rule(baseRule.getLeftVariable(), prefix));
             for (Rule rule : leftSimilarRules) {
+                this.rules.add(new Rule(newVariable, rule.removePrefix(prefix.size()).getRightSymbols()));
                 this.rules.remove(rule);
             }
 

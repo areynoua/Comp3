@@ -17,6 +17,11 @@ public class Rule {
     private GrammarSymbol leftVariable;
     private List<GrammarSymbol> rightSymbols; // Symbols can be either variables or terminals
 
+    public Rule(GrammarSymbol leftVariable, List<GrammarSymbol> rightSymbols) {
+        this.leftVariable = leftVariable;
+        this.rightSymbols = rightSymbols;
+    }
+
     public Rule(String leftVariable, String[] rightSymbols) {
         this.leftVariable = new GrammarSymbol(leftVariable);
         this.rightSymbols = new ArrayList<>();
@@ -25,6 +30,11 @@ public class Rule {
                 this.rightSymbols.add(new GrammarSymbol(rightSymbol));                
             }
         }
+    }
+
+    public Rule removePrefix(Integer prefixSize) {
+        List<GrammarSymbol> withoutPrefix = rightSymbols.subList(prefixSize, rightSymbols.size());
+        return new Rule(leftVariable, withoutPrefix);
     }
 
     public boolean contains(GrammarSymbol symbol) {
