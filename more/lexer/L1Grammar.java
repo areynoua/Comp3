@@ -1,5 +1,5 @@
 /**
-* Imp LL(1) Parser's action table
+* Imp LL(1) grammar
 *
 * @author Antoine Passemiers
 * @author Alexis Reynouard
@@ -25,8 +25,6 @@ public class L1Grammar {
 
     private List<Rule> rules;
     private Map<GrammarSymbol, Set<GrammarSymbol>> firsts;
-
-    private int dbg_lvl;
     
     public L1Grammar(String path) {
         firsts = new HashMap();
@@ -35,7 +33,7 @@ public class L1Grammar {
         saveRulesToFiles("grammars/unproductive_removed.grammar");
         removeInaccessible();
         saveRulesToFiles("grammars/inaccessible_removed.grammar");
-        leftFactor();
+        // leftFactor();
         saveRulesToFiles("grammars/left_factored.grammar");
 
         // To test:
@@ -72,18 +70,20 @@ public class L1Grammar {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split("->");
-                String leftHandPart = parts[0].replaceAll("\\s+","");
-                if (leftHandPart.length() > 0) {
-                    previousLeftHandPart = leftHandPart;
-                } else {
-                    leftHandPart = previousLeftHandPart;
+                if (parts.length == 2) { // Don't process empty lines
+                    String leftHandPart = parts[0].replaceAll("\\s+","");
+                    if (leftHandPart.length() > 0) {
+                        previousLeftHandPart = leftHandPart;
+                    } else {
+                        leftHandPart = previousLeftHandPart;
+                    }
+                    String rightHandPart = parts[1];
+                    String[] rightHandTokens = rightHandPart.split(" ");
+                    for (int i = 0; i < rightHandTokens.length; i++) {
+                        rightHandTokens[i] = rightHandTokens[i].replaceAll("\\s+","");
+                    }
+                    this.rules.add(new Rule(leftHandPart, rightHandTokens));
                 }
-                String rightHandPart = parts[1];
-                String[] rightHandTokens = rightHandPart.split(" ");
-                for (int i = 0; i < rightHandTokens.length; i++) {
-                    rightHandTokens[i] = rightHandTokens[i].replaceAll("\\s+","");
-                }
-                this.rules.add(new Rule(leftHandPart, rightHandTokens));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -117,12 +117,12 @@ public class L1Grammar {
         return V;
     }
 
-    private void removeUseless() {
+    public void removeUseless() {
         removeUnproductive();
         removeInaccessible();
     }
 
-    private void removeUnproductive() {
+    public void removeUnproductive() {
         Set<GrammarSymbol> allVariables = getVariables();
         Set<GrammarSymbol> vPrevious = new HashSet<>();
         Set<GrammarSymbol> vCurrent = new HashSet<>();
@@ -154,11 +154,17 @@ public class L1Grammar {
         }
     }
 
-    private void removeInaccessible() {
+    /**
+     * Removes inaccessible variables
+     * NOTE: this methods makes the assumption that the left
+     * variable of the rule in this.rules is the start variable
+     * of the grammar.
+     */
+    public void removeInaccessible() {
         Set<GrammarSymbol> vPrevious = new HashSet<>();
         Set<GrammarSymbol> vCurrent = new HashSet<>();
         vPrevious.add(new GrammarSymbol("<DummyVariable"));
-        vCurrent.add(new GrammarSymbol("<Program>"));
+        vCurrent.add(this.rules.get(0).getLeftVariable());
         while (!vCurrent.equals(vPrevious)) {
             vPrevious = vCurrent;
             vCurrent = new HashSet<>();
@@ -221,7 +227,7 @@ public class L1Grammar {
         return null;
     }
 
-    private void leftFactor() {
+    public void leftFactor() {
         Rule baseRule;
         while ((baseRule = hasRulesWithCommonPrefix()) != null) {
             Set<Rule> leftSimilarRules = rulesWithCommonPrefix(baseRule);
@@ -230,7 +236,7 @@ public class L1Grammar {
             GrammarSymbol newVariable = new GrammarSymbol(newVariableName);
             List<GrammarSymbol> prefix = commonPrefix(baseRule, leftSimilarRules);
 
-            // leftSimilarRules.add(baseRule);
+            leftSimilarRules.add(baseRule);
 
             prefix.add(newVariable);
             this.rules.add(new Rule(baseRule.getLeftVariable(), prefix));
@@ -244,36 +250,25 @@ public class L1Grammar {
         }
     }
 
-    private Set<GrammarSymbol> first1(GrammarSymbol symbol) {
-        // DEBUG
-        this.dbg_lvl += 1;
-        if (this.dbg_lvl > 20) {
-            System.exit(3);
-        }
-        for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
+    public Set<GrammarSymbol> first1(GrammarSymbol symbol) {
         System.out.println("first1(" + symbol + ")");
 
         if (this.firsts.containsKey(symbol)) {
-            for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
             System.out.println("hit");
-            this.dbg_lvl -= 1;
             return this.firsts.get(symbol);
         }
 
         Set<GrammarSymbol> symbols = new HashSet<>();
 
         if (symbol.isTerminal()) {
-            for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
             System.out.println("terminal");
             symbols.add(symbol);
         }
 
         else { // symbol is a variable
-            for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
             System.out.println("variable");
             for (Rule rule : this.rules) {
                 if (rule.getLeftVariable().equals(symbol)) {
-                    for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
                     System.out.println(rule);
                     GrammarSymbol s = rule.getRightSymbols().get(0);
                     symbols.addAll(first1(s));
@@ -282,8 +277,6 @@ public class L1Grammar {
         }
 
         this.firsts.put(symbol, symbols);
-        this.dbg_lvl -= 1;
         return symbols;
     }
-
 }
