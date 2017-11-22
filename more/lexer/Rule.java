@@ -20,6 +20,7 @@ public class Rule {
     public Rule(GrammarSymbol leftVariable, List<GrammarSymbol> rightSymbols) {
         this.leftVariable = leftVariable;
         this.rightSymbols = rightSymbols;
+        assert(this.rightSymbols.size() > 0);
     }
 
     public Rule(String leftVariable, String[] rightSymbols) {
@@ -30,6 +31,7 @@ public class Rule {
                 this.rightSymbols.add(new GrammarSymbol(rightSymbol));                
             }
         }
+        assert(this.rightSymbols.size() > 0);
     }
 
     public Rule removePrefix(Integer prefixSize) {

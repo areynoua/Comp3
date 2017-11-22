@@ -27,6 +27,7 @@ public class Main {
       }
       for (int i = firstFilePos; i < argv.length; i++) {
         LexicalAnalyzer scanner = null;
+        L1Grammar grammar = null;
         LL1Parser parser = null;
 
         try {
@@ -35,6 +36,7 @@ public class Main {
           scanner = new LexicalAnalyzer(reader);
           while ( !scanner.isAtEOF() )
             scanner.yylex();
+          grammar = new L1Grammar("imp.grammar");
           parser = new LL1Parser();
           parser.parse(scanner.getTokens());
         }
