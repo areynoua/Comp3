@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class Main {
   /**
    * Runs the scanner and the parser on input files.
@@ -38,7 +40,9 @@ public class Main {
             scanner.yylex();
           grammar = new L1Grammar("grammars/imp.grammar");
           parser = new LL1Parser();
-          parser.parse(scanner.getTokens());
+          List<Symbol> symbols = scanner.getTokens();
+          System.out.println("Ready for the while(true)?!");
+          parser.parse(symbols);
         }
         catch (java.io.FileNotFoundException e) {
           System.out.println("File not found : \""+argv[i]+"\"");
