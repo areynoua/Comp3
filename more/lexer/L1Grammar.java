@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -27,11 +28,11 @@ public class L1Grammar {
     public L1Grammar(String path) {
         fromFile(path);
         removeUnproductive();
-        saveRulesToFiles("unproductive_removed.grammar");
+        saveRulesToFiles("grammars/unproductive_removed.grammar");
         removeInaccessible();
-        saveRulesToFiles("inaccessible_removed.grammar");
+        saveRulesToFiles("grammars/inaccessible_removed.grammar");
         leftFactor();
-        saveRulesToFiles("left_factored.grammar");
+        saveRulesToFiles("grammars/left_factored.grammar");
 
         for (Rule rule : rules) {
             System.out.println(rule);
@@ -227,7 +228,7 @@ public class L1Grammar {
 
     private Set<GrammarSymbol> first1(GrammarSymbol symbol) {
         if (this.firsts.containsKey(symbol)) {
-            return this.first.get(symbol);
+            return this.firsts.get(symbol);
         }
 
         Set<GrammarSymbol> symbols = new HashSet<>();

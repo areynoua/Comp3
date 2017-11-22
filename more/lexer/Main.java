@@ -36,7 +36,7 @@ public class Main {
           scanner = new LexicalAnalyzer(reader);
           while ( !scanner.isAtEOF() )
             scanner.yylex();
-          grammar = new L1Grammar("imp.grammar");
+          grammar = new L1Grammar("grammars/imp.grammar");
           parser = new LL1Parser();
           parser.parse(scanner.getTokens());
         }
