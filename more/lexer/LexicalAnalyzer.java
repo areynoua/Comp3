@@ -61,14 +61,14 @@ public class LexicalAnalyzer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\1\1\1\0\1\2\1\3\1\4\1\5\1\1\1\6"+
-    "\1\7\5\6\1\10\1\2\1\11\1\12\1\13\1\14"+
-    "\5\6\1\15\1\16\2\6\2\2\1\17\1\20\1\6"+
-    "\1\21\2\6\1\22\1\6\1\23\1\24\3\6\1\25"+
-    "\1\26\2\6\1\27\1\30\1\31\2\6\2\0\1\32"+
-    "\1\6\1\33\1\6\1\34\1\6\1\35\2\6\1\36"+
-    "\5\6\1\37\1\40\1\41\1\42\1\43\2\6\1\44"+
-    "\1\45\1\46\1\47";
+    "\2\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7"+
+    "\5\6\1\10\1\1\1\11\1\12\1\13\1\14\5\6"+
+    "\1\15\1\16\2\6\2\1\1\17\1\20\1\6\1\21"+
+    "\2\6\1\22\1\6\1\23\1\24\3\6\1\25\1\26"+
+    "\2\6\1\27\1\30\1\31\2\6\2\0\1\32\1\6"+
+    "\1\33\1\6\1\34\1\6\1\35\2\6\1\36\5\6"+
+    "\1\37\1\40\1\41\1\42\1\43\2\6\1\44\1\45"+
+    "\1\46\1\47";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[81];
@@ -217,9 +217,9 @@ public class LexicalAnalyzer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\1\1\0\1\11\2\1\1\11\10\1\1\11\1\1"+
-    "\4\11\13\1\2\11\7\1\1\11\7\1\3\11\2\1"+
-    "\2\0\1\11\31\1";
+    "\2\0\1\11\2\1\1\11\10\1\1\11\1\1\4\11"+
+    "\13\1\2\11\7\1\1\11\7\1\3\11\2\1\2\0"+
+    "\1\11\31\1";
 
   private static int [] zzUnpackAttribute() {
     int [] result = new int[81];
@@ -730,23 +730,23 @@ public class LexicalAnalyzer {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { /* ignore */
+            { throw new BadTerminalException("Bad terminal: '" + yytext() + "'");
             }
           case 40: break;
           case 2: 
-            { throw new BadTerminalException("Bad terminal: '" + yytext() + "'");
+            { addSymbol(LexicalUnit.LPAREN);
             }
           case 41: break;
           case 3: 
-            { addSymbol(LexicalUnit.LPAREN);
+            { addSymbol(LexicalUnit.TIMES);
             }
           case 42: break;
           case 4: 
-            { addSymbol(LexicalUnit.TIMES);
+            { addSymbol(LexicalUnit.RPAREN);
             }
           case 43: break;
           case 5: 
-            { addSymbol(LexicalUnit.RPAREN);
+            { /* ignore */
             }
           case 44: break;
           case 6: 

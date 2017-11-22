@@ -25,8 +25,11 @@ public class L1Grammar {
 
     private List<Rule> rules;
     private Map<GrammarSymbol, Set<GrammarSymbol>> firsts;
+
+    private int dbg_lvl;
     
     public L1Grammar(String path) {
+        firsts = new HashMap();
         fromFile(path);
         removeUnproductive();
         saveRulesToFiles("grammars/unproductive_removed.grammar");
@@ -34,6 +37,19 @@ public class L1Grammar {
         saveRulesToFiles("grammars/inaccessible_removed.grammar");
         leftFactor();
         saveRulesToFiles("grammars/left_factored.grammar");
+
+        // To test:
+        Set<GrammarSymbol> variables = getVariables();
+        for (GrammarSymbol symbol : variables) {
+            first1(symbol);
+            System.out.println("--------------------------------------");
+            System.out.println(symbol);
+            System.out.println(first1(symbol));
+            System.out.println("--------------------------------------");
+            System.out.println("--------------------------------------");
+        }
+
+
 
         for (Rule rule : rules) {
             System.out.println(rule);
@@ -223,31 +239,50 @@ public class L1Grammar {
                 this.rules.remove(rule);
             }
 
-            System.out.println("shdsdj");
+            System.out.print("leftFactor: ");
+            System.out.println(baseRule);
         }
     }
 
     private Set<GrammarSymbol> first1(GrammarSymbol symbol) {
+        // DEBUG
+        this.dbg_lvl += 1;
+        if (this.dbg_lvl > 20) {
+            System.exit(3);
+        }
+        for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
+        System.out.println("first1(" + symbol + ")");
+
         if (this.firsts.containsKey(symbol)) {
+            for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
+            System.out.println("hit");
+            this.dbg_lvl -= 1;
             return this.firsts.get(symbol);
         }
 
         Set<GrammarSymbol> symbols = new HashSet<>();
 
         if (symbol.isTerminal()) {
+            for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
+            System.out.println("terminal");
             symbols.add(symbol);
         }
 
         else { // symbol is a variable
+            for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
+            System.out.println("variable");
             for (Rule rule : this.rules) {
-                if (rule.getLeftVariable() == symbol) {
+                if (rule.getLeftVariable().equals(symbol)) {
+                    for (int i = 0; i < this.dbg_lvl; ++i) System.out.print(" ");
+                    System.out.println(rule);
                     GrammarSymbol s = rule.getRightSymbols().get(0);
                     symbols.addAll(first1(s));
                 }
             }
         }
 
-        this.firsts.set(symbol, symbols);
+        this.firsts.put(symbol, symbols);
+        this.dbg_lvl -= 1;
         return symbols;
     }
 

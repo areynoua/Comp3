@@ -29,6 +29,7 @@ echo Test jar
 echo --------
 for file in ../test/*.imp; do
 	echo $file
+	java -jar ../dist/impCompiler.jar $file;
 	java -jar ../dist/impCompiler.jar $file > /tmp/imp.out;
 	if ! diff --suppress-common-lines -b -W 85 -y /tmp/imp.out ${file%.imp}.out ; then
 		echo
