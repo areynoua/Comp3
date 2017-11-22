@@ -40,7 +40,7 @@ public class Main {
             scanner.yylex();
           
           // grammar = new L1Grammar("grammars/imp.grammar");
-          grammar = new L1Grammar("grammars/test.grammar");
+          grammar = new L1Grammar("grammars/imp.grammar");
           parser = new LL1Parser();
 
           List<Symbol> symbols = scanner.getTokens();

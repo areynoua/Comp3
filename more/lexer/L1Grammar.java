@@ -33,10 +33,13 @@ public class L1Grammar {
         saveRulesToFiles("grammars/unproductive_removed.grammar");
         removeInaccessible();
         saveRulesToFiles("grammars/inaccessible_removed.grammar");
-        // leftFactor();
+        leftFactor();
         saveRulesToFiles("grammars/left_factored.grammar");
 
+        System.out.println(this);
+
         // To test:
+        /*
         Set<GrammarSymbol> variables = getVariables();
         for (GrammarSymbol symbol : variables) {
             first1(symbol);
@@ -46,12 +49,7 @@ public class L1Grammar {
             System.out.println("--------------------------------------");
             System.out.println("--------------------------------------");
         }
-
-
-
-        for (Rule rule : rules) {
-            System.out.println(rule);
-        }
+        */
 
         System.out.println("Finished");
     }
@@ -105,6 +103,15 @@ public class L1Grammar {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+        for (Rule rule : rules) {
+            result += rule.toString() + "\n";
+        }
+        return result;
     }
 
     private Set<GrammarSymbol> getVariables() {
@@ -194,6 +201,7 @@ public class L1Grammar {
         for (Rule rule : rules) {
             if (!baseRule.equals(rule)) {
                 if (rule.getLeftVariable().equals(baseRule.getLeftVariable())) {
+                    // System.out.println(baseRule.getRightSymbols().size());
                     if (rule.getRightSymbols().get(0).equals(baseRule.getRightSymbols().get(0))) {
                         leftSimilarRules.add(rule);
                     }
@@ -237,11 +245,13 @@ public class L1Grammar {
             List<GrammarSymbol> prefix = commonPrefix(baseRule, leftSimilarRules);
 
             leftSimilarRules.add(baseRule);
+            Integer prefixSize = prefix.size();
 
             prefix.add(newVariable);
             this.rules.add(new Rule(baseRule.getLeftVariable(), prefix));
             for (Rule rule : leftSimilarRules) {
-                this.rules.add(new Rule(newVariable, rule.removePrefix(prefix.size()).getRightSymbols()));
+                System.out.println(rule.removePrefix(prefix.size()));
+                this.rules.add(new Rule(newVariable, rule.removePrefix(prefixSize).getRightSymbols()));
                 this.rules.remove(rule);
             }
 
