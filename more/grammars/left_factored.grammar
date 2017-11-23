@@ -2,6 +2,7 @@
 <Code>              -> epsilon 
 <Code>              -> <InstList> 
 <InstList>          -> <Instruction> 
+<InstList>          -> <Instruction> ; <InstList> 
 <Instruction>       -> <Assign> 
 <Instruction>       -> <If> 
 <Instruction>       -> <While> 
@@ -19,6 +20,7 @@
 <Op>                -> * 
 <Op>                -> / 
 <If>                -> if <Cond> then <Code> endif 
+<If>                -> if <Cond> then <Code> else <Code> endif 
 <Cond>              -> <Cond> <BinOp> <Cond> 
 <Cond>              -> not <SimpleCond> 
 <Cond>              -> <SimpleCond> 
@@ -33,11 +35,6 @@
 <Comp>              -> <> 
 <While>             -> while <Cond> do <Code> done 
 <For>               -> for [VarName] from <ExprArith> by <ExprArith> to <ExprArith> do <Code> done 
+<For>               -> for [VarName] from <ExprArith> to <ExprArith> do <Code> done 
 <Print>             -> print ( [VarName] ) 
 <Read>              -> read ( [VarName] ) 
-<InstList>          -> <InstList-Tail> 
-<InstList-Tail>     -> ; <InstList> 
-<If>                -> <If-Tail> 
-<If-Tail>           -> <Cond> then <Code> else <Code> endif 
-<For>               -> <For-Tail> 
-<For-Tail>          -> [VarName] from <ExprArith> to <ExprArith> do <Code> done 
