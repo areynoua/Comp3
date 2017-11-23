@@ -10,7 +10,7 @@ javac lexer/*.java
 
 # Generate javadoc
 echo Generate javadoc
-javadoc -quiet -d ../doc/ lexer/*.java
+#javadoc -quiet -d ../doc/ lexer/*.java
 
 # Generate jar
 cd lexer
