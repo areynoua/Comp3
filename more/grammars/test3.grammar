@@ -1,0 +1,9 @@
+<S>         -> <expr> $
+<expr>      -> - <expr>
+            -> ( <expr> )
+            -> <var> <expr-tail>
+<expr-tail> -> - <expr>
+            -> epsilon
+<var>       -> ID <var-tail>
+<var-tail>  -> ( <expr> )
+            -> epsilon

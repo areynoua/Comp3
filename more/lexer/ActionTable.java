@@ -9,6 +9,7 @@ import java.lang.String;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class ActionTable {
             GrammarSymbol variable = rule.getLeftVariable();
 
             boolean hasEpsilon = false;
-            for (GrammarSymbol terminal : first.get(rule.getRightSymbols().get(0))) {
+            for (GrammarSymbol terminal : computeFirst(rule.getRightSymbols())) {
                 M.put(Arrays.asList(variable, terminal), i);
                 if (terminal.equals(GrammarSymbol.EPSILON)) hasEpsilon = true;
             }
@@ -58,6 +59,21 @@ public class ActionTable {
         }
 
         System.out.println(this.toString());
+    }
+
+    Set<GrammarSymbol> computeFirst(List<GrammarSymbol> sequence) {
+        Map<GrammarSymbol, Set<GrammarSymbol>> first = grammar.getFirst();
+        Set<GrammarSymbol> symbols = new HashSet<>();
+        int i = 0;
+        boolean hasEpsilon = true;
+        while (hasEpsilon && (i < sequence.size())) {
+            Set<GrammarSymbol> terminals = first.get(sequence.get(i));
+            symbols.addAll(terminals);
+            hasEpsilon = (terminals.contains(GrammarSymbol.EPSILON));
+            i++;
+        }
+        if (i == sequence.size()) symbols.add(GrammarSymbol.EPSILON);
+        return symbols;
     }
 
     Integer get(GrammarSymbol symbol, GrammarSymbol terminal) {

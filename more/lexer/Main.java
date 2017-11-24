@@ -39,7 +39,7 @@ public class Main {
           while ( !scanner.isAtEOF() )
             scanner.yylex();
           
-          grammar = new L1Grammar("grammars/test.grammar");
+          grammar = new L1Grammar("grammars/test3.grammar");
           parser = new LL1Parser(grammar);
 
           List<Symbol> symbols = scanner.getTokens();
