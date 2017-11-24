@@ -31,7 +31,6 @@ public class L1Grammar {
     private int dbg_lvl;
 
     public L1Grammar(String path) {
-        following = new HashMap();
         fromFile(path);
         removeUnproductive();
         saveRulesToFiles("grammars/unproductive_removed.grammar");
@@ -39,26 +38,25 @@ public class L1Grammar {
         saveRulesToFiles("grammars/inaccessible_removed.grammar");
         leftFactor();
         saveRulesToFiles("grammars/left_factored.grammar");
+        System.out.println("--------------------------------------------------------------------------------");
 
         computeFirst();
-        System.out.println("--------------------------------------------------------------------------------");
         for (GrammarSymbol toprint : this.getVariables()) {
+            System.out.print("first(");
             System.out.print(toprint);
-            System.out.print(" = ");
+            System.out.print(") = ");
             System.out.println(this.first.get(toprint));
         }
         System.out.println("--------------------------------------------------------------------------------");
 
-/*
-        computeFollow1();
-        System.out.println("--------------------------------------------------------------------------------");
+        computeFollow();
         for (GrammarSymbol toprint : this.getVariables()) {
+            System.out.print("follow(");
             System.out.print(toprint);
-            System.out.print(" = ");
-            System.out.println(this.following.get(toprint));
+            System.out.print(") = ");
+            System.out.println(this.follow.get(toprint));
         }
         System.out.println("--------------------------------------------------------------------------------");
-        */
 
         System.out.println(this);
 
@@ -329,39 +327,26 @@ public class L1Grammar {
         boolean finished;
         do {
             finished = true;
-            // OK je vois bien ce qu'il faut faire ici
-        }
-    }
-
-    /*
-    public void computeFollow1() {
-        // Only 1 call needed I think
-        assert(this.following.size() == 0);
-        // Initialization
-        for (GrammarSymbol variable : this.getVariables()) {
-            this.following.put(variable, new HashSet<GrammarSymbol>());
-        }
-        this.following.get(this.rules.get(0).getLeftVariable()).add(new GrammarSymbol("epsilon"));
-
-        // Fix point iteration
-        boolean finished;
-        do {
-            finished = true;
             for (Rule rule : this.rules) {
-                List<GrammarSymbol> rSymbols = rule.getRightSymbols();
-                for (int rSIdx = 0; rSIdx < rSymbols.size() - 1; ++rSIdx) {
-                    GrammarSymbol va = rSymbols.get(rSIdx);
-                    if (!va.isTerminal()) {
-                        finished = finished && !this.following.get(va).addAll(first1(rSymbols.get(rSIdx+1)));
+                for (int rsi = 0; rsi < rule.getRightSymbols().size() - 1; ++rsi) {
+                    GrammarSymbol var = rule.getRightSymbols().get(rsi);
+                    if (!var.isTerminal()) {
+                        Set<GrammarSymbol> toAdd = new HashSet<>();
+                        toAdd.addAll(this.first.get(rule.getRightSymbols().get(rsi + 1)));
+                        if (toAdd.contains(GrammarSymbol.EPSILON)) {
+                            toAdd.remove(GrammarSymbol.EPSILON);
+                            toAdd.addAll(this.follow.get(rule.getLeftVariable()));
+                        }
+                        finished = finished && !this.follow.get(var).addAll(toAdd);
                     }
                 }
-                int rSIdx = rSymbols.size()-1;
-                GrammarSymbol va = rSymbols.get(rSIdx);
-                if (!va.isTerminal()) {
-                    finished = finished && !this.following.get(va).addAll(this.following.get(rule.getLeftVariable()));
+                GrammarSymbol var = rule.getRightSymbols().get(rule.getRightSymbols().size() - 1);
+                if (!var.isTerminal()) {
+                    Set<GrammarSymbol> toAdd = new HashSet<>();
+                    toAdd.addAll(this.follow.get(rule.getLeftVariable()));
+                    finished = finished && !this.follow.get(var).addAll(toAdd);
                 }
             }
         } while(!finished);
     }
-    */
 }
