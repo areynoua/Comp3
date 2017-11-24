@@ -25,11 +25,13 @@ public class L1Grammar {
 
     private List<Rule> rules;
     private Map<GrammarSymbol, Set<GrammarSymbol>> firsts;
+    private Map<GrammarSymbol, Set<GrammarSymbol>> following;
 
     private int dbg_lvl;
-    
+
     public L1Grammar(String path) {
         firsts = new HashMap();
+        following = new HashMap();
         fromFile(path);
         removeUnproductive();
         saveRulesToFiles("grammars/unproductive_removed.grammar");
@@ -38,20 +40,16 @@ public class L1Grammar {
         leftFactor();
         saveRulesToFiles("grammars/left_factored.grammar");
 
-        System.out.println(this);
-
-        // To test:
-        /*
-        Set<GrammarSymbol> variables = getVariables();
-        for (GrammarSymbol symbol : variables) {
-            first1(symbol);
-            System.out.println("--------------------------------------");
-            System.out.println(symbol);
-            System.out.println(first1(symbol));
-            System.out.println("--------------------------------------");
-            System.out.println("--------------------------------------");
+        computeFollow1();
+        System.out.println("--------------------------------------------------------------------------------");
+        for (GrammarSymbol toprint : this.getVariables()) {
+            System.out.print(toprint);
+            System.out.print(" = ");
+            System.out.println(this.following.get(toprint));
         }
-        */
+        System.out.println("--------------------------------------------------------------------------------");
+
+        System.out.println(this);
 
         System.out.println("Finished");
     }
@@ -200,11 +198,18 @@ public class L1Grammar {
 
     private Set<Rule> rulesWithCommonPrefix(final Rule baseRule) {
         Set<Rule> leftSimilarRules = new HashSet<>();
-        for (Rule rule : rules) {
+        for (Rule rule : this.rules) {
             if (!baseRule.equals(rule)) {
                 if (rule.getLeftVariable().equals(baseRule.getLeftVariable())) {
                     // System.out.println(baseRule.getRightSymbols().size());
-                    if (rule.getRightSymbols().get(0).equals(baseRule.getRightSymbols().get(0))) {
+                    Integer nSymbols = Math.min(baseRule.getRightSymbols().size(), rule.getRightSymbols().size());
+                    boolean atLeastOneDifference = false;
+                    for (int i = 0; i < nSymbols; i++) {
+                        if (!rule.getRightSymbols().get(i).equals(baseRule.getRightSymbols().get(i))) {
+                            atLeastOneDifference = true;
+                        }
+                    }
+                    if (atLeastOneDifference && (rule.getRightSymbols().get(0).equals(baseRule.getRightSymbols().get(0)))) {
                         leftSimilarRules.add(rule);
                     }
                 }
@@ -215,11 +220,12 @@ public class L1Grammar {
 
     private List<GrammarSymbol> commonPrefix(final Rule baseRule, final Set<Rule> rules) {
         int prefixSize = Integer.MAX_VALUE;
-        for (Rule rule : this.rules) {
-            int nCommonSymbols = 0;
+        for (Rule rule : rules) {
             int nSymbols = Math.min(baseRule.getRightSymbols().size(), rule.getRightSymbols().size());
+            int nCommonSymbols = 0;
             for (int i = 0; i < nSymbols; i++) {
                 if (baseRule.getRightSymbols().get(i).equals(rule.getRightSymbols().get(i))) nCommonSymbols++;
+                else break;
             }
             prefixSize = Math.min(prefixSize, nCommonSymbols);
         }
@@ -246,42 +252,37 @@ public class L1Grammar {
             GrammarSymbol newVariable = new GrammarSymbol(newVariableName);
             List<GrammarSymbol> prefix = commonPrefix(baseRule, leftSimilarRules);
 
+            System.out.println(prefix);
+
             leftSimilarRules.add(baseRule);
             Integer prefixSize = prefix.size();
-
             prefix.add(newVariable);
+
             this.rules.add(new Rule(baseRule.getLeftVariable(), prefix));
             for (Rule rule : leftSimilarRules) {
-                System.out.println(rule.removePrefix(prefix.size()));
-                this.rules.add(new Rule(newVariable, rule.removePrefix(prefixSize).getRightSymbols()));
+                Rule newRule = new Rule(newVariable, rule.removePrefix(prefixSize).getRightSymbols());
+                System.out.println("New: " + newRule);
+                this.rules.add(newRule);
                 this.rules.remove(rule);
             }
-
-            System.out.print("leftFactor: ");
-            System.out.println(baseRule);
         }
     }
 
     public Set<GrammarSymbol> first1(GrammarSymbol symbol) {
-        System.out.println("first1(" + symbol + ")");
 
         if (this.firsts.containsKey(symbol)) {
-            System.out.println("hit");
             return this.firsts.get(symbol);
         }
 
         Set<GrammarSymbol> symbols = new HashSet<>();
 
         if (symbol.isTerminal()) {
-            System.out.println("terminal");
             symbols.add(symbol);
         }
 
         else { // symbol is a variable
-            System.out.println("variable");
             for (Rule rule : this.rules) {
                 if (rule.getLeftVariable().equals(symbol)) {
-                    System.out.println(rule);
                     GrammarSymbol s = rule.getRightSymbols().get(0);
                     symbols.addAll(first1(s));
                 }
@@ -290,5 +291,35 @@ public class L1Grammar {
 
         this.firsts.put(symbol, symbols);
         return symbols;
+    }
+
+    public void computeFollow1() {
+        // Only 1 call needed I think
+        assert(this.following.size() == 0);
+        // Initialization
+        for (GrammarSymbol variable : this.getVariables()) {
+            this.following.put(variable, new HashSet<GrammarSymbol>());
+        }
+        this.following.get(this.rules.get(0).getLeftVariable()).add(new GrammarSymbol("epsilon"));
+
+        // Fix point iteration
+        boolean finished;
+        do {
+            finished = true;
+            for (Rule rule : this.rules) {
+                List<GrammarSymbol> rSymbols = rule.getRightSymbols();
+                for (int rSIdx = 0; rSIdx < rSymbols.size() - 1; ++rSIdx) {
+                    GrammarSymbol va = rSymbols.get(rSIdx);
+                    if (!va.isTerminal()) {
+                        finished = finished && !this.following.get(va).addAll(first1(rSymbols.get(rSIdx+1)));
+                    }
+                }
+                int rSIdx = rSymbols.size()-1;
+                GrammarSymbol va = rSymbols.get(rSIdx);
+                if (!va.isTerminal()) {
+                    finished = finished && !this.following.get(va).addAll(this.following.get(rule.getLeftVariable()));
+                }
+            }
+        } while(!finished);
     }
 }
