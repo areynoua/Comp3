@@ -47,13 +47,25 @@ public class Rule {
         return false;
     }
 
-    public Set<GrammarSymbol> getVariables() {
-        Set<GrammarSymbol> variables = new HashSet<>();
-        variables.add(leftVariable);
-        for (GrammarSymbol rightSymbol : rightSymbols) {
-            if (!rightSymbol.isTerminal()) variables.add(rightSymbol);
+    public Set<GrammarSymbol> getGrammarSymbols(boolean getV, boolean getT) {
+        Set<GrammarSymbol> symbols = new HashSet<>();
+        if (getV) {
+            symbols.add(leftVariable);
         }
-        return variables;
+        for (GrammarSymbol rightSymbol : rightSymbols) {
+            if ((rightSymbol.isTerminal() && getT) || (!rightSymbol.isTerminal() && getV)) {
+                symbols.add(rightSymbol);
+            }
+        }
+        return symbols;
+    }
+
+    public Set<GrammarSymbol> getVariables() {
+        return this.getGrammarSymbols(true, false);
+    }
+
+    public Set<GrammarSymbol> getTerminals() {
+        return this.getGrammarSymbols(false, true);
     }
 
     @Override

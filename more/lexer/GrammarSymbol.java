@@ -11,6 +11,8 @@ public class GrammarSymbol {
     private final boolean isTerminalSymbol;
     private final String value;
 
+    public static final GrammarSymbol EPSILON = new GrammarSymbol("epsilon");
+
     public GrammarSymbol(String value) {
         this.isTerminalSymbol = !((value.charAt(0) == '<') && (value.length() > 2));
         this.value = value;

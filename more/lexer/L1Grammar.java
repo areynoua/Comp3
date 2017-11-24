@@ -114,14 +114,24 @@ public class L1Grammar {
         return result;
     }
 
-    private Set<GrammarSymbol> getVariables() {
-        Set<GrammarSymbol> V = new HashSet<>();
+    private Set<GrammarSymbol> getGrammarSymbols(boolean getV, boolean getT) {
+        Set<GrammarSymbol> S = new HashSet<>();
         for (Rule rule : rules) {
-            for (GrammarSymbol variable : rule.getVariables()) {
-                V.add(variable);
-            }
+            S.addAll(rule.getGrammarSymbols(getV, getT));
         }
-        return V;
+        return S;
+    }
+
+    private Set<GrammarSymbol> getGrammarSymbols() {
+        return getGrammarSymbols(true, true);
+    }
+
+    private Set<GrammarSymbol> getVariables() {
+        return this.getGrammarSymbols(true, false);
+    }
+
+    private Set<GrammarSymbol> getTerminals() {
+        return this.getGrammarSymbols(false, true);
     }
 
     public void removeUseless() {
