@@ -1,0 +1,13 @@
+<S>     -> <Exp> $
+<Exp>   -> <Prod> <Expi>
+<Expi>  -> + <Prod> <Expi>
+<Expi>  -> - <Prod> <Expi>
+<Expi>  -> epsilon
+<Prod>  -> <Atom> <Prodi>
+<Prodi> -> * <Atom> <Prodi>
+<Prodi> -> / <Atom> <Prodi>
+<Prodi> -> epsilon
+<Atom>  -> - <Atom>
+<Atom>  -> Cst
+<Atom>  -> Id
+<Atom>  -> ( <Exp> )

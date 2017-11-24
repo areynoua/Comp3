@@ -2,6 +2,7 @@
 *~
 *.swp
 *.class
+/*.pdf
 more/jflex
 /Euclid.imp
 /Euclid.out
