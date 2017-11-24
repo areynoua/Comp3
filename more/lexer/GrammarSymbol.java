@@ -12,6 +12,7 @@ public class GrammarSymbol {
     private final String value;
 
     public static final GrammarSymbol EPSILON = new GrammarSymbol("epsilon");
+    public static final GrammarSymbol EOS = new GrammarSymbol("$");
 
     public GrammarSymbol(String value) {
         this.isTerminalSymbol = !((value.charAt(0) == '<') && (value.length() > 2));

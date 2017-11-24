@@ -12,10 +12,12 @@ public class LL1Parser {
 
     private Integer cursor; // Points to the current token from the input token list
     private Stack<GrammarSymbol> stack; // PDA stack
+    private L1Grammar grammar;
     private ActionTable actionTable; // LL 1 parser's action table
 
-    public LL1Parser() {
-        actionTable = new ActionTable();
+    public LL1Parser(L1Grammar grammar) {
+        this.grammar = grammar;
+        this.actionTable = new ActionTable(grammar);
         resetPDA();
     }
 

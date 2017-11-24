@@ -38,9 +38,10 @@ public class L1Grammar {
         saveRulesToFiles("grammars/inaccessible_removed.grammar");
         leftFactor();
         saveRulesToFiles("grammars/left_factored.grammar");
+        computeFirst();
+        computeFollow();
         System.out.println("--------------------------------------------------------------------------------");
 
-        computeFirst();
         for (GrammarSymbol toprint : this.getVariables()) {
             System.out.print("first(");
             System.out.print(toprint);
@@ -49,7 +50,6 @@ public class L1Grammar {
         }
         System.out.println("--------------------------------------------------------------------------------");
 
-        computeFollow();
         for (GrammarSymbol toprint : this.getVariables()) {
             System.out.print("follow(");
             System.out.print(toprint);
@@ -63,11 +63,12 @@ public class L1Grammar {
         System.out.println("Finished");
     }
 
-    public Integer getRule(GrammarSymbol variable, GrammarSymbol terminal) {
-        // TODO: return cell M[A, u]
-        // A is the variable on top of the stack
-        // u is the look-ahead token
-        return 0; // TODO
+    public Map<GrammarSymbol, Set<GrammarSymbol>> getFirst() {
+        return first;
+    }
+
+    public Map<GrammarSymbol, Set<GrammarSymbol>> getFollow() {
+        return follow;
     }
 
     private void fromFile(String path) {
@@ -123,7 +124,7 @@ public class L1Grammar {
         return result;
     }
 
-    private Set<GrammarSymbol> getGrammarSymbols(boolean getV, boolean getT) {
+    public Set<GrammarSymbol> getGrammarSymbols(boolean getV, boolean getT) {
         Set<GrammarSymbol> S = new HashSet<>();
         for (Rule rule : rules) {
             S.addAll(rule.getGrammarSymbols(getV, getT));
@@ -131,15 +132,19 @@ public class L1Grammar {
         return S;
     }
 
-    private Set<GrammarSymbol> getGrammarSymbols() {
+    public List<Rule> getRules() {
+        return rules;
+    }
+
+    public Set<GrammarSymbol> getGrammarSymbols() {
         return getGrammarSymbols(true, true);
     }
 
-    private Set<GrammarSymbol> getVariables() {
+    public Set<GrammarSymbol> getVariables() {
         return this.getGrammarSymbols(true, false);
     }
 
-    private Set<GrammarSymbol> getTerminals() {
+    public Set<GrammarSymbol> getTerminals() {
         return this.getGrammarSymbols(false, true);
     }
 
