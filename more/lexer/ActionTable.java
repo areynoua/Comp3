@@ -21,9 +21,9 @@ public class ActionTable {
     private static final Integer ERROR = -3;
 
     private Map<List<GrammarSymbol>, Integer> M;
-    private L1Grammar grammar;
+    private final L1Grammar grammar;
 
-    ActionTable(L1Grammar grammar) {
+    ActionTable(final L1Grammar grammar) {
         this.grammar = grammar;
         Map<GrammarSymbol, Set<GrammarSymbol>> first = grammar.getFirst();
         Map<GrammarSymbol, Set<GrammarSymbol>> follow = grammar.getFollow();
@@ -43,8 +43,16 @@ public class ActionTable {
         int i = 0;
         for (Rule rule : grammar.getRules()) {
             GrammarSymbol variable = rule.getLeftVariable();
+
+            boolean hasEpsilon = false;
             for (GrammarSymbol terminal : first.get(rule.getRightSymbols().get(0))) {
                 M.put(Arrays.asList(variable, terminal), i);
+                if (terminal.equals(GrammarSymbol.EPSILON)) hasEpsilon = true;
+            }
+            if (hasEpsilon) {
+                for (GrammarSymbol terminal : follow.get(rule.getLeftVariable())) {
+                    M.put(Arrays.asList(variable, terminal), i);
+                }   
             }
             i++;
         }
@@ -54,24 +62,6 @@ public class ActionTable {
 
     Integer get(GrammarSymbol symbol, GrammarSymbol terminal) {
         return M.get(Arrays.asList(symbol, terminal));
-    }
-
-    @Override
-    public String toString() {
-        String result = String.join("", Collections.nCopies(19, " "));
-        for (GrammarSymbol terminal : getTerminals()) {
-            result += String.format("%8s", terminal) + " ";
-        }
-        result += "\n";
-        for (GrammarSymbol symbol : getGrammarSymbols()) {
-            result += String.format("%18s", symbol) + " ";
-            for (GrammarSymbol terminal : getTerminals()) {
-                Integer action = get(symbol, terminal);
-                result += String.format("%8s", action) + " ";
-            }
-            result += "\n";
-        }
-        return result;
     }
 
     private Set<GrammarSymbol> getTerminals() {
@@ -86,5 +76,29 @@ public class ActionTable {
         symbols.add(GrammarSymbol.EPSILON);
         symbols.add(GrammarSymbol.EOS);
         return symbols;
+    }
+
+    @Override
+    public String toString() {
+        String result = String.join("", Collections.nCopies(19, " "));
+        for (GrammarSymbol terminal : getTerminals()) {
+            result += String.format("%8s", terminal) + " ";
+        }
+        result += "\n";
+        for (GrammarSymbol symbol : getGrammarSymbols()) {
+            if (!symbol.isTerminal()) {
+                result += String.format("%18s", symbol) + " ";
+                for (GrammarSymbol terminal : getTerminals()) {
+                    Integer action = get(symbol, terminal);
+                    if (action != ActionTable.ERROR) {
+                        result += String.format("%8s", action) + " ";
+                    } else {
+                        result += String.format("%8s", " ") + " ";
+                    }
+                }
+                result += "\n";
+            }
+        }
+        return result;
     }
 }
