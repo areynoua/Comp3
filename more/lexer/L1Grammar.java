@@ -24,13 +24,13 @@ import java.util.Set;
 public class L1Grammar {
 
     private List<Rule> rules;
-    private Map<GrammarSymbol, Set<GrammarSymbol>> firsts;
-    private Map<GrammarSymbol, Set<GrammarSymbol>> following;
+
+    private Map<GrammarSymbol, Set<GrammarSymbol>> first;
+    private Map<GrammarSymbol, Set<GrammarSymbol>> follow;
 
     private int dbg_lvl;
 
     public L1Grammar(String path) {
-        firsts = new HashMap();
         following = new HashMap();
         fromFile(path);
         removeUnproductive();
@@ -40,6 +40,16 @@ public class L1Grammar {
         leftFactor();
         saveRulesToFiles("grammars/left_factored.grammar");
 
+        computeFirst();
+        System.out.println("--------------------------------------------------------------------------------");
+        for (GrammarSymbol toprint : this.getVariables()) {
+            System.out.print(toprint);
+            System.out.print(" = ");
+            System.out.println(this.first.get(toprint));
+        }
+        System.out.println("--------------------------------------------------------------------------------");
+
+/*
         computeFollow1();
         System.out.println("--------------------------------------------------------------------------------");
         for (GrammarSymbol toprint : this.getVariables()) {
@@ -48,6 +58,7 @@ public class L1Grammar {
             System.out.println(this.following.get(toprint));
         }
         System.out.println("--------------------------------------------------------------------------------");
+        */
 
         System.out.println(this);
 
@@ -278,31 +289,51 @@ public class L1Grammar {
         }
     }
 
-    public Set<GrammarSymbol> first1(GrammarSymbol symbol) {
-
-        if (this.firsts.containsKey(symbol)) {
-            return this.firsts.get(symbol);
+    private void computeFirst() {
+        assert(this.first == null);
+        this.first = new HashMap<GrammarSymbol, Set<GrammarSymbol>>();
+        for (GrammarSymbol terminal : this.getTerminals()) {
+            Set<GrammarSymbol> f = new HashSet<>(1);
+            f.add(terminal);
+            this.first.put(terminal, f);
+        }
+        for (GrammarSymbol variable : this.getVariables()) {
+            this.first.put(variable, new HashSet<GrammarSymbol>());
         }
 
-        Set<GrammarSymbol> symbols = new HashSet<>();
-
-        if (symbol.isTerminal()) {
-            symbols.add(symbol);
-        }
-
-        else { // symbol is a variable
+        boolean finished;
+        do {
+            finished = true;
             for (Rule rule : this.rules) {
-                if (rule.getLeftVariable().equals(symbol)) {
-                    GrammarSymbol s = rule.getRightSymbols().get(0);
-                    symbols.addAll(first1(s));
+                Set<GrammarSymbol> toAdd = new HashSet<>();
+                toAdd.add(GrammarSymbol.EPSILON);
+                for (int gsIdx = 0;
+                        gsIdx < rule.getRightSymbols().size() && toAdd.contains(GrammarSymbol.EPSILON);
+                        ++gsIdx) {
+                    toAdd.remove(GrammarSymbol.EPSILON);
+                    toAdd.addAll(this.first.get(rule.getRightSymbols().get(gsIdx)));
                 }
+                finished = finished && !this.first.get(rule.getLeftVariable()).addAll(toAdd);
             }
-        }
-
-        this.firsts.put(symbol, symbols);
-        return symbols;
+        } while(!finished);
     }
 
+    private void computeFollow() {
+        assert(this.follow == null);
+        this.follow = new HashMap<GrammarSymbol, Set<GrammarSymbol>>();
+        for (GrammarSymbol variable : this.getVariables()) {
+            this.follow.put(variable, new HashSet<GrammarSymbol>());
+        }
+        this.follow.get(this.rules.get(0).getLeftVariable()).add(GrammarSymbol.EPSILON);
+
+        boolean finished;
+        do {
+            finished = true;
+            // OK je vois bien ce qu'il faut faire ici
+        }
+    }
+
+    /*
     public void computeFollow1() {
         // Only 1 call needed I think
         assert(this.following.size() == 0);
@@ -332,4 +363,5 @@ public class L1Grammar {
             }
         } while(!finished);
     }
+    */
 }
