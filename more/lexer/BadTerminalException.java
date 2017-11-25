@@ -1,3 +1,4 @@
+package lexer;
 // Example of use: Non ASCII character in identifier
 public class BadTerminalException extends Exception {
     public BadTerminalException() { super(); }

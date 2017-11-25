@@ -1,3 +1,4 @@
+package lexer;
 public enum LexicalUnit{
     VARNAME,
     NUMBER,

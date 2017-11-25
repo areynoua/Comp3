@@ -1,3 +1,4 @@
+package parser;
 /**
 * Imp grammar symbols (variables or terminals)
 *

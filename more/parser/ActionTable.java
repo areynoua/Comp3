@@ -1,3 +1,4 @@
+package parser;
 /**
 * Imp LL(1) Parser's action table
 *

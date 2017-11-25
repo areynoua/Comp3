@@ -1,3 +1,4 @@
+package lexer;
 // Example of use: if end of comment occurs outside of any comment
 public class BadTerminalContextException extends Exception {
     public BadTerminalContextException() { super(); }
