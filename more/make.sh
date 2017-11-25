@@ -19,20 +19,21 @@ jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class Main.class
 # Test class
 echo Test class
 echo ----------
-java Main ../test/example.imp > /dev/null
+java Main ../test/test-1.imp
 
-# Test jar
-echo
-echo Test jar
-echo --------
-for file in ../test/*.imp; do
-	echo $file
-	java -jar ../dist/impCompiler.jar $file;
-	java -jar ../dist/impCompiler.jar $file > /tmp/imp.out;
-#	if ! diff --suppress-common-lines -b -W 85 -y /tmp/imp.out ${file%.imp}.out ; then
-#		echo
-#		echo vimdiff /tmp/imp.out ${file%.imp}.out
-#		echo
-#		exit 1;
-#	fi
-done
+## Test jar
+#echo
+#echo Test jar
+#echo --------
+##for file in ../test/*.imp; do
+#file="../test/test-1.imp"
+##	echo $file
+##	java -jar ../dist/impCompiler.jar $file;
+##	java -jar ../dist/impCompiler.jar $file > /tmp/imp.out;
+##	if ! diff --suppress-common-lines -b -W 85 -y /tmp/imp.out ${file%.imp}.out ; then
+##		echo
+##		echo vimdiff /tmp/imp.out ${file%.imp}.out
+##		echo
+##		exit 1;
+##	fi
+##done
