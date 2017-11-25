@@ -87,31 +87,31 @@ from the start grammar symbol. Let's summarize: a rule is useless if it is unpro
 Unreachable symbols are symbols that cannot be accessed using composed rules from grammar $G$.
 
 \begin{tabular}{|l p{35em}|} \hline
- i & $V_i$ \\ \hline
-0 & $\{Program\}$ \\ \hline
-1 & $V_0 \cup \{Code\}$ \\ \hline
-2 & $V_1 \cup \{IntList\}$ \\ \hline
-3 & $V_2 \cup \{Instruction\}$ \\ \hline
-4 & $V_3 \cup \{Assign, If, While, For, Print, Read\}$ \\ \hline
-5 & $V_4 \cup \{ExprArithm, Cond\}$ \\ \hline
-6 & $V_5 \cup \{Op, BinOp, SimpleCond\}$ \\ \hline
-7 & $V_6 \cup \{Comp\}$ \\ \hline
-8 & $V_7$ \\ \hline
+   i & $V_i$ \\ \hline
+  0 & $\{Program\}$ \\ \hline
+  1 & $V_0 \cup \{Code\}$ \\ \hline
+  2 & $V_1 \cup \{IntList\}$ \\ \hline
+  3 & $V_2 \cup \{Instruction\}$ \\ \hline
+  4 & $V_3 \cup \{Assign, If, While, For, Print, Read\}$ \\ \hline
+  5 & $V_4 \cup \{ExprArithm, Cond\}$ \\ \hline
+  6 & $V_5 \cup \{Op, BinOp, SimpleCond\}$ \\ \hline
+  7 & $V_6 \cup \{Comp\}$ \\ \hline
+  8 & $V_7$ \\ \hline
 \end{tabular}
 
 All variables are accessible.
 
 \subsection{Unproductive variables}
 
-A rule is productive if all symbols in the right-hand part of this rule are productive. Because terminals are always productive, we must only look for
+A rule is productive if all symbols of its right-hand part are productive. Because terminals are always productive, we must only look for
 productive variables. The intuition is that a variable is unproductive if none of its derivations yields anything. In other words, it is impossible to find a \textbf{finite} word such that it can be derived from this variable. Typically, this happens when the variable is recursive. For example:
 \begin{equation}
   \begin{split}
-    \varstyle{ExprArithP1} \rightarrow \varstyle{ExprArthP1} + \varstyle{ExprArithP2}
+    \varstyle{ExprArith-p1} \rightarrow \varstyle{ExprArth-p1} + \varstyle{ExprArith-p2}
    \end{split}
 \end{equation}
 
-This rule, \textbf{all by itself} (with no other rule including \varstyle{ExprArithmP1} as left-hand variable, is unproductive.
+This rule, \textbf{all by itself} (with no other rule including \varstyle{ExprArithmP1} as left-hand variable), is unproductive.
 Indeed, the derivation requires an infinite number of steps to reach $ + $ \varstyle{ExprArithP2}, which results in an infinite word of variables.
 To be productive, this word must be composed of \textbf{terminals}.
 More formally, a productive rule $A \rightarrow \alpha$ must be such that its left-hand productive variable yields a finite sequence of terminals:
@@ -124,20 +124,27 @@ More formally, a productive rule $A \rightarrow \alpha$ must be such that its le
 To remove unproductive rules, we had to remove unproductive variables first. The easiest way to proceed is to enumerate the productive variables.
 We did it as follows:
 \begin{itemize}
-  \item TODO
+  \item Initialize the set of productive symbols as the set of terminals, because we know that terminals are productive by nature. Indeed, 
+  a string composed of a \textbf{finite number of terminals} is finite itself.
+  \item Every time a rule of the form $A \rightarrow \alpha$ is found, where $\alpha$ is a string composed of productive symbols, we add its left-hand 
+  variable to the set of productive symbols. The reason is that a string composed of strings of terminals are also finite. Using an inductive reasoning, 
+  one can notice that this intuition holds for as many recursion levels as needed.
+  \item We stop after we have explored all rules without discovering new productive variables.
 \end{itemize}
+This yields the following table:
 
 \begin{tabular}{|l p{35em}|} \hline
- i & $V_i$ \\ \hline
-0 & $\phi$ \\ \hline
-1 & $\{Code, ExprArithm, Op, BinOp, Comp, Print, Read\}$ \\ \hline
-2 & $V_1 \cup \{Program, Instruction, Assign, For, SimpleCond\}$ \\ \hline
-3 & $V_2 \cup \{IntList, Cond\}$ \\ \hline
-4 & $V_3 \cup \{While, If\}$ \\ \hline
-5 & $V_4$ \\ \hline
+   i & $V_i$ \\ \hline
+  0 & $T$ \\ \hline
+  1 & $V_0 \cup \{Code, ExprArithm, Op, BinOp, Comp, Print, Read\}$ \\ \hline
+  2 & $V_1 \cup \{Program, Instruction, Assign, For, SimpleCond\}$ \\ \hline
+  3 & $V_2 \cup \{IntList, Cond\}$ \\ \hline
+  4 & $V_3 \cup \{While, If\}$ \\ \hline
+  5 & $V_4$ \\ \hline
 \end{tabular}
 
-All variables are productive.
+At the end, we get that the set contains all grammar symbols. As consequence, all variables are productive. To validate this result, we implemented
+an unproductive-rule removal algorithm and got the same result.
 
 \section{Removing ambiguity}
 
@@ -155,6 +162,8 @@ All variables are productive.
 \begin{tabular}{lll}
   \varstyle{Assign} & $\rightarrow$ & [VarName] := \varstyle{ExprArith-p0} \\
   \varstyle{ExprArith-p2} & $\rightarrow$ & [VarName] \\
+  & $\rightarrow$ & [Number] \\
+  & $\rightarrow$ & ( \varstyle{ExprArith-p2} \\
 
   \varstyle{SimpleCond} & $\rightarrow$ & \varstyle{ExprArithmP1} \varstyle{Comp} \varstyle{ExprArithP1} \\
   \varstyle{ExprArithP1} & $\rightarrow$ & \varstyle{ExprArithP1} + \varstyle{ExprArithP2} \\
@@ -173,9 +182,22 @@ All variables are productive.
 
 \section{Removing left-recursion and applying factorization}
 
-\subsection{Left-recursion}
+\subsection{Left-recursion removal}
 
-\subsection{Factorization}
+<A> → <A>a
+On ajoute:
+<A> → <A-i> <A-j>
+<A-j> → epsilon
+et, pour chacune règle
+<A> → <A>b
+on change par
+<A-j> → b
+et, pour chaque règle
+<A> → c
+on change par
+<A-i> → c
+
+\subsection{Left-factoring}
 
 \begin{tabular}{lll}
   \varstyle{If} & $\rightarrow$ & if \varstyle{Cond} then \varstyle{Code} \varstyle{IfTail} \\
@@ -223,5 +245,18 @@ All variables are productive.
   & Print & print ( [VarName] ) \\
   & Read & read ( [VarName] ) \\
 \end{tabular}
+
+
+
+\chapter{Implementation}
+
+\section{How to use the parser}
+
+Arguments :
+	(1) [OPTIONS] --ru <grammar file> -o <grammar output file>
+	(2) [OPTIONS] --ll <grammar file> -o <grammar output file>
+	(3) [OPTIONS] --at <ll1 unambiguous grammar file>
+	(4) [OPTIONS] <ll1 unambiguous grammar file> <code> -o <latex output file>
+
 
 \end{document}
