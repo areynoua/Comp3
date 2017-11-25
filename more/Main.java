@@ -28,7 +28,7 @@ public class Main {
             System.out.println(arg);
         }
         if (argv.length == 0) {
-            System.out.println("Usage : java Main [ --encoding <name> ] <inputfile(s)>");
+            System.out.println("Arguments :\n	(1) [OPTIONS] --ru <grammar file>\n	(2) [OPTIONS] --ll <grammar file>\n	(3) [OPTIONS] --at <ll1 unambiguous grammar file>\n	(4) [OPTIONS] <ll1 unambiguous grammar file> <code>");
         }
         else {
             int firstFilePos = 0;

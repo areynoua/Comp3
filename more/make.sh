@@ -19,6 +19,7 @@ jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class Main.class
 # Test class
 echo Test class
 echo ----------
+java Main
 java Main ../test/test-1.imp
 
 ## Test jar
