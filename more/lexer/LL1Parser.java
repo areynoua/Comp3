@@ -49,6 +49,10 @@ public class LL1Parser {
 
     private void produce(Integer ruleId) {
         stack.pop();
+        if (!(grammar != null)) System.out.println("Error: grammar != null is false");
+        if (!(grammar.getRules() != null)) System.out.println("Error: grammar.getRules() != null is false");
+        if (!(ruleId != null)) System.out.println("Error: ruleId != null is false");
+        if (!(grammar.getRules().get(ruleId) != null)) System.out.println("Error: grammar.getRules().get(ruleId) != null is false");
         Rule rule = grammar.getRules().get(ruleId);
         Integer nSymbols = rule.getRightSymbols().size();
         for (int i = nSymbols - 1; i > -1; i--) {
@@ -57,7 +61,8 @@ public class LL1Parser {
     }
 
     private void match() {
-        stack.pop();
+        System.out.print("match ");
+        System.out.println(stack.pop());
         cursor++;
     }
 

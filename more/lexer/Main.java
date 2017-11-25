@@ -43,7 +43,7 @@ public class Main {
           parser = new LL1Parser(grammar);
 
           List<Symbol> symbols = scanner.getTokens();
-          // parser.parse(symbols);
+          parser.parse(symbols);
         }
         catch (java.io.FileNotFoundException e) {
           System.out.println("File not found : \""+argv[i]+"\"");
