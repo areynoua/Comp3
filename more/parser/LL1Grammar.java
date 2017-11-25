@@ -33,14 +33,14 @@ public class LL1Grammar {
 
     public LL1Grammar(String path) {
         fromFile(path);
-        removeUnproductive();
-        saveRulesToFiles("grammars/unproductive_removed.grammar");
-        removeInaccessible();
-        saveRulesToFiles("grammars/inaccessible_removed.grammar");
-        leftFactor();
-        saveRulesToFiles("grammars/left_factored.grammar");
-        removeLeftRecursion();
-        saveRulesToFiles("grammars/left_recursion_removed.grammar");
+        //removeUnproductive();
+        //saveRulesToFiles("grammars/unproductive_removed.grammar");
+        //removeInaccessible();
+        //saveRulesToFiles("grammars/inaccessible_removed.grammar");
+        //leftFactor();
+        //saveRulesToFiles("grammars/left_factored.grammar");
+        //removeLeftRecursion();
+        //saveRulesToFiles("grammars/left_recursion_removed.grammar");
         computeFirst();
         computeFollow();
         System.out.println("--------------------------------------------------------------------------------");

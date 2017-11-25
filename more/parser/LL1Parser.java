@@ -11,6 +11,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.StringJoiner;
 
 import lexer.LexicalUnit;
 import lexer.Symbol;
@@ -65,22 +66,39 @@ public class LL1Parser {
     }
 
     private void match() {
-        System.out.print("match ");
-        System.out.println(stack.pop());
-        cursor++;
+        System.out.print(stack.pop());
+        System.out.print(' ');
+        ++cursor;
     }
 
     private void accept() {
-        System.out.println("The sequence of tokens has been accepted");
+        System.out.println("\nThe sequence of tokens has been accepted");
     }
 
     private void error() {
-        System.out.println("There is a syntax error in the input program");
+        System.out.println("\nThere is a syntax error in the input program");
+        System.out.println(this);
+        System.exit(1);
     }
 
     private void resetPDA() {
         stack = new Stack<>();
         cursor = 0;
+    }
+
+    @Override
+    public String toString() {
+        StringJoiner stackSj = new StringJoiner("', '", "[ '", "' ]"); 
+        Stack<GrammarSymbol> stack = (Stack<GrammarSymbol>) this.stack.clone();
+        while (!stack.empty()) {
+            stackSj.add(stack.pop().toString());
+        }
+
+        StringJoiner sj = new StringJoiner("\n    ","LL1Parser:\n    ","\n");
+        sj.add("cursor: " + this.cursor)
+          .add("stack:  " + stackSj.toString());
+
+        return sj.toString();
     }
 
     List<GrammarSymbol> symbolsToGrammarSymbols(List<Symbol> symbols) {
