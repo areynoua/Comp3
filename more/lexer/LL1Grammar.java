@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class L1Grammar {
+public class LL1Grammar {
 
     private List<Rule> rules;
 
@@ -30,7 +30,7 @@ public class L1Grammar {
 
     private int dbg_lvl;
 
-    public L1Grammar(String path) {
+    public LL1Grammar(String path) {
         fromFile(path);
         removeUnproductive();
         saveRulesToFiles("grammars/unproductive_removed.grammar");

@@ -29,7 +29,7 @@ public class Main {
       }
       for (int i = firstFilePos; i < argv.length; i++) {
         LexicalAnalyzer scanner = null;
-        L1Grammar grammar = null;
+        LL1Grammar grammar = null;
         LL1Parser parser = null;
 
         try {
@@ -39,11 +39,11 @@ public class Main {
           while ( !scanner.isAtEOF() )
             scanner.yylex();
           
-          grammar = new L1Grammar("grammars/test3.grammar");
+          grammar = new LL1Grammar("grammars/imp.grammar");
           parser = new LL1Parser(grammar);
 
           List<Symbol> symbols = scanner.getTokens();
-          parser.parse(symbols);
+          //parser.parse(symbols);
         }
         catch (java.io.FileNotFoundException e) {
           System.out.println("File not found : \""+argv[i]+"\"");

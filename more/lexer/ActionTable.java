@@ -22,9 +22,9 @@ public class ActionTable {
     public static final Integer ERROR = -3;
 
     private Map<List<GrammarSymbol>, Integer> M;
-    private final L1Grammar grammar;
+    private final LL1Grammar grammar;
 
-    ActionTable(final L1Grammar grammar) {
+    ActionTable(final LL1Grammar grammar) {
         this.grammar = grammar;
         Map<GrammarSymbol, Set<GrammarSymbol>> first = grammar.getFirst();
         Map<GrammarSymbol, Set<GrammarSymbol>> follow = grammar.getFollow();
