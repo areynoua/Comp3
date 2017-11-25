@@ -17,9 +17,9 @@ import java.util.Set;
 
 public class ActionTable {
 
-    private static final Integer MATCH = -1;
-    private static final Integer ACCEPT = -2;
-    private static final Integer ERROR = -3;
+    public static final Integer MATCH = -1;
+    public static final Integer ACCEPT = -2;
+    public static final Integer ERROR = -3;
 
     private Map<List<GrammarSymbol>, Integer> M;
     private final L1Grammar grammar;
@@ -30,7 +30,7 @@ public class ActionTable {
         Map<GrammarSymbol, Set<GrammarSymbol>> follow = grammar.getFollow();
         M = new HashMap<>();
         for (GrammarSymbol symbol : getGrammarSymbols()) {
-            for (GrammarSymbol terminal : getTerminals()) {
+            for (GrammarSymbol terminal : getTerminals(true)) {
                 if (symbol.isTerminal()) {
                     if (symbol.equals(terminal)) M.put(Arrays.asList(symbol, terminal), ActionTable.MATCH);
                     else M.put(Arrays.asList(symbol, terminal), ActionTable.ERROR);
@@ -80,9 +80,13 @@ public class ActionTable {
         return M.get(Arrays.asList(symbol, terminal));
     }
 
-    private Set<GrammarSymbol> getTerminals() {
+    private Set<GrammarSymbol> getTerminals(boolean includeEpsilon) {
         Set<GrammarSymbol> terminals = grammar.getTerminals();
-        terminals.add(GrammarSymbol.EPSILON);
+        if (includeEpsilon) {
+            terminals.add(GrammarSymbol.EPSILON);
+        } else {
+            terminals.remove(GrammarSymbol.EPSILON);
+        }
         terminals.add(GrammarSymbol.EOS);
         return terminals;
     }
@@ -97,14 +101,14 @@ public class ActionTable {
     @Override
     public String toString() {
         String result = String.join("", Collections.nCopies(19, " "));
-        for (GrammarSymbol terminal : getTerminals()) {
+        for (GrammarSymbol terminal : getTerminals(false)) {
             result += String.format("%8s", terminal) + " ";
         }
         result += "\n";
         for (GrammarSymbol symbol : getGrammarSymbols()) {
             if (!symbol.isTerminal()) {
                 result += String.format("%18s", symbol) + " ";
-                for (GrammarSymbol terminal : getTerminals()) {
+                for (GrammarSymbol terminal : getTerminals(false)) {
                     Integer action = get(symbol, terminal);
                     if (action != ActionTable.ERROR) {
                         result += String.format("%8s", action) + " ";
