@@ -9,18 +9,33 @@ echo Compile Java
 javac lexer/*.java parser/*.java Main.java
 
 # Generate javadoc
-echo Generate javadoc
+#echo Generate javadoc
 #javadoc -quiet -d ../doc/ lexer/*.java
 
 # Generate jar
 echo Generate jar
 jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class Main.class
 
+rm -f grammars/imp_ru.grammar grammars/imp_ll.grammar tree.tex
+
 # Test class
 echo Test class
 echo ----------
+echo
+echo $ java Main
 java Main
-java Main ../test/test-1.imp
+echo
+echo $ java Main --ru grammars/imp.grammar -o grammars/imp_ru.grammar
+java Main --ru grammars/imp.grammar -o grammars/imp_ru.grammar
+echo
+echo $ java Main --ll grammars/imp_prim.grammar -o grammars/imp_ll.grammar
+java Main --ll grammars/imp_prim.grammar -o grammars/imp_ll.grammar
+echo
+echo $ java Main --at grammars/imp_ll.grammar
+java Main --at grammars/imp_ll.grammar
+echo
+echo $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.tex
+java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.tex
 
 ## Test jar
 #echo

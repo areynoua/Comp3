@@ -63,7 +63,7 @@ public class LL1Parser {
         if (!(ruleId != null)) System.out.println("Error: ruleId != null is false");
         if (!(grammar.getRules().get(ruleId) != null)) System.out.println("Error: grammar.getRules().get(ruleId) != null is false");
         Rule rule = grammar.getRules().get(ruleId);
-        System.out.println(rule);
+        // System.out.println(rule);
         Integer nSymbols = rule.getRightSymbols().size();
         for (int i = nSymbols - 1; i > -1; i--) {
             if (!rule.getRightSymbols().get(i).equals(GrammarSymbol.EPSILON)) {
@@ -80,6 +80,7 @@ public class LL1Parser {
     }
 
     private void accept() {
+        this.stack.pop();
         System.out.println("\nThe sequence of tokens has been accepted");
     }
 

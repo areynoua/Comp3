@@ -16,9 +16,25 @@ REM Generate jar
 ECHO Generate jar
 jar cfe  ../dist/impCompiler.jar Main lexer/*.class parser/*.class Main.class
 
+del /s /q /f grammars/imp_ru.grammar grammars/imp_ll.grammar tree.tex
+
 REM Test class
 ECHO Test class...
-java Main ../test/test-1.imp
+ECHO
+ECHO $ java Main
+java Main
+ECHO
+ECHO $ java Main --ru grammars/imp.grammar -o grammars/imp_ru.grammar
+java Main --ru grammars/imp.grammar -o grammars/imp_ru.grammar
+ECHO
+ECHO $ java Main --ll grammars/imp_prim.grammar -o grammars/imp_ll.grammar
+java Main --ll grammars/imp_prim.grammar -o grammars/imp_ll.grammar
+ECHO
+ECHO $ java Main --at grammars/imp_ll.grammar
+java Main --at grammars/imp_ll.grammar
+ECHO
+ECHO $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.tex
+java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.tex
 
 REM Delete class files
 ECHO Delete class files

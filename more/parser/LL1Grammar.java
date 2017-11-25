@@ -31,39 +31,39 @@ public class LL1Grammar {
 
     private int dbg_lvl;
 
-    public LL1Grammar(String path) {
+    public LL1Grammar(String path) throws FileNotFoundException, IOException {
         fromFile(path);
         //removeUnproductive();
         //saveRulesToFiles("grammars/unproductive_removed.grammar");
         //removeInaccessible();
         //saveRulesToFiles("grammars/inaccessible_removed.grammar");
-        leftFactor();
-        saveRulesToFiles("grammars/left_factored.grammar");
-        removeLeftRecursion();
-        saveRulesToFiles("grammars/left_recursion_removed.grammar");
+        //leftFactor();
+        //saveRulesToFiles("grammars/left_factored.grammar");
+        //removeLeftRecursion();
+        //saveRulesToFiles("grammars/unambiguous_ll1.grammar");
         computeFirst();
         computeFollow();
-        System.out.println("--------------------------------------------------------------------------------");
+        //System.out.println("--------------------------------------------------------------------------------");
 
-        for (GrammarSymbol toprint : this.getVariables()) {
-            System.out.print("first(");
-            System.out.print(toprint);
-            System.out.print(") = ");
-            System.out.println(this.first.get(toprint));
-        }
-        System.out.println("--------------------------------------------------------------------------------");
+        //for (GrammarSymbol toprint : this.getVariables()) {
+        //    System.out.print("first(");
+        //    System.out.print(toprint);
+        //    System.out.print(") = ");
+        //    System.out.println(this.first.get(toprint));
+        //}
+        //System.out.println("--------------------------------------------------------------------------------");
 
-        for (GrammarSymbol toprint : this.getVariables()) {
-            System.out.print("follow(");
-            System.out.print(toprint);
-            System.out.print(") = ");
-            System.out.println(this.follow.get(toprint));
-        }
-        System.out.println("--------------------------------------------------------------------------------");
+        //for (GrammarSymbol toprint : this.getVariables()) {
+        //    System.out.print("follow(");
+        //    System.out.print(toprint);
+        //    System.out.print(") = ");
+        //    System.out.println(this.follow.get(toprint));
+        //}
+        //System.out.println("--------------------------------------------------------------------------------");
 
-        System.out.println(this);
+        //System.out.println(this);
 
-        System.out.println("Finished");
+        //System.out.println("Finished");
     }
 
     public Map<GrammarSymbol, Set<GrammarSymbol>> getFirst() {
@@ -74,32 +74,27 @@ public class LL1Grammar {
         return follow;
     }
 
-    private void fromFile(String path) {
+    private void fromFile(String path) throws FileNotFoundException, IOException {
         rules = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
-            String previousLeftHandPart = null;
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split("->");
-                if (parts.length == 2) { // Don't process empty lines
-                    String leftHandPart = parts[0].replaceAll("\\s+","");
-                    if (leftHandPart.length() > 0) {
-                        previousLeftHandPart = leftHandPart;
-                    } else {
-                        leftHandPart = previousLeftHandPart;
-                    }
-                    String rightHandPart = parts[1];
-                    String[] rightHandTokens = rightHandPart.split(" ");
-                    for (int i = 0; i < rightHandTokens.length; i++) {
-                        rightHandTokens[i] = rightHandTokens[i].replaceAll("\\s+","");
-                    }
-                    this.rules.add(new Rule(leftHandPart, rightHandTokens));
+        BufferedReader br = new BufferedReader(new FileReader(path));
+        String previousLeftHandPart = null;
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split("->");
+            if (parts.length == 2) { // Don't process empty lines
+                String leftHandPart = parts[0].replaceAll("\\s+","");
+                if (leftHandPart.length() > 0) {
+                    previousLeftHandPart = leftHandPart;
+                } else {
+                    leftHandPart = previousLeftHandPart;
                 }
+                String rightHandPart = parts[1];
+                String[] rightHandTokens = rightHandPart.split(" ");
+                for (int i = 0; i < rightHandTokens.length; i++) {
+                    rightHandTokens[i] = rightHandTokens[i].replaceAll("\\s+","");
+                }
+                this.rules.add(new Rule(leftHandPart, rightHandTokens));
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -287,7 +282,7 @@ public class LL1Grammar {
             GrammarSymbol newVariable = new GrammarSymbol(newVariableName);
             List<GrammarSymbol> prefix = commonPrefix(baseRule, leftSimilarRules);
 
-            System.out.println(prefix);
+            // System.out.println(prefix);
 
             leftSimilarRules.add(baseRule);
             Integer prefixSize = prefix.size();
@@ -298,7 +293,7 @@ public class LL1Grammar {
                 List<GrammarSymbol> rightHandPart = rule.removePrefix(prefixSize).getRightSymbols();
                 if (rightHandPart.size() == 0) rightHandPart.add(GrammarSymbol.EPSILON);
                 Rule newRule = new Rule(newVariable, rightHandPart);
-                System.out.println("New: " + newRule);
+                // System.out.println("New: " + newRule);
                 this.rules.add(newRule);
                 this.rules.remove(rule);
             }
