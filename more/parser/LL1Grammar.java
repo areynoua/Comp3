@@ -37,10 +37,10 @@ public class LL1Grammar {
         //saveRulesToFiles("grammars/unproductive_removed.grammar");
         //removeInaccessible();
         //saveRulesToFiles("grammars/inaccessible_removed.grammar");
-        //leftFactor();
-        //saveRulesToFiles("grammars/left_factored.grammar");
-        //removeLeftRecursion();
-        //saveRulesToFiles("grammars/left_recursion_removed.grammar");
+        leftFactor();
+        saveRulesToFiles("grammars/left_factored.grammar");
+        removeLeftRecursion();
+        saveRulesToFiles("grammars/left_recursion_removed.grammar");
         computeFirst();
         computeFollow();
         System.out.println("--------------------------------------------------------------------------------");

@@ -34,16 +34,20 @@ public class LL1Parser {
         List<Integer> rulesUsed = new ArrayList<>();
         List<GrammarSymbol> symbols = symbolsToGrammarSymbols(tokens);
         GrammarSymbol startVariable = grammar.getRules().get(0).getLeftVariable();
+        stack.push(GrammarSymbol.EOS);
         stack.push(startVariable);
         while (!stack.empty()) {
             GrammarSymbol tos = stack.peek(); // top of stack
             GrammarSymbol symbol = symbols.get(cursor);
             Integer action = actionTable.get(tos, symbol);
+            
             if (action == ActionTable.MATCH) {
+                // System.out.println(tokens.get(cursor));
                 match();
             } else if (action == ActionTable.ACCEPT) {
                 accept();
             } else if (action == ActionTable.ERROR) {
+                // System.out.println(tokens.get(cursor));
                 error();
             } else {
                 produce(action);
@@ -59,15 +63,19 @@ public class LL1Parser {
         if (!(ruleId != null)) System.out.println("Error: ruleId != null is false");
         if (!(grammar.getRules().get(ruleId) != null)) System.out.println("Error: grammar.getRules().get(ruleId) != null is false");
         Rule rule = grammar.getRules().get(ruleId);
+        System.out.println(rule);
         Integer nSymbols = rule.getRightSymbols().size();
         for (int i = nSymbols - 1; i > -1; i--) {
-            stack.push(rule.getRightSymbols().get(i));
+            if (!rule.getRightSymbols().get(i).equals(GrammarSymbol.EPSILON)) {
+                stack.push(rule.getRightSymbols().get(i));
+            }
         }
     }
 
     private void match() {
-        System.out.print(stack.pop());
-        System.out.print(' ');
+        GrammarSymbol tos = stack.pop();
+        // System.out.print(tos);
+        // System.out.print(' ');
         ++cursor;
     }
 
@@ -144,6 +152,7 @@ public class LL1Parser {
         for (Symbol symbol : symbols) {
             grammarSymbols.add(new GrammarSymbol(conversions.get(symbol.getType())));
         }
+        grammarSymbols.add(GrammarSymbol.EOS);
         return grammarSymbols;
     }
 }

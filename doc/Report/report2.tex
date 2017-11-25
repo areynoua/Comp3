@@ -153,9 +153,10 @@ All variables are productive.
 \end{tabular}
 
 \begin{tabular}{lll}
-  \varstyle{Assign} & $\rightarrow$ & [VarName] := \varstyle{ExprArithP1} \\
+  \varstyle{Assign} & $\rightarrow$ & [VarName] := \varstyle{ExprArith-p0} \\
+  \varstyle{ExprArith-p2} & $\rightarrow$ & [VarName] \\
+
   \varstyle{SimpleCond} & $\rightarrow$ & \varstyle{ExprArithmP1} \varstyle{Comp} \varstyle{ExprArithP1} \\
-  &  $\rightarrow$ & TODO ??? \\
   \varstyle{ExprArithP1} & $\rightarrow$ & \varstyle{ExprArithP1} + \varstyle{ExprArithP2} \\
   & $\rightarrow$ & \varstyle{ExprArithP1} - \varstyle{ExprArithP2} \\
   & $\rightarrow$ & \varstyle{ExprArithP2} \\
