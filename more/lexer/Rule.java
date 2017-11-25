@@ -47,6 +47,20 @@ public class Rule {
         return false;
     }
 
+    public boolean isLeftRecursive() { // Suppose that there is no rule like "A → epsilon alpha" with alpha ≠ epsilon
+        return this.getLeftVariable().equals(this.getRightSymbols().get(0));
+    }
+
+    public void removeLeftRecursion(String nonLeftRecursiveSuffix, String leftRecursiveSuffix) {
+        if (isLeftRecursive()) {
+            this.leftVariable = new GrammarSymbol(this.leftVariable.nameVariant(leftRecursiveSuffix));
+            this.rightSymbols.remove(0);
+        }
+        else {
+            this.leftVariable = new GrammarSymbol(this.leftVariable.nameVariant(nonLeftRecursiveSuffix));
+        }
+    }
+
     public Set<GrammarSymbol> getGrammarSymbols(boolean getV, boolean getT) {
         Set<GrammarSymbol> symbols = new HashSet<>();
         if (getV) {

@@ -38,6 +38,8 @@ public class L1Grammar {
         saveRulesToFiles("grammars/inaccessible_removed.grammar");
         leftFactor();
         saveRulesToFiles("grammars/left_factored.grammar");
+        removeLeftRecursion();
+        saveRulesToFiles("grammars/left_recursion_removed.grammar");
         computeFirst();
         computeFollow();
         System.out.println("--------------------------------------------------------------------------------");
@@ -148,6 +150,16 @@ public class L1Grammar {
         return this.getGrammarSymbols(false, true);
     }
 
+    public Set<GrammarSymbol> getLeftRecursiveVariables() {
+        Set<GrammarSymbol> leftRecursiveVariables = new HashSet<>();
+        for (Rule rule : this.rules) {
+            if (rule.isLeftRecursive()) {
+                leftRecursiveVariables.add(rule.getLeftVariable());
+            }
+        }
+        return leftRecursiveVariables;
+    }
+
     public void removeUseless() {
         removeUnproductive();
         removeInaccessible();
@@ -223,19 +235,17 @@ public class L1Grammar {
     private Set<Rule> rulesWithCommonPrefix(final Rule baseRule) {
         Set<Rule> leftSimilarRules = new HashSet<>();
         for (Rule rule : this.rules) {
-            if (!baseRule.equals(rule)) {
-                if (rule.getLeftVariable().equals(baseRule.getLeftVariable())) {
-                    // System.out.println(baseRule.getRightSymbols().size());
-                    Integer nSymbols = Math.min(baseRule.getRightSymbols().size(), rule.getRightSymbols().size());
-                    boolean atLeastOneDifference = false;
-                    for (int i = 0; i < nSymbols; i++) {
-                        if (!rule.getRightSymbols().get(i).equals(baseRule.getRightSymbols().get(i))) {
-                            atLeastOneDifference = true;
-                        }
+            if (!baseRule.equals(rule) && rule.getLeftVariable().equals(baseRule.getLeftVariable())) {
+                // System.out.println(baseRule.getRightSymbols().size());
+                Integer nSymbols = Math.min(baseRule.getRightSymbols().size(), rule.getRightSymbols().size());
+                boolean atLeastOneDifference = false;
+                for (int i = 0; i < nSymbols && !atLeastOneDifference; i++) {
+                    if (!rule.getRightSymbols().get(i).equals(baseRule.getRightSymbols().get(i))) {
+                        atLeastOneDifference = true;
                     }
-                    if (atLeastOneDifference && (rule.getRightSymbols().get(0).equals(baseRule.getRightSymbols().get(0)))) {
-                        leftSimilarRules.add(rule);
-                    }
+                }
+                if (atLeastOneDifference && (rule.getRightSymbols().get(0).equals(baseRule.getRightSymbols().get(0)))) {
+                    leftSimilarRules.add(rule);
                 }
             }
         }
@@ -290,6 +300,33 @@ public class L1Grammar {
                 this.rules.remove(rule);
             }
         }
+    }
+
+    public void removeLeftRecursion() {
+        // A → Aa
+        // A → B
+        Set<GrammarSymbol> leftRecursiveVariables = this.getLeftRecursiveVariables();
+        Set<Rule> newRules = new HashSet<>();
+        for (GrammarSymbol variable : leftRecursiveVariables) {
+            // A → UV
+            List<GrammarSymbol> rightij = new ArrayList<>(2);
+            rightij.add(new GrammarSymbol(variable.nameVariant("i")));
+            rightij.add(new GrammarSymbol(variable.nameVariant("j")));
+            newRules.add(new Rule(variable, rightij));
+
+            // V → epsilon
+            List<GrammarSymbol> righteps = new ArrayList<>(1);
+            righteps.add(GrammarSymbol.EPSILON);
+            newRules.add(new Rule(new GrammarSymbol(variable.nameVariant("j")), righteps));
+        }
+        for (Rule rule : this.rules) {
+            if (leftRecursiveVariables.contains(rule.getLeftVariable())) {
+                // V → a  or  U → B
+                rule.removeLeftRecursion("i","j");
+            }
+        }
+
+        this.rules.addAll(newRules);
     }
 
     private void computeFirst() {

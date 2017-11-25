@@ -23,6 +23,16 @@ public class GrammarSymbol {
         return isTerminalSymbol;
     }
 
+    public String nameVariant(String suffix) {
+        if (this.isTerminal()) {
+            return this.value + "-" + suffix;
+        }
+        else {
+            assert(this.value.charAt(this.value.length() - 1) == '>');
+            return this.value.substring(0, this.value.length() - 1) + "-" + suffix + ">";
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof GrammarSymbol)) return false;
