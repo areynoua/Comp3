@@ -238,14 +238,14 @@ public class LL1Grammar {
         for (Rule rule : this.rules) {
             if (!baseRule.equals(rule) && rule.getLeftVariable().equals(baseRule.getLeftVariable())) {
                 // System.out.println(baseRule.getRightSymbols().size());
-                Integer nSymbols = Math.min(baseRule.getRightSymbols().size(), rule.getRightSymbols().size());
-                boolean atLeastOneDifference = false;
-                for (int i = 0; i < nSymbols && !atLeastOneDifference; i++) {
-                    if (!rule.getRightSymbols().get(i).equals(baseRule.getRightSymbols().get(i))) {
-                        atLeastOneDifference = true;
-                    }
-                }
-                if (atLeastOneDifference && (rule.getRightSymbols().get(0).equals(baseRule.getRightSymbols().get(0)))) {
+                // Integer nSymbols = Math.min(baseRule.getRightSymbols().size(), rule.getRightSymbols().size());
+                // boolean atLeastOneDifference = false;
+                // for (int i = 0; i < nSymbols && !atLeastOneDifference; i++) {
+                //    if (!rule.getRightSymbols().get(i).equals(baseRule.getRightSymbols().get(i))) {
+                //        atLeastOneDifference = true;
+                //    }
+                //}
+                if (rule.getRightSymbols().get(0).equals(baseRule.getRightSymbols().get(0))) {
                     leftSimilarRules.add(rule);
                 }
             }
@@ -295,7 +295,9 @@ public class LL1Grammar {
 
             this.rules.add(new Rule(baseRule.getLeftVariable(), prefix));
             for (Rule rule : leftSimilarRules) {
-                Rule newRule = new Rule(newVariable, rule.removePrefix(prefixSize).getRightSymbols());
+                List<GrammarSymbol> rightHandPart = rule.removePrefix(prefixSize).getRightSymbols();
+                if (rightHandPart.size() == 0) rightHandPart.add(GrammarSymbol.EPSILON);
+                Rule newRule = new Rule(newVariable, rightHandPart);
                 System.out.println("New: " + newRule);
                 this.rules.add(newRule);
                 this.rules.remove(rule);

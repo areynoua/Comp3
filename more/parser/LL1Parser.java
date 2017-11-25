@@ -40,7 +40,7 @@ public class LL1Parser {
             GrammarSymbol tos = stack.peek(); // top of stack
             GrammarSymbol symbol = symbols.get(cursor);
             Integer action = actionTable.get(tos, symbol);
-            
+
             if (action == ActionTable.MATCH) {
                 // System.out.println(tokens.get(cursor));
                 match();
