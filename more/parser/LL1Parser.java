@@ -45,6 +45,7 @@ public class LL1Parser {
                 // System.out.println(tokens.get(cursor));
                 match();
             } else if (action == ActionTable.ACCEPT) {
+                System.out.println(rulesUsed.size());
                 accept();
             } else if (action == ActionTable.ERROR) {
                 // System.out.println(tokens.get(cursor));
@@ -80,6 +81,7 @@ public class LL1Parser {
     }
 
     private void accept() {
+        stack.pop();
         System.out.println("\nThe sequence of tokens has been accepted");
     }
 
