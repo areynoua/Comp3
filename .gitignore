@@ -2,6 +2,8 @@
 *~
 *.swp
 *.class
+*.log
+*.aux
 /*.pdf
 more/jflex
 /Euclid.imp
