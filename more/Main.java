@@ -25,7 +25,7 @@ public class Main {
      */
     public static boolean argParse(String argv[]) {
         if (argv.length == 0 || argv.length % 2 == 1) {
-            System.out.println("Arguments :\n	(1) [OPTIONS] --ru <grammar file> -o <grammar output file>\n	(2) [OPTIONS] --ll <grammar file> -o <grammar output file>\n	(3) [OPTIONS] --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) [OPTIONS] <ll1 unambiguous grammar file> <code> -o <latex output file>");
+            System.out.println("Arguments :\n	(1) [OPTIONS] --ru <grammar file> -o <grammar output file>\n	(2) [OPTIONS] --ll <grammar file> -o <grammar output file>\n	(3) [OPTIONS] --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) [OPTIONS] <ll1 unambiguous grammar file> <code> [-o <parse tree output file>]");
             System.out.println("(1) remove useless\n(2) left factorization and removing of left recursion\n(3) print action table\n(4) save parse tree");
             return false;
         }
@@ -66,7 +66,7 @@ public class Main {
                     inputCodeFileName = argv[i+1];
             }
         }
-        return action != null && outputFileName != null;
+        return action != null && (outputFileName != null || action == PARSE);
     }
 
     /**
@@ -103,8 +103,20 @@ public class Main {
                         }
                         parser = new LL1Parser(grammar);
                         List<Symbol> symbols = scanner.getTokens();
-                        parser.parse(symbols);
-                        parser.saveLatexTreeToFile(outputFileName);
+                        boolean success = parser.parse(symbols);
+                        if (success) {
+                            if (outputFileName != null) {
+                                parser.saveTextTreeToFile(outputFileName + ".txt");
+                                parser.saveLatexTreeToFile(outputFileName + ".tex");
+                            }
+                            System.out.println("Parsing done");
+                            System.out.println("Rule used:");
+                            System.out.println(parser.rulesUsedToString());
+                        }
+                        else {
+                            System.out.println("Syntax error");
+                            System.out.println(parser);
+                        }
                         break;
                     default :
                         System.out.println("Unknown action");

@@ -6,6 +6,7 @@ package parser;
 * @author Alexis Reynouard
 */
 
+import java.util.Collections;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -33,7 +34,7 @@ public class LL1Parser {
         resetPDA();
     }
 
-    public void parse(List<Symbol> tokens) {
+    public boolean parse(List<Symbol> tokens) {
         resetPDA();
         List<GrammarSymbol> symbols = symbolsToGrammarSymbols(tokens);
         GrammarSymbol startVariable = grammar.getRules().get(0).getLeftVariable();
@@ -48,13 +49,16 @@ public class LL1Parser {
                 match();
             } else if (action == ActionTable.ACCEPT) {
                 accept();
+                return true;
             } else if (action == ActionTable.ERROR) {
                 error();
+                return false;
             } else {
                 produce(action);
                 rulesUsed.add(action);
             }
         }
+        return false;
     }
 
     private void produce(Integer ruleId) {
@@ -78,13 +82,13 @@ public class LL1Parser {
 
     private void accept() {
         stack.pop();
-        System.out.println("\nThe sequence of tokens has been accepted");
+        //System.out.println("\nThe sequence of tokens has been accepted");
     }
 
     private void error() {
-        System.out.println("\nThere is a syntax error in the input program");
-        System.out.println(this);
-        System.exit(1);
+        //System.out.println("\nThere is a syntax error in the input program");
+        //System.out.println(this);
+        //System.exit(1);
     }
 
     private void resetPDA() {
@@ -108,9 +112,55 @@ public class LL1Parser {
         return sj.toString();
     }
 
+    public String rulesUsedToString() {
+        return rulesUsed.toString();
+    }
+
+    public String toTextTree() {
+        StringBuilder sb = new StringBuilder();
+        Stack<Integer> levels = new Stack<>();
+        int ruleUsedIdx = 0;
+
+        levels.push(ruleUsedIdx);
+        levels.push(rulesUsed.get(ruleUsedIdx));
+        String varName = grammar.getRules().get(rulesUsed.get(ruleUsedIdx)).getLeftVariable().toString();
+        sb.append(varName.substring(1, varName.length() - 1));
+        sb.append("\n");
+
+        while (!levels.empty()) {
+            int level = levels.size() / 2;
+            sb.append(String.join("", Collections.nCopies(level, "| ")));
+            int ruleId = levels.pop();
+            Rule rule = grammar.getRules().get(ruleId);
+            int position = levels.pop();
+            GrammarSymbol symbol = rule.getRightSymbols().get(position);
+
+            if (symbol.isTerminal()) {
+                sb.append("+ ");
+                sb.append(symbol.toString());
+                sb.append("\n");
+            }
+            else {
+                sb.append("+ ");
+                sb.append(symbol.toString());
+                sb.append("\n");
+            }
+            if (position < rule.getRightSymbols().size() - 1) {
+                levels.push(position+1);
+                levels.push(ruleId);
+            }
+            if (!symbol.isTerminal()) {
+                levels.push(0);
+                levels.push(rulesUsed.get(++ruleUsedIdx));
+            }
+        }
+        sb.append("$");
+        return sb.toString();
+    }
+
     public String toLatexTree() {
         // !! Tikz limit to 255 levels
-        int limit = 10;
+        int limit = 255;
         StringBuilder sb = new StringBuilder();
         Stack<Integer> levels = new Stack<>();
         int ruleUsedIdx = 0;
@@ -140,7 +190,9 @@ public class LL1Parser {
 
                 if (symbol.isTerminal()) {
                     if (levels.size() < limit*2) {
+                        sb.append("$");
                         sb.append(symbol.toString());
+                        sb.append("$");
                         sb.append("}}\n");
                     }
                 }
@@ -178,6 +230,19 @@ public class LL1Parser {
             writer.println("\\documentclass[a4paper]{article}\n\\usepackage{tikz}\n\\begin{document}");
             writer.println(this.toLatexTree());
             writer.println("\\end{document}");
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveTextTreeToFile(final String path) {
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter(path, "UTF-8");
+            writer.println(this.toTextTree());
             writer.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -56,6 +56,8 @@ import java.util.List;
 %}
 
 %eof{
+/* part 1 */
+/*
     // Print matched lexical units
     for (Symbol symbol : symbols) {
         System.out.println(symbol.toString());
@@ -69,6 +71,7 @@ import java.util.List;
         String token = identifier.getValue().toString();
         System.out.println(String.format("%-15s", token) + " " + line);
     }
+	*/
 %eof}
 
 %eofval{

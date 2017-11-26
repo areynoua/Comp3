@@ -563,7 +563,9 @@ public class LexicalAnalyzer {
   private void zzDoEOF() {
     if (!zzEOFDone) {
       zzEOFDone = true;
-        // Print matched lexical units
+    /* part 1 */
+/*
+    // Print matched lexical units
     for (Symbol symbol : symbols) {
         System.out.println(symbol.toString());
     }
@@ -576,6 +578,7 @@ public class LexicalAnalyzer {
         String token = identifier.getValue().toString();
         System.out.println(String.format("%-15s", token) + " " + line);
     }
+	*/
 
     }
   }
