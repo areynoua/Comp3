@@ -8,27 +8,25 @@
   &  & \varstyle{Print} \\
   &  & \varstyle{Read} \\
   & \varstyle{Assign} & [VarName] := \varstyle{ExprArith-p0} \\
-  & \varstyle{ExprArith-p2} & [VarName] \\
-  &  & [Number] \\
-  &  & ( \varstyle{ExprArith-p2} ) \\
-  &  & - \varstyle{ExprArith-p2} \\
   & \varstyle{ExprArith-p0-j} & \varstyle{Op-p0} \varstyle{ExprArith-p1} \\
   & \varstyle{ExprArith-p0-i} & \varstyle{ExprArith-p1} \\
-  & \varstyle{ExprArith-p1-j} & \varstyle{Op-p1} \varstyle{ExprArith-p2} \\
-  & \varstyle{ExprArith-p1-i} & \varstyle{ExprArith-p2} \\
+  & \varstyle{ExprArith-p1-j} & \varstyle{Op-p1} \varstyle{Atom} \\
+  & \varstyle{ExprArith-p1-i} & \varstyle{Atom} \\
+  & \varstyle{Atom} & [VarName] \\
+  &  & [Number] \\
+  &  & ( \varstyle{ExprArith-p0} ) \\
+  &  & - \varstyle{Atom} \\
   & \varstyle{Op-p0} & + \\
   &  & - \\
   & \varstyle{Op-p1} & * \\
   &  & / \\
-  & \varstyle{Cond-p0-j} & \varstyle{BinOp-p0} \varstyle{Cond-p1} \\
+  & \varstyle{Cond-p0-j} & or \varstyle{Cond-p1} \\
   & \varstyle{Cond-p0-i} & \varstyle{Cond-p1} \\
-  & \varstyle{Cond-p1-j} & \varstyle{BinOp-p1} \varstyle{Cond-p2} \\
+  & \varstyle{Cond-p1-j} & and \varstyle{Cond-p2} \\
   & \varstyle{Cond-p1-i} & \varstyle{Cond-p2} \\
   & \varstyle{Cond-p2} & not \varstyle{SimpleCond} \\
   &  & \varstyle{SimpleCond} \\
   & \varstyle{SimpleCond} & \varstyle{ExprArith-p0} \varstyle{Comp} \varstyle{ExprArith-p0} \\
-  & \varstyle{BinOp-p1} & and \\
-  & \varstyle{BinOp-p0} & or \\
   & \varstyle{Comp} & = \\
   &  & >= \\
   &  & > \\

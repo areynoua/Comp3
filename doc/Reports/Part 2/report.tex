@@ -84,7 +84,25 @@ from the start grammar symbol. Let's summarize: a rule is useless if it is unpro
 
 \subsection{Unreachable symbols}
 
-Unreachable symbols are symbols that cannot be accessed using composed rules from grammar $G$.
+Unreachable symbols are symbols that cannot be derived from the start variable. The start variable \varstyle{Program} is reachable by nature
+because every sequence of input tokens is a program and this implies that it is the only variable to begin with. 
+The property of a reachable variable $A$ is as follows: if there exists a rule of the form $A \rightarrow \alpha$, then all symbols in sequence $\alpha$
+are reachable as well. By induction, we can infer that any symbol is reachable if:
+\begin{equation}
+  \begin{split}
+    \varstyle{Program} \Rightarrow_{G}^{*} A \beta B, \text{ where } A, B \in (T \cup V)^{*} \text{ and } \beta \in (T \cup V)
+   \end{split}
+\end{equation}
+where $G$ is the Imp grammar.
+
+To remove the unreachable symbols, we first enumerate the reachable symbols using the following procedure:
+\begin{itemize}
+  \item Initialize the set of reachable symbols as the set containing only the start symbol \varstyle{Program}.
+  \item Every time a rule of the form $A \rightarrow \alpha$ is found, where $A$ is a reachable variable, we add every symbol from sequence $\alpha$
+  to the set of reachable symbols.
+  \item We stop after we have explored all rules without discovering new reachable symbols.
+\end{itemize}
+This yields the following table:
 
 \begin{tabular}{|l p{35em}|} \hline
    i & $V_i$ \\ \hline
@@ -99,7 +117,8 @@ Unreachable symbols are symbols that cannot be accessed using composed rules fro
   8 & $V_7$ \\ \hline
 \end{tabular}
 
-All variables are accessible.
+We observe that in the end the set of reachable symbols contains all the symbols of the grammar. As a result, \textbf{all symbols are reachable}.
+To validate this result, we implemented the unreachable-symbol removal algorithm and got the same result.
 
 \subsection{Unproductive variables}
 
@@ -120,6 +139,7 @@ More formally, a productive rule $A \rightarrow \alpha$ must be such that its le
     A \Rightarrow_{G}^{*} w \text{ where } w \in T^{*}
   \end{split}
 \end{equation}
+where $G$ is the Imp grammar.
 
 To remove unproductive rules, we had to remove unproductive variables first. The easiest way to proceed is to enumerate the productive variables.
 We did it as follows:
@@ -143,39 +163,118 @@ This yields the following table:
   5 & $V_4$ \\ \hline
 \end{tabular}
 
-At the end, we get that the set contains all grammar symbols. As consequence, all variables are productive. To validate this result, we implemented
-an unproductive-rule removal algorithm and got the same result.
+At the end, we get that the set contains all grammar symbols. As consequence, \textbf{all symbols are productive}. To validate this result, we implemented
+the unproductive-rule removal algorithm and got the same result.
 
-\section{Removing ambiguity}
+\section{Removing ambiguities}
+
+A grammar is ambiguous if one can draw at least two different derivation trees from a same input word, using the grammar rules.
+The Imp grammar is ambiguous because of its logical and arithmetic operators. Let's replace ambiguous rules by new rules in such way
+that is takes into account both operator associativity and operator priority.
 
 \subsection{Operator priority}
 
+Let's take the sequence of tokens $A + B * C$ as example. In any case, a top-down parser would apply rule 
+\varstyle{ExprArith} $\rightarrow$ \varstyle{ExprArith} \varstyle{Op} \varstyle{ExprArith}. 
+Because of the ambiguity of the grammar, the parser would not know which operator to apply next, it could use any of the two following rules:
+
 \begin{tabular}{lll}
-  \varstyle{CondP1} & $\rightarrow$ & \varstyle{CondP1} and \varstyle{CondP2} \\
-  & $\rightarrow$ & \varstyle{CondP2} \\
-  \varstyle{CondP2} & $\rightarrow$ & \varstyle{CondP2} or \varstyle{CondP3} \\
-  & $\rightarrow$ & \varstyle{CondP3} \\
-  \varstyle{CondP3} & $\rightarrow$ & not \varstyle{SimpleCond} \\
-  & $\rightarrow$ & \varstyle{SimpleCond} \\
+  \varstyle{Op} & $\rightarrow$ + \\
+  & $\rightarrow$ * \\
 \end{tabular}
 
-\begin{tabular}{lll}
-  \varstyle{Assign} & $\rightarrow$ & [VarName] := \varstyle{ExprArith-p0} \\
-  \varstyle{ExprArith-p2} & $\rightarrow$ & [VarName] \\
-  & $\rightarrow$ & [Number] \\
-  & $\rightarrow$ & ( \varstyle{ExprArith-p2} \\
+Because operators * and / have a higher priority than operators + and -, the parser must consider expression $A + B * C$ as \textbf{the sum of two expressions} $A$ and $B * C$. Let's rename $A$ by \varstyle{ExprArith-p0} (where p0 stands for lowest priority 0), and $B * C$ by \varstyle{ExprArith-p1}.
+We now get a new rule:
 
-  \varstyle{SimpleCond} & $\rightarrow$ & \varstyle{ExprArithmP1} \varstyle{Comp} \varstyle{ExprArithP1} \\
-  \varstyle{ExprArithP1} & $\rightarrow$ & \varstyle{ExprArithP1} + \varstyle{ExprArithP2} \\
-  & $\rightarrow$ & \varstyle{ExprArithP1} - \varstyle{ExprArithP2} \\
-  & $\rightarrow$ & \varstyle{ExprArithP2} \\
-  \varstyle{ExprArithP2} & $\rightarrow$ & \varstyle{ExprArithP2} * \varstyle{ExprArithP3} \\
-  & $\rightarrow$ & \varstyle{ExprArithP2} / \varstyle{ExprArithP3} \\
-  & $\rightarrow$ & \varstyle{ExprArithP3} \\
-  \varstyle{ExprArithP3} & $\rightarrow$ & [VarName] \\
-  & $\rightarrow$ & [number] \\
-  & $\rightarrow$ & ( \varstyle{ExprArithP3} ) \\
-  & $\rightarrow$ & - \varstyle{ExprArithP3} \\
+\begin{tabular}{lll}
+\varstyle{ExprArith-p0} & $\rightarrow$ & \varstyle{ExprArith-p0} \varstyle{Op} \varstyle{ExprArith-p1}
+\end{tabular}
+
+where \varstyle{Op} can be any of the operators that have the same priority level as + (actually we only consider + and -). The problem of this technique is
+that \textbf{it makes the assumption that the total expression contains an addition or a subtraction}. Let's add a rule to give the parser the opportunity
+to skip these operations if it needs to:
+
+\begin{tabular}{lll}
+\varstyle{ExprArith-p0} & $\rightarrow$ & \varstyle{ExprArith-p1}
+\end{tabular}
+
+The grammar now takes into account the differences in priority between \{+, -\} and \{*, /\}, but not between \{*, /\} and operators () and unary minus.
+Because unary minus has a higher priority than operators * and /, let's use the same method. This results in the following new rules:
+
+\begin{tabular}{lll}
+  \varstyle{ExprArith-p1} & $\rightarrow$ & \varstyle{ExprArith-p1} \varstyle{Op-p1} \varstyle{Atom} \\
+  & $\rightarrow$ & \varstyle{Atom} \\
+  \varstyle{Atom} & $\rightarrow$ & - \varstyle{Atom} \\
+\end{tabular}
+
+where \varstyle{Op-p1} can be any of the operators that have the same priority level as * (can be either * or /).
+
+\subsubsection{The problem of parentheses}
+The problem of parentheses is less trivial than the unary minus problem. Let's take $(A + B) * C$ as example. We must add a new rule such as
+the () operator has the highest priority. To respect the priority order, this rule must be of the form \\ \varstyle{Atom} $\rightarrow \alpha$.
+In our example, \textbf{the parser will apply the multiplication first} (because applying addition first would lead the parser in a state where $(A$ and $B)$
+are atoms). Let's consider the case where we use this rule:
+
+\begin{tabular}{lll}
+  \varstyle{Atom} & $\rightarrow$ & ( \varstyle{Atom} ) \\
+\end{tabular}
+
+The parser will apply it and end up with $A + B$ as an atom. Since $A + B$ is \textbf{not a terminal}, this produces an error. Because $A + B$ is an arithmetic
+expression itself, we must not regard it as an atom. Let's correct the rule:
+
+\begin{tabular}{lll}
+  \varstyle{Atom} & $\rightarrow$ & ( \varstyle{ExprArith-p0} ) \\
+\end{tabular}
+
+Let's check the derivation of $(A + B) * C$ (and skip some steps for making it more concise):
+
+\begin{tabular}{ll}
+  & \varstyle{ExprArith-p0}  \\
+  $\rightarrow$ & \varstyle{ExprArith-p1} \\
+  $\rightarrow$ & \varstyle{ExprArith-p1} \varstyle{Op-p1} \varstyle{Atom} \\
+  $\rightarrow$ & \varstyle{Atom} * \varstyle{Atom} \\
+  $\rightarrow$ & ( \varstyle{ExprArith-p0} ) * [VarName] \\
+  $\rightarrow$ & ( \varstyle{ExprArith-p0} \varstyle{Op-p0} \varstyle{ExprArith-p1} ) * [VarName] \\
+  $\rightarrow$ & ( \varstyle{ExprArith-p1} + \varstyle{ExprArith-p1} ) * [VarName] \\
+  $\rightarrow$ & ( \varstyle{Atom} + \varstyle{Atom} ) * [VarName] \\
+  $\rightarrow$ & ( [VarName] + [VarName] ) * [VarName] \\
+\end{tabular}
+
+We obtain the desired outcome. Let's add rule \varstyle{Atom} $\rightarrow$ ( \varstyle{ExprArith-p0} ) to the grammar.
+
+\subsubsection{Arithmetic operators}
+
+Let's summarize all the changes we did to the grammar:
+
+\begin{tabular}{lll}
+  \varstyle{SimpleCond} & $\rightarrow$ & \varstyle{ExprArith-p0} \varstyle{Comp} \varstyle{ExprArith-p0} \\
+  \varstyle{ExprArith-p0} & $\rightarrow$ & \varstyle{ExprArith-p0} \varstyle{Op-p0} \varstyle{ExprArith-p1} \\
+  & $\rightarrow$ & \varstyle{ExprArith-p1} \\
+  \varstyle{ExprArith-p1} & $\rightarrow$ & \varstyle{ExprArith-p1} \varstyle{Op-p1} \varstyle{Atom} \\
+  & $\rightarrow$ & \varstyle{Atom} \\
+  \varstyle{Atom} & $\rightarrow$ & [VarName] \\
+  & $\rightarrow$ & [Number] \\
+  & $\rightarrow$ & ( \varstyle{ExprArith-p0} ) \\
+  & $\rightarrow$ & - \varstyle{Atom} \\
+  \varstyle{Op-p0} & $\rightarrow$ & + \\
+  & $\rightarrow$ & - \\
+  \varstyle{Op-p1} & $\rightarrow$ & * \\
+  & $\rightarrow$ & / \\
+\end{tabular}
+
+\subsubsection{Logical operators}
+
+We apply the same reasoning we did for arithmetic operators.
+The changes to apply to deal with priorities of operators \{or, and, not\} \textbf{are similar to the changes we made} to take the priorities of operators
+\{+, *, -\} into account. After repeating our analysis, we obtain the following new rules for logical operators:
+
+\begin{tabular}{lll}
+  \varstyle{Cond-p0} & $\rightarrow$ & \varstyle{Cond-p0} or \varstyle{Cond-p1} \\
+  & $\rightarrow$ & \varstyle{Cond-p1} \\
+  \varstyle{Cond-p1} & $\rightarrow$ & \varstyle{Cond-p1} and \varstyle{Cond-p2} \\
+  & $\rightarrow$ & \varstyle{Cond-p2} \\
+  \varstyle{Cond-p2} & $\rightarrow$ & not \varstyle{SimpleCond} \\
+  & $\rightarrow$ & \varstyle{SimpleCond} \\
 \end{tabular}
 
 \subsection{Operator associativity}
@@ -227,27 +326,25 @@ on change par
   &  & \varstyle{Print} \\
   &  & \varstyle{Read} \\
   & \varstyle{Assign} & [VarName] := \varstyle{ExprArith-p0} \\
-  & \varstyle{ExprArith-p2} & [VarName] \\
-  &  & [Number] \\
-  &  & ( \varstyle{ExprArith-p2} ) \\
-  &  & - \varstyle{ExprArith-p2} \\
   & \varstyle{ExprArith-p0-j} & \varstyle{Op-p0} \varstyle{ExprArith-p1} \\
   & \varstyle{ExprArith-p0-i} & \varstyle{ExprArith-p1} \\
-  & \varstyle{ExprArith-p1-j} & \varstyle{Op-p1} \varstyle{ExprArith-p2} \\
-  & \varstyle{ExprArith-p1-i} & \varstyle{ExprArith-p2} \\
+  & \varstyle{ExprArith-p1-j} & \varstyle{Op-p1} \varstyle{Atom} \\
+  & \varstyle{ExprArith-p1-i} & \varstyle{Atom} \\
+  & \varstyle{Atom} & [VarName] \\
+  &  & [Number] \\
+  &  & ( \varstyle{ExprArith-p0} ) \\
+  &  & - \varstyle{Atom} \\
   & \varstyle{Op-p0} & + \\
   &  & - \\
   & \varstyle{Op-p1} & * \\
   &  & / \\
-  & \varstyle{Cond-p0-j} & \varstyle{BinOp-p0} \varstyle{Cond-p1} \\
+  & \varstyle{Cond-p0-j} & or \varstyle{Cond-p1} \\
   & \varstyle{Cond-p0-i} & \varstyle{Cond-p1} \\
-  & \varstyle{Cond-p1-j} & \varstyle{BinOp-p1} \varstyle{Cond-p2} \\
+  & \varstyle{Cond-p1-j} & and \varstyle{Cond-p2} \\
   & \varstyle{Cond-p1-i} & \varstyle{Cond-p2} \\
   & \varstyle{Cond-p2} & not \varstyle{SimpleCond} \\
   &  & \varstyle{SimpleCond} \\
   & \varstyle{SimpleCond} & \varstyle{ExprArith-p0} \varstyle{Comp} \varstyle{ExprArith-p0} \\
-  & \varstyle{BinOp-p1} & and \\
-  & \varstyle{BinOp-p0} & or \\
   & \varstyle{Comp} & = \\
   &  & >= \\
   &  & > \\

@@ -8,27 +8,25 @@
                     -> <Print> 
                     -> <Read> 
 <Assign>            -> [VarName] := <ExprArith-p0> 
-<ExprArith-p2>      -> [VarName] 
-                    -> [Number] 
-                    -> ( <ExprArith-p2> ) 
-                    -> - <ExprArith-p2> 
 <ExprArith-p0-j>    -> <Op-p0> <ExprArith-p1> 
 <ExprArith-p0-i>    -> <ExprArith-p1> 
-<ExprArith-p1-j>    -> <Op-p1> <ExprArith-p2> 
-<ExprArith-p1-i>    -> <ExprArith-p2> 
+<ExprArith-p1-j>    -> <Op-p1> <Atom> 
+<ExprArith-p1-i>    -> <Atom> 
+<Atom>              -> [VarName] 
+                    -> [Number] 
+                    -> ( <ExprArith-p0> ) 
+                    -> - <Atom> 
 <Op-p0>             -> + 
                     -> - 
 <Op-p1>             -> * 
                     -> / 
-<Cond-p0-j>         -> <BinOp-p0> <Cond-p1> 
+<Cond-p0-j>         -> or <Cond-p1> 
 <Cond-p0-i>         -> <Cond-p1> 
-<Cond-p1-j>         -> <BinOp-p1> <Cond-p2> 
+<Cond-p1-j>         -> and <Cond-p2> 
 <Cond-p1-i>         -> <Cond-p2> 
 <Cond-p2>           -> not <SimpleCond> 
                     -> <SimpleCond> 
 <SimpleCond>        -> <ExprArith-p0> <Comp> <ExprArith-p0> 
-<BinOp-p1>          -> and 
-<BinOp-p0>          -> or 
 <Comp>              -> = 
                     -> >= 
                     -> > 
