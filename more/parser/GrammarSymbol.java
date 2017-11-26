@@ -49,4 +49,12 @@ public class GrammarSymbol {
     public String toString() {
         return this.value;
     }
+
+    public String withoutChevrons() {
+        if (this.isTerminal()) {
+            return this.value;
+        } else {
+            return this.value.substring(1, this.value.length() - 1);
+        }
+    }
 }

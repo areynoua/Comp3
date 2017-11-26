@@ -1,57 +1,57 @@
 <Program>           -> begin <Code> end 
 <Code>              -> epsilon 
-<Code>              -> <InstList> 
+                    -> <InstList> 
 <Instruction>       -> <Assign> 
-<Instruction>       -> <If> 
-<Instruction>       -> <While> 
-<Instruction>       -> <For> 
-<Instruction>       -> <Print> 
-<Instruction>       -> <Read> 
+                    -> <If> 
+                    -> <While> 
+                    -> <For> 
+                    -> <Print> 
+                    -> <Read> 
 <Assign>            -> [VarName] := <ExprArith-p0> 
 <ExprArith-p2>      -> [VarName] 
-<ExprArith-p2>      -> [Number] 
-<ExprArith-p2>      -> ( <ExprArith-p2> ) 
-<ExprArith-p2>      -> - <ExprArith-p2> 
+                    -> [Number] 
+                    -> ( <ExprArith-p2> ) 
+                    -> - <ExprArith-p2> 
 <ExprArith-p0-j>    -> <Op-p0> <ExprArith-p1> 
 <ExprArith-p0-i>    -> <ExprArith-p1> 
 <ExprArith-p1-j>    -> <Op-p1> <ExprArith-p2> 
 <ExprArith-p1-i>    -> <ExprArith-p2> 
 <Op-p0>             -> + 
-<Op-p0>             -> - 
+                    -> - 
 <Op-p1>             -> * 
-<Op-p1>             -> / 
+                    -> / 
 <Cond-p0-j>         -> <BinOp-p0> <Cond-p1> 
 <Cond-p0-i>         -> <Cond-p1> 
 <Cond-p1-j>         -> <BinOp-p1> <Cond-p2> 
 <Cond-p1-i>         -> <Cond-p2> 
 <Cond-p2>           -> not <SimpleCond> 
-<Cond-p2>           -> <SimpleCond> 
+                    -> <SimpleCond> 
 <SimpleCond>        -> <ExprArith-p0> <Comp> <ExprArith-p0> 
 <BinOp-p1>          -> and 
 <BinOp-p0>          -> or 
 <Comp>              -> = 
-<Comp>              -> >= 
-<Comp>              -> > 
-<Comp>              -> <= 
-<Comp>              -> < 
-<Comp>              -> <> 
+                    -> >= 
+                    -> > 
+                    -> <= 
+                    -> < 
+                    -> <> 
 <While>             -> while <Cond-p0> do <Code> done 
 <Print>             -> print ( [VarName] ) 
 <Read>              -> read ( [VarName] ) 
 <If>                -> if <Cond-p0> then <Code> <If-Tail> 
 <If-Tail>           -> else <Code> endif 
-<If-Tail>           -> endif 
+                    -> endif 
 <For>               -> for [VarName] from <ExprArith-p0> <For-Tail> 
 <For-Tail>          -> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
-<For-Tail>          -> to <ExprArith-p0> do <Code> done 
+                    -> to <ExprArith-p0> do <Code> done 
 <InstList>          -> <Instruction> <InstList-Tail> 
 <InstList-Tail>     -> ; <InstList> 
-<InstList-Tail>     -> epsilon 
-<ExprArith-p1-j>    -> epsilon 
-<ExprArith-p0-j>    -> epsilon 
-<Cond-p0>           -> <Cond-p0-i> <Cond-p0-j> 
+                    -> epsilon 
 <ExprArith-p1>      -> <ExprArith-p1-i> <ExprArith-p1-j> 
-<Cond-p1-j>         -> epsilon 
-<Cond-p0-j>         -> epsilon 
-<ExprArith-p0>      -> <ExprArith-p0-i> <ExprArith-p0-j> 
+<ExprArith-p0-j>    -> epsilon 
 <Cond-p1>           -> <Cond-p1-i> <Cond-p1-j> 
+<ExprArith-p0>      -> <ExprArith-p0-i> <ExprArith-p0-j> 
+<Cond-p0-j>         -> epsilon 
+<Cond-p0>           -> <Cond-p0-i> <Cond-p0-j> 
+<ExprArith-p1-j>    -> epsilon 
+<Cond-p1-j>         -> epsilon 

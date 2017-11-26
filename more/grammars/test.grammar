@@ -18,5 +18,4 @@
 <primary>                 -> ( <expression> )
                           -> ID
                           -> INTLIT
-<addop>                   -> +
-                          -> -
+<addop>                   -> +                          -> -
