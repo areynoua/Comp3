@@ -1,0 +1,55 @@
+  & \varstyle{Program} & begin \varstyle{Code} end \\
+  & \varstyle{Code} & epsilon \\
+  &  & \varstyle{InstList} \\
+  & \varstyle{Instruction} & \varstyle{Assign} \\
+  &  & \varstyle{If} \\
+  &  & \varstyle{While} \\
+  &  & \varstyle{For} \\
+  &  & \varstyle{Print} \\
+  &  & \varstyle{Read} \\
+  & \varstyle{Assign} & [VarName] := \varstyle{ExprArith-p0} \\
+  & \varstyle{ExprArith-p0-j} & \varstyle{Op-p0} \varstyle{ExprArith-p1} \\
+  & \varstyle{ExprArith-p0-i} & \varstyle{ExprArith-p1} \\
+  & \varstyle{ExprArith-p1-j} & \varstyle{Op-p1} \varstyle{Atom} \\
+  & \varstyle{ExprArith-p1-i} & \varstyle{Atom} \\
+  & \varstyle{Atom} & [VarName] \\
+  &  & [Number] \\
+  &  & ( \varstyle{ExprArith-p0} ) \\
+  &  & - \varstyle{Atom} \\
+  & \varstyle{Op-p0} & + \\
+  &  & - \\
+  & \varstyle{Op-p1} & * \\
+  &  & / \\
+  & \varstyle{Cond-p0-j} & or \varstyle{Cond-p1} \\
+  & \varstyle{Cond-p0-i} & \varstyle{Cond-p1} \\
+  & \varstyle{Cond-p1-j} & and \varstyle{Cond-p2} \\
+  & \varstyle{Cond-p1-i} & \varstyle{Cond-p2} \\
+  & \varstyle{Cond-p2} & not \varstyle{SimpleCond} \\
+  &  & \varstyle{SimpleCond} \\
+  & \varstyle{SimpleCond} & \varstyle{ExprArith-p0} \varstyle{Comp} \varstyle{ExprArith-p0} \\
+  & \varstyle{Comp} & = \\
+  &  & >= \\
+  &  & > \\
+  &  & <= \\
+  &  & < \\
+  &  & <> \\
+  & \varstyle{While} & while \varstyle{Cond-p0} do \varstyle{Code} done \\
+  & \varstyle{Print} & print ( [VarName] ) \\
+  & \varstyle{Read} & read ( [VarName] ) \\
+  & \varstyle{InstList} & \varstyle{Instruction} \varstyle{InstList-Tail} \\
+  & \varstyle{InstList-Tail} & ; \varstyle{InstList} \\
+  &  & epsilon \\
+  & \varstyle{If} & if \varstyle{Cond-p0} then \varstyle{Code} \varstyle{If-Tail} \\
+  & \varstyle{If-Tail} & endif \\
+  &  & else \varstyle{Code} endif \\
+  & \varstyle{For} & for [VarName] from \varstyle{ExprArith-p0} \varstyle{For-Tail} \\
+  & \varstyle{For-Tail} & by \varstyle{ExprArith-p0} to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
+  &  & to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
+  & \varstyle{ExprArith-p1} & \varstyle{ExprArith-p1-i} \varstyle{ExprArith-p1-j} \\
+  & \varstyle{Cond-p1-j} & epsilon \\
+  & \varstyle{Cond-p0} & \varstyle{Cond-p0-i} \varstyle{Cond-p0-j} \\
+  & \varstyle{Cond-p0-j} & epsilon \\
+  & \varstyle{ExprArith-p0-j} & epsilon \\
+  & \varstyle{ExprArith-p0} & \varstyle{ExprArith-p0-i} \varstyle{ExprArith-p0-j} \\
+  & \varstyle{Cond-p1} & \varstyle{Cond-p1-i} \varstyle{Cond-p1-j} \\
+  & \varstyle{ExprArith-p1-j} & epsilon \\

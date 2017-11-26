@@ -73,8 +73,28 @@ public class LL1Grammar {
         PrintWriter writer;
         try {
             writer = new PrintWriter(path, "UTF-8");
+            GrammarSymbol lastVariable = GrammarSymbol.EPSILON;
             for (Rule rule : rules) {
-                writer.println(rule.toPrettyString(true, 20));
+                boolean keepLeft = (!lastVariable.equals(rule.getLeftVariable()));
+                writer.println(rule.toPrettyString(keepLeft, 20));
+                lastVariable = rule.getLeftVariable();
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveLatexRulesToFiles(final String path) {
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter(path, "UTF-8");
+            GrammarSymbol lastVariable = GrammarSymbol.EPSILON;
+            for (Rule rule : rules) {
+                writer.println(rule.toLatex(!lastVariable.equals(rule.getLeftVariable())));
+                lastVariable = rule.getLeftVariable();
             }
             writer.close();
         } catch (FileNotFoundException e) {

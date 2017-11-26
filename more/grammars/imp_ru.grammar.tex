@@ -1,0 +1,40 @@
+  & \varstyle{Program} & begin \varstyle{Code} end \\
+  & \varstyle{Code} & epsilon \\
+  &  & \varstyle{InstList} \\
+  & \varstyle{InstList} & \varstyle{Instruction} \\
+  &  & \varstyle{Instruction} ; \varstyle{InstList} \\
+  & \varstyle{Instruction} & \varstyle{Assign} \\
+  &  & \varstyle{If} \\
+  &  & \varstyle{While} \\
+  &  & \varstyle{For} \\
+  &  & \varstyle{Print} \\
+  &  & \varstyle{Read} \\
+  & \varstyle{Assign} & [VarName] := \varstyle{ExprArith} \\
+  & \varstyle{ExprArith} & [VarName] \\
+  &  & [Number] \\
+  &  & ( \varstyle{ExprArith} ) \\
+  &  & - \varstyle{ExprArith} \\
+  &  & \varstyle{ExprArith} \varstyle{Op} \varstyle{ExprArith} \\
+  & \varstyle{Op} & + \\
+  &  & - \\
+  &  & * \\
+  &  & / \\
+  & \varstyle{If} & if \varstyle{Cond} then \varstyle{Code} endif \\
+  &  & if \varstyle{Cond} then \varstyle{Code} else \varstyle{Code} endif \\
+  & \varstyle{Cond} & \varstyle{Cond} \varstyle{BinOp} \varstyle{Cond} \\
+  &  & not \varstyle{SimpleCond} \\
+  &  & \varstyle{SimpleCond} \\
+  & \varstyle{SimpleCond} & \varstyle{ExprArith} \varstyle{Comp} \varstyle{ExprArith} \\
+  & \varstyle{BinOp} & and \\
+  &  & or \\
+  & \varstyle{Comp} & = \\
+  &  & >= \\
+  &  & > \\
+  &  & <= \\
+  &  & < \\
+  &  & <> \\
+  & \varstyle{While} & while \varstyle{Cond} do \varstyle{Code} done \\
+  & \varstyle{For} & for [VarName] from \varstyle{ExprArith} by \varstyle{ExprArith} to \varstyle{ExprArith} do \varstyle{Code} done \\
+  &  & for [VarName] from \varstyle{ExprArith} to \varstyle{ExprArith} do \varstyle{Code} done \\
+  & \varstyle{Print} & print ( [VarName] ) \\
+  & \varstyle{Read} & read ( [VarName] ) \\

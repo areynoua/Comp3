@@ -4,6 +4,7 @@
 *.class
 *.log
 *.aux
+*.synctex.gz
 /*.pdf
 more/jflex
 more/tree.tex

@@ -59,4 +59,12 @@ public class GrammarSymbol implements Comparable<GrammarSymbol> {
         }
         return this.value.compareTo(other.value);
     }
+
+    public String withoutChevrons() {
+        if (this.isTerminal()) {
+            return this.value;
+        } else {
+            return this.value.substring(1, this.value.length() - 1);
+        }
+    }
 }

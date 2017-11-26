@@ -114,6 +114,23 @@ public class Rule {
         return result;
     }
 
+    public String toLatex(boolean showLeftVariable) {
+        String result = "  & ";
+        if (showLeftVariable) {
+            result += "\\varstyle{" + leftVariable.withoutChevrons() + "}";
+        }
+        result += " & ";
+        for (GrammarSymbol rightSymbol : rightSymbols) {
+            if (rightSymbol.isTerminal()) {
+                result += rightSymbol.toString() + " ";
+            } else {
+                result += "\\varstyle{" + rightSymbol.withoutChevrons() + "} ";
+            }
+        }
+        result += "\\\\";
+        return result;
+    }
+
     public GrammarSymbol getLeftVariable() {
         return leftVariable;
     }

@@ -113,7 +113,7 @@ public class Main {
 
                 if (action == REMOVE_USELESS || action == LEFT_LEFT) {
                     grammar.saveRulesToFile(outputFileName);
-                    // grammar.saveLatexRulesToFiles(outputFileName + ".tex"); // TODO
+                    grammar.saveLatexRulesToFiles(outputFileName + ".tex"); // TODO
                 }
             }
             catch (java.io.FileNotFoundException e) {
