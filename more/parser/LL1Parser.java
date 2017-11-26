@@ -186,9 +186,21 @@ public class LL1Parser {
         }
     }
 
-
     public String actionTableToString() {
         return this.actionTable.toString();
+    }
+
+    public void saveLatexActionTableToFile(final String path) {
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter(path, "UTF-8");
+            writer.println(this.actionTable.toLatexString());
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     List<GrammarSymbol> symbolsToGrammarSymbols(List<Symbol> symbols) {

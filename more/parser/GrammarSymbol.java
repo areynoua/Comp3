@@ -6,8 +6,7 @@ package parser;
 * @author Alexis Reynouard
 */
 
-
-public class GrammarSymbol {
+public class GrammarSymbol implements Comparable<GrammarSymbol> {
     
     private final boolean isTerminalSymbol;
     private final String value;
@@ -48,5 +47,16 @@ public class GrammarSymbol {
     @Override
     public String toString() {
         return this.value;
+    }
+
+    @Override
+    public int compareTo(GrammarSymbol other) {
+        if (this.value.length() < other.value.length()) {
+            return -1;
+        }
+        if (this.value.length() > other.value.length()) {
+            return 1;
+        }
+        return this.value.compareTo(other.value);
     }
 }
