@@ -37,10 +37,8 @@
                     -> <> 
 <While>             -> while <Cond-p0> do <Code> done 
 <Print>             -> print ( [VarName] ) 
-<Read>              -> read ( [VarName] ) 
-<If>                -> if <Cond-p0> then <Code> <If-Tail> 
-<If-Tail>           -> else <Code> endif 
-                    -> endif 
-<For>               -> for [VarName] from <ExprArith-p0> <For-Tail> 
-<For-Tail>          -> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
-                    -> to <ExprArith-p0> do <Code> done 
+<Read>              -> read ( [VarName] )
+<If>                -> if <Cond-p0> then <Code> else <Code> endif 
+                    -> if <Cond-p0> then <Code> endif 
+<For>               -> for [VarName] from <ExprArith-p0> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
+                    -> for [VarName] from <ExprArith-p0> to <ExprArith-p0> do <Code> done 
