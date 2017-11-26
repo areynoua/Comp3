@@ -34,7 +34,15 @@ automaton (PDA) that accepts the language by empty stack. Let's define this PDA 
 
 Hard coding is bad. That is the reason why we did not described the grammar in the source code itself.
 We encoded the Imp grammar (as it was presented in the project statement) in a dedicated \textit{more/grammars} folder and called \textit{imp.grammar}.
-After that, 
+After that, we checked for useless rules and symbols (and found nothing) by hand but also programmatically, and finally dealed with
+the operators priority and associativity by hand. The resulting grammar file, called \textit{imp\_prim.grammar} is used as input by our program.
+We will refer to the later as the \textbf{unambiguous Imp grammar}.
+
+We removed left-recursion, left-factored the grammar and finally computed first sets and follow sets of each grammar symbol by hand. 
+Everything has been verified programmatically. When the parser is executed on an input Imp file, a lexer is instantiated to be able
+to get the resulting list of tokens. Then this sequence of tokens is passed to the parser that first loads the unambiguous Imp grammar,
+processes all the steps that we just enumerated \textbf{to make it LL(1)}, 
+builds its action table from first sets and follow sets, and finally does the parsing itself.
 
 \section{Grammar symbols and rules}
 
@@ -43,9 +51,16 @@ was already present in our source code, and because it is (as explained earlier)
 we created a new class \textit{GrammarSymbol}. A grammar symbol \textbf{can be either a variable or a terminal}. Everytime one does need
 to know whether a grammar symbol is a terminal or not, he calls the method \textit{isTerminal}.
 
+A \textit{Rule} is an object that consists of a left-hand variable represented by a \textit{GrammarSymbol} and a right-hand sequence
+of symbols represented by a list of \textit{GrammarSymbol} objects. All rules are instantiated when loading the unambiguous grammar file.
+For better productivity, we added special methods to display the rules, pretty print them or export them to LaTex.
 
+\section{Action table}
 
-\section{Pushdown automaton}
+Class \textit{ActionTable} has been implemented as a HashMap, where keys are pairs of \textit{GrammarSymbol} objects, and values are integers
+that represent actions. Each key pair is composed of two parts: the symbol that is on top of the stack, and the next input terminal to read.
+Integer values that are positive represent rule numbers, in particular the rule that must be used to produce. Strictly negative integers
+represent other types of actions: -1 stands for \textbf{match}, -2 stands for \textbf{accept} and -3 stands for \textbf{error}.
 
 \section{LL(1) parser}
 
