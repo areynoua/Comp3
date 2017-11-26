@@ -25,7 +25,7 @@ public class Main {
      */
     public static boolean argParse(String argv[]) {
         if (argv.length == 0 || argv.length % 2 == 1) {
-            System.out.println("Arguments :\n	(1) [OPTIONS] --ru <grammar file> -o <grammar output file>\n	(2) [OPTIONS] --ll <grammar file> -o <grammar output file>\n	(3) [OPTIONS] --at <ll1 unambiguous grammar file>\n	(4) [OPTIONS] <ll1 unambiguous grammar file> <code> -o <latex output file>");
+            System.out.println("Arguments :\n	(1) [OPTIONS] --ru <grammar file> -o <grammar output file>\n	(2) [OPTIONS] --ll <grammar file> -o <grammar output file>\n	(3) [OPTIONS] --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) [OPTIONS] <ll1 unambiguous grammar file> <code> -o <latex output file>");
             System.out.println("(1) remove useless\n(2) left factorization and removing of left recursion\n(3) print action table\n(4) save parse tree");
             return false;
         }
@@ -66,7 +66,7 @@ public class Main {
                     inputCodeFileName = argv[i+1];
             }
         }
-        return action != null;
+        return action != null && outputFileName != null;
     }
 
     /**
@@ -92,7 +92,7 @@ public class Main {
                         break;
                     case ACTION_TABLE :
                         parser = new LL1Parser(grammar);
-                        System.out.println(parser.actionTableToString());
+                        parser.saveLatexActionTableToFile(outputFileName);
                         break;
                     case PARSE :
                         java.io.FileInputStream stream = new java.io.FileInputStream(inputCodeFileName);

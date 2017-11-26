@@ -33,37 +33,8 @@ public class LL1Grammar {
 
     public LL1Grammar(String path) throws FileNotFoundException, IOException {
         fromFile(path);
-        //removeUnproductive();
-        //saveRulesToFile("grammars/unproductive_removed.grammar");
-        //removeInaccessible();
-        //saveRulesToFile("grammars/inaccessible_removed.grammar");
-        //leftFactor();
-        //saveRulesToFile("grammars/left_factored.grammar");
-        //removeLeftRecursion();
-        //saveRulesToFile("grammars/unambiguous_ll1.grammar");
         computeFirst();
         computeFollow();
-        //System.out.println("--------------------------------------------------------------------------------");
-
-        //for (GrammarSymbol toprint : this.getVariables()) {
-        //    System.out.print("first(");
-        //    System.out.print(toprint);
-        //    System.out.print(") = ");
-        //    System.out.println(this.first.get(toprint));
-        //}
-        //System.out.println("--------------------------------------------------------------------------------");
-
-        //for (GrammarSymbol toprint : this.getVariables()) {
-        //    System.out.print("follow(");
-        //    System.out.print(toprint);
-        //    System.out.print(") = ");
-        //    System.out.println(this.follow.get(toprint));
-        //}
-        //System.out.println("--------------------------------------------------------------------------------");
-
-        //System.out.println(this);
-
-        //System.out.println("Finished");
     }
 
     public Map<GrammarSymbol, Set<GrammarSymbol>> getFirst() {

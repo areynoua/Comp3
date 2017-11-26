@@ -7,6 +7,8 @@ package parser;
 */
 
 import java.lang.String;
+import java.lang.StringBuilder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 public class ActionTable {
 
@@ -121,5 +122,57 @@ public class ActionTable {
             }
         }
         return result;
+    }
+
+    public String toLatexString() {
+        List<GrammarSymbol> variables = new ArrayList();
+        List<GrammarSymbol> terminals = new ArrayList();
+        variables.addAll(grammar.getVariables());
+        terminals.addAll(grammar.getTerminals());
+        terminals.remove(GrammarSymbol.EPSILON);
+        variables.sort(null);
+        terminals.sort(null);
+        terminals.add(GrammarSymbol.EOS);
+        terminals.add(GrammarSymbol.EPSILON);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\\begin{tabular}{r|");
+        sb.append(String.join("", Collections.nCopies(terminals.size(), "@{\\hskip0.12em}c")));
+        sb.append("}\n");
+        for (GrammarSymbol terminal : terminals) {
+            sb.append(" & \\verb=");
+            sb.append(terminal.toString());
+            sb.append("=");
+        }
+        sb.append("\\\\\n");
+
+        for (GrammarSymbol row : variables) {
+            sb.append("\\verb=");
+            sb.append(row);
+            sb.append("=");
+            for (GrammarSymbol terminal : terminals) {
+                Integer action = get(row, terminal);
+                sb.append(" & ");
+                sb.append(action != ActionTable.ERROR ? action : " ");
+            }
+            sb.append(" \\\\\n");
+        }
+        sb.append("\\hline\n");
+        for (GrammarSymbol row : terminals) {
+            if (row.equals(GrammarSymbol.EPSILON))
+                continue;
+            sb.append("\\verb=");
+            sb.append(row);
+            sb.append("=");
+            for (GrammarSymbol terminal : terminals) {
+                Integer action = get(row, terminal);
+                sb.append(" & ");
+                sb.append(action != ActionTable.ERROR ? action : " ");
+            }
+            sb.append("\\\\\n");
+        }
+
+        sb.append("\\end{tabular}");
+        return sb.toString();
     }
 }
