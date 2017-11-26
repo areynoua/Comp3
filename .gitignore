@@ -4,6 +4,7 @@
 *.class
 *.log
 *.aux
+*.jar
 *.synctex.gz
 /*.pdf
 more/jflex
