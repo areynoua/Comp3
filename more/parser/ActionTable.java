@@ -56,10 +56,10 @@ public class ActionTable {
                     M.put(Arrays.asList(variable, terminal), i);
                 }   
             }
-            i++;
+            ++i;
         }
 
-        System.out.println(this.toString());
+        // System.out.println(this.toString());
     }
 
     Set<GrammarSymbol> computeFirst(List<GrammarSymbol> sequence) {

@@ -6,6 +6,9 @@ package parser;
 * @author Alexis Reynouard
 */
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -22,6 +25,7 @@ public class LL1Parser {
     private Stack<GrammarSymbol> stack; // PDA stack
     private LL1Grammar grammar;
     private ActionTable actionTable; // LL 1 parser's action table
+    private List<Integer> rulesUsed; // Output
 
     public LL1Parser(LL1Grammar grammar) {
         this.grammar = grammar;
@@ -31,7 +35,6 @@ public class LL1Parser {
 
     public void parse(List<Symbol> tokens) {
         resetPDA();
-        List<Integer> rulesUsed = new ArrayList<>();
         List<GrammarSymbol> symbols = symbolsToGrammarSymbols(tokens);
         GrammarSymbol startVariable = grammar.getRules().get(0).getLeftVariable();
         stack.push(GrammarSymbol.EOS);
@@ -42,13 +45,10 @@ public class LL1Parser {
             Integer action = actionTable.get(tos, symbol);
 
             if (action == ActionTable.MATCH) {
-                // System.out.println(tokens.get(cursor));
                 match();
             } else if (action == ActionTable.ACCEPT) {
-                System.out.println(rulesUsed.size());
                 accept();
             } else if (action == ActionTable.ERROR) {
-                // System.out.println(tokens.get(cursor));
                 error();
             } else {
                 produce(action);
@@ -59,10 +59,6 @@ public class LL1Parser {
 
     private void produce(Integer ruleId) {
         stack.pop();
-        if (!(grammar != null)) System.out.println("Error: grammar != null is false");
-        if (!(grammar.getRules() != null)) System.out.println("Error: grammar.getRules() != null is false");
-        if (!(ruleId != null)) System.out.println("Error: ruleId != null is false");
-        if (!(grammar.getRules().get(ruleId) != null)) System.out.println("Error: grammar.getRules().get(ruleId) != null is false");
         Rule rule = grammar.getRules().get(ruleId);
         // System.out.println(rule);
         Integer nSymbols = rule.getRightSymbols().size();
@@ -94,6 +90,7 @@ public class LL1Parser {
     private void resetPDA() {
         stack = new Stack<>();
         cursor = 0;
+        rulesUsed = new ArrayList<>(); // output
     }
 
     @Override
@@ -109,6 +106,89 @@ public class LL1Parser {
           .add("stack:  " + stackSj.toString());
 
         return sj.toString();
+    }
+
+    public String toLatexTree() {
+        // !! Tikz limit to 255 levels
+        int limit = 10;
+        StringBuilder sb = new StringBuilder();
+        Stack<Integer> levels = new Stack<>();
+        int ruleUsedIdx = 0;
+
+        levels.push(ruleUsedIdx);
+        levels.push(rulesUsed.get(ruleUsedIdx));
+        sb.append("\\begin{tikzpicture}");
+        sb.append("[level 1/.style={sibling distance=45mm},level 2/.style={sibling distance=45mm},\n");
+        sb.append(" level 3/.style={sibling distance=45mm},level 4/.style={sibling distance=45mm},\n");
+        sb.append(" level 5/.style={sibling distance=25mm},level 6/.style={sibling distance=25mm},\n");
+        sb.append(" level 7/.style={sibling distance=20mm},level 8/.style={sibling distance=23mm}]");
+        sb.append("\n\\node {");
+        String varName = grammar.getRules().get(rulesUsed.get(ruleUsedIdx)).getLeftVariable().toString();
+        sb.append(varName.substring(1, varName.length() - 1));
+        sb.append("}\n");
+
+        while (!levels.empty()) {
+            int ruleId = levels.pop();
+            Rule rule = grammar.getRules().get(ruleId);
+            int position = levels.pop();
+            if (position == rule.getRightSymbols().size() && !levels.empty()) {
+                if (levels.size() < limit*2) sb.append("}\n");
+            }
+            if (position != rule.getRightSymbols().size()) {
+                GrammarSymbol symbol = rule.getRightSymbols().get(position);
+                if (levels.size() < limit*2) sb.append("child { node {");
+
+                if (symbol.isTerminal()) {
+                    if (levels.size() < limit*2) {
+                        sb.append(symbol.toString());
+                        sb.append("}}\n");
+                    }
+                }
+                else {
+                    if (levels.size() < limit*2) {
+                        if (levels.size() < (limit-1)*2) {
+                            sb.append("$<$");
+                            sb.append(symbol.toString().substring(1,symbol.toString().length()-1));
+                            sb.append("$>$");
+                            sb.append("}\n");
+                        }
+                        else {
+                            sb.append("...}}\n");
+                        }
+                    }
+                }
+                if (position < rule.getRightSymbols().size()) {
+                    levels.push(position+1);
+                    levels.push(ruleId);
+                }
+                if (!symbol.isTerminal()) {
+                    levels.push(0);
+                    levels.push(rulesUsed.get(++ruleUsedIdx));
+                }
+            }
+        }
+        sb.append(";\n\\end{tikzpicture}");
+        return sb.toString();
+    }
+
+    public void saveLatexTreeToFile(final String path) {
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter(path, "UTF-8");
+            writer.println("\\documentclass[a4paper]{article}\n\\usepackage{tikz}\n\\begin{document}");
+            writer.println(this.toLatexTree());
+            writer.println("\\end{document}");
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public String actionTableToString() {
+        return this.actionTable.toString();
     }
 
     List<GrammarSymbol> symbolsToGrammarSymbols(List<Symbol> symbols) {

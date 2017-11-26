@@ -91,48 +91,40 @@ public class Main {
                         grammar.removeLeftRecursion();
                         break;
                     case ACTION_TABLE :
-                        System.out.println("TODO");
+                        parser = new LL1Parser(grammar);
+                        System.out.println(parser.actionTableToString());
                         break;
                     case PARSE :
-                        System.out.println("TODO");
+                        java.io.FileInputStream stream = new java.io.FileInputStream(inputCodeFileName);
+                        java.io.Reader reader = new java.io.InputStreamReader(stream, encodingName);
+                        scanner = new LexicalAnalyzer(reader);
+                        while ( !scanner.isAtEOF() ) {
+                            scanner.yylex();
+                        }
+                        parser = new LL1Parser(grammar);
+                        List<Symbol> symbols = scanner.getTokens();
+                        parser.parse(symbols);
+                        parser.saveLatexTreeToFile(outputFileName);
                         break;
                     default :
-                        System.out.println("???");
+                        System.out.println("Unknown action");
                         break;
                 }
 
                 if (action == REMOVE_USELESS || action == LEFT_LEFT) {
-                    grammar.saveRulesToFiles(outputFileName);
-                    // grammar.saveLatexRulesToFiles(outputFileName + ".tex");
+                    grammar.saveRulesToFile(outputFileName);
+                    // grammar.saveLatexRulesToFiles(outputFileName + ".tex"); // TODO
                 }
-
-                /*
-                java.io.FileInputStream stream = new java.io.FileInputStream(argv[i]);
-                java.io.Reader reader = new java.io.InputStreamReader(stream, encodingName);
-                scanner = new LexicalAnalyzer(reader);
-                while ( !scanner.isAtEOF() )
-                    scanner.yylex();
-                 */
-
-                /*
-                parser = new LL1Parser(grammar);
-
-                List<Symbol> symbols = scanner.getTokens();
-                System.out.println("--------------------------------------------------------------------------------");
-                parser.parse(symbols);
-                */
             }
             catch (java.io.FileNotFoundException e) {
                 System.out.println(e.getMessage());
                 System.out.println(e);
-                System.out.println("We are sorry");
                 System.exit(2);
             }
             catch (java.io.IOException e) {
                 System.out.println(e.getMessage());
                 System.out.println(e);
             }
-            /*
             catch (BadTerminalException e) {
                 System.out.println("Unknown terminal:");
                 System.out.println(e);
@@ -145,9 +137,6 @@ public class Main {
                 System.out.println("Unexpected exception:");
                 e.printStackTrace();
             }
-            */
         }
     }
-
-
 }

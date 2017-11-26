@@ -1,0 +1,6 @@
+begin
+  read(a) ;
+  while b <> 0 do
+    c := b
+  done
+end

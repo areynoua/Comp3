@@ -34,13 +34,13 @@ public class LL1Grammar {
     public LL1Grammar(String path) throws FileNotFoundException, IOException {
         fromFile(path);
         //removeUnproductive();
-        //saveRulesToFiles("grammars/unproductive_removed.grammar");
+        //saveRulesToFile("grammars/unproductive_removed.grammar");
         //removeInaccessible();
-        //saveRulesToFiles("grammars/inaccessible_removed.grammar");
+        //saveRulesToFile("grammars/inaccessible_removed.grammar");
         //leftFactor();
-        //saveRulesToFiles("grammars/left_factored.grammar");
+        //saveRulesToFile("grammars/left_factored.grammar");
         //removeLeftRecursion();
-        //saveRulesToFiles("grammars/unambiguous_ll1.grammar");
+        //saveRulesToFile("grammars/unambiguous_ll1.grammar");
         computeFirst();
         computeFollow();
         //System.out.println("--------------------------------------------------------------------------------");
@@ -98,7 +98,7 @@ public class LL1Grammar {
         }
     }
 
-    public void saveRulesToFiles(final String path) {
+    public void saveRulesToFile(final String path) {
         PrintWriter writer;
         try {
             writer = new PrintWriter(path, "UTF-8");

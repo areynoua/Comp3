@@ -6,6 +6,7 @@
 *.aux
 /*.pdf
 more/jflex
+more/tree.tex
 /Euclid.imp
 /Euclid.out
 /LexicalUnit.java

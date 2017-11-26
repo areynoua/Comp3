@@ -32,10 +32,11 @@ echo $ java Main --ll grammars/imp_prim.grammar -o grammars/imp_ll.grammar
 java Main --ll grammars/imp_prim.grammar -o grammars/imp_ll.grammar
 echo
 echo $ java Main --at grammars/imp_ll.grammar
-java Main --at grammars/imp_ll.grammar
+java Main --at grammars/imp_ll.grammar > /dev/null
 echo
 echo $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.tex
-java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.tex
+java Main grammars/imp_ll.grammar ../test/test-10.imp -o tree.tex
+pdflatex tree.tex
 
 ## Test jar
 #echo
