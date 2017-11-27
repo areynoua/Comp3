@@ -9,8 +9,8 @@ echo Compile Java
 javac lexer/*.java parser/*.java Main.java
 
 # Generate javadoc
-#echo Generate javadoc
-#javadoc -quiet -d ../doc/ lexer/*.java
+echo Generate javadoc
+javadoc -quiet -d ../doc/ lexer/*.java
 
 # Generate jar
 echo Generate jar

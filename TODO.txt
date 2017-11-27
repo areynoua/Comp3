@@ -1,2 +1,0 @@
-1) Créer un nouveau dossier more/parser contenant les fichiers java de la partie 2
-2) Mettre à jour les scripts make en conséquence
