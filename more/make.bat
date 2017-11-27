@@ -16,7 +16,7 @@ REM Generate jar
 ECHO Generate jar
 jar cfe  ../dist/impCompiler.jar Main lexer/*.class parser/*.class Main.class
 
-del /s /q /f grammars/imp_ru.grammar grammars/imp_ll.grammar tree.tex
+del /s /q /f grammars/imp_ru.grammar grammars/imp_ll.grammar tree
 
 REM Test class
 ECHO Test class...
@@ -33,12 +33,8 @@ ECHO
 ECHO $ java Main --at grammars/imp_ll.grammar
 java Main --at grammars/imp_ll.grammar
 ECHO
-ECHO $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.js
-java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.js
-
-REM Delete class files
-ECHO Delete class files
-del /s /q /f *.class
+ECHO $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree
+java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree
 
 REM Test jar
 REM ECHO[
