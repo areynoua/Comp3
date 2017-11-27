@@ -7,17 +7,28 @@ import lexer.Symbol;
 import parser.LL1Grammar;
 import parser.LL1Parser;
 
-
+/**
+ * Entry point of the compiler
+ */
 public class Main {
+    /** Command line argument: ACTION --ru */
     private static final int REMOVE_USELESS = 0;
+    /** Command line argument: ACTION  --ll */
     private static final int LEFT_LEFT = 1;
+    /** Command line argument: ACTION --at */
     private static final int ACTION_TABLE = 2;
+    /** Command line argument: default ACTION*/
     private static final int PARSE = 3;
 
+    /** Uncommented command line argument */
     private static String encodingName;
+    /** Command line argument: input code file */
     private static String inputCodeFileName;
+    /** Command line argument: input grammar file */
     private static String inputGrammarFileName;
+    /** Command line argument: output file */
     private static String outputFileName;
+    /** Command line argument: choosen ACTION */
     private static Integer action;
 
     /**
@@ -25,8 +36,8 @@ public class Main {
      */
     public static boolean argParse(String argv[]) {
         if (argv.length == 0 || argv.length % 2 == 1) {
-            System.out.println("Arguments :\n	(1) [OPTIONS] --ru <grammar file> -o <grammar output file>\n	(2) [OPTIONS] --ll <grammar file> -o <grammar output file>\n	(3) [OPTIONS] --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) [OPTIONS] <ll1 unambiguous grammar file> <code> [-o <parse tree output file>]");
-            System.out.println("(1) remove useless\n(2) left factorization and removing of left recursion\n(3) print action table\n(4) save parse tree");
+            System.out.println("Arguments :\n	(1) --ru <grammar file> -o <grammar output file>\n	(2) --ll <grammar file> -o <grammar output file>\n	(3) --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) <ll1 unambiguous grammar file> <code> [-o <parse tree output file>]");
+            System.out.println("(1) remove useless\n(2) left factorization and removing of left recursion\n(3) print action table\n(4) save parse tree and output the rule used");
             return false;
         }
         encodingName = "UTF-8";
@@ -70,7 +81,7 @@ public class Main {
     }
 
     /**
-     * Runs the scanner and the parser on input files.
+     * Perform the choosen actions on the choosen file.
      */
     public static void main(String argv[]) {
         if (argParse(argv)) {
@@ -93,6 +104,7 @@ public class Main {
                     case ACTION_TABLE :
                         parser = new LL1Parser(grammar);
                         parser.saveLatexActionTableToFile(outputFileName);
+                        grammar.saveLatexFirstFollowToFile("first_follow.tex");
                         break;
                     case PARSE :
                         java.io.FileInputStream stream = new java.io.FileInputStream(inputCodeFileName);
@@ -106,8 +118,8 @@ public class Main {
                         boolean success = parser.parse(symbols);
                         if (success) {
                             if (outputFileName != null) {
-                                // parser.saveTextTreeToFile(outputFileName + ".txt");
-                                // parser.saveLatexTreeToFile(outputFileName + ".tex");
+                                parser.saveTextTreeToFile(outputFileName + ".txt");
+                                parser.saveLatexTreeToFile(outputFileName + ".tex");
                                 parser.saveJavascriptToFile("trees/rules.js");
                             }
                             System.out.println("Parsing done");
@@ -126,7 +138,7 @@ public class Main {
 
                 if (action == REMOVE_USELESS || action == LEFT_LEFT) {
                     grammar.saveRulesToFile(outputFileName);
-                    grammar.saveLatexRulesToFiles(outputFileName + ".tex"); // TODO
+                    grammar.saveLatexRulesToFiles(outputFileName + ".tex");
                 }
             }
             catch (java.io.FileNotFoundException e) {

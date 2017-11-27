@@ -1,5 +1,8 @@
 package lexer;
-// Example of use: if end of comment occurs outside of any comment
+/**
+ * Thrown when the lexer read an incoherent token.
+ * This can occur, for example with an "end of comment" terminal outside of any comment.
+ */
 public class BadTerminalContextException extends Exception {
     public BadTerminalContextException() { super(); }
     public BadTerminalContextException(String message) { super(message); }

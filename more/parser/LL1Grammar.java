@@ -1,10 +1,4 @@
 package parser;
-/**
-* Imp LL(1) grammar
-*
-* @author Antoine Passemiers
-* @author Alexis Reynouard
-*/
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -21,7 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
+/**
+* Imp LL(1) grammar
+*
+* @author Antoine Passemiers
+* @author Alexis Reynouard
+*/
 public class LL1Grammar {
 
     private List<Rule> rules;
@@ -29,22 +28,24 @@ public class LL1Grammar {
     private Map<GrammarSymbol, Set<GrammarSymbol>> first;
     private Map<GrammarSymbol, Set<GrammarSymbol>> follow;
 
-    private int dbg_lvl;
-
+    /** Construct grammar from rules from an file */
     public LL1Grammar(String path) throws FileNotFoundException, IOException {
         fromFile(path);
         computeFirst();
         computeFollow();
     }
 
+    /** First1 set */
     public Map<GrammarSymbol, Set<GrammarSymbol>> getFirst() {
         return first;
     }
 
+    /** Follow1 set */
     public Map<GrammarSymbol, Set<GrammarSymbol>> getFollow() {
         return follow;
     }
 
+    /** Actual construction from file */
     private void fromFile(String path) throws FileNotFoundException, IOException {
         rules = new ArrayList<>();
         BufferedReader br = new BufferedReader(new FileReader(path));
@@ -69,6 +70,7 @@ public class LL1Grammar {
         }
     }
 
+    /** Save the grammar to a file */
     public void saveRulesToFile(final String path) {
         PrintWriter writer;
         try {
@@ -87,6 +89,7 @@ public class LL1Grammar {
         }
     }
 
+    /** Save the grammar to a file in a latex format */
     public void saveLatexRulesToFiles(final String path) {
         PrintWriter writer;
         try {
@@ -113,6 +116,11 @@ public class LL1Grammar {
         return result;
     }
 
+    /** Return a set of all grammar symbols that exists in any rule
+     *
+     * @param getT: include terminals
+     * @param getV: include variables
+     */
     public Set<GrammarSymbol> getGrammarSymbols(boolean getV, boolean getT) {
         Set<GrammarSymbol> S = new HashSet<>();
         for (Rule rule : rules) {
@@ -121,24 +129,29 @@ public class LL1Grammar {
         return S;
     }
 
+    /** Return rules */
     public List<Rule> getRules() {
         return rules;
     }
 
+    /**  Return a set of all grammar symbols that exists in any rule */
     public Set<GrammarSymbol> getGrammarSymbols() {
         return getGrammarSymbols(true, true);
     }
 
+    /**  Return a set of all grammar variables that exists in any rule */
     public Set<GrammarSymbol> getVariables() {
         return this.getGrammarSymbols(true, false);
     }
 
+    /**  Return a set of all grammar terminals that exists in any rule */
     public Set<GrammarSymbol> getTerminals() {
         return this.getGrammarSymbols(false, true);
     }
 
-    public Set<GrammarSymbol> getLeftRecursiveVariables() {
-        Set<GrammarSymbol> leftRecursiveVariables = new HashSet<>();
+    /** return the left recursive variables */
+    public List<GrammarSymbol> getLeftRecursiveVariables() {
+        List<GrammarSymbol> leftRecursiveVariables = new ArrayList<>();
         for (Rule rule : this.rules) {
             if (rule.isLeftRecursive()) {
                 leftRecursiveVariables.add(rule.getLeftVariable());
@@ -147,11 +160,13 @@ public class LL1Grammar {
         return leftRecursiveVariables;
     }
 
+    /** remove the useless rules */
     public void removeUseless() {
         removeUnproductive();
         removeInaccessible();
     }
 
+    /** remove the productive rules */
     public void removeUnproductive() {
         Set<GrammarSymbol> allVariables = getVariables();
         Set<GrammarSymbol> vPrevious = new HashSet<>();
@@ -219,18 +234,11 @@ public class LL1Grammar {
         }
     }
 
-    private Set<Rule> rulesWithCommonPrefix(final Rule baseRule) {
-        Set<Rule> leftSimilarRules = new HashSet<>();
+    /** return the rules with common prefix */
+    private List<Rule> rulesWithCommonPrefix(final Rule baseRule) {
+        List<Rule> leftSimilarRules = new ArrayList<>();
         for (Rule rule : this.rules) {
             if (!baseRule.equals(rule) && rule.getLeftVariable().equals(baseRule.getLeftVariable())) {
-                // System.out.println(baseRule.getRightSymbols().size());
-                // Integer nSymbols = Math.min(baseRule.getRightSymbols().size(), rule.getRightSymbols().size());
-                // boolean atLeastOneDifference = false;
-                // for (int i = 0; i < nSymbols && !atLeastOneDifference; i++) {
-                //    if (!rule.getRightSymbols().get(i).equals(baseRule.getRightSymbols().get(i))) {
-                //        atLeastOneDifference = true;
-                //    }
-                //}
                 if (rule.getRightSymbols().get(0).equals(baseRule.getRightSymbols().get(0))) {
                     leftSimilarRules.add(rule);
                 }
@@ -239,7 +247,8 @@ public class LL1Grammar {
         return leftSimilarRules;
     }
 
-    private List<GrammarSymbol> commonPrefix(final Rule baseRule, final Set<Rule> rules) {
+    /** return the longest common prefix with baseRule */
+    private List<GrammarSymbol> commonPrefix(final Rule baseRule, final List<Rule> rules) {
         int prefixSize = Integer.MAX_VALUE;
         for (Rule rule : rules) {
             int nSymbols = Math.min(baseRule.getRightSymbols().size(), rule.getRightSymbols().size());
@@ -257,6 +266,7 @@ public class LL1Grammar {
         return prefix;
     }
 
+    /** return a rule with a common prefix */
     private Rule hasRulesWithCommonPrefix() {
         for (Rule rule : this.rules) {
             if (rulesWithCommonPrefix(rule).size() > 0) return rule;
@@ -264,16 +274,15 @@ public class LL1Grammar {
         return null;
     }
 
+    /** Perform a left factorization of the grammar */
     public void leftFactor() {
         Rule baseRule;
         while ((baseRule = hasRulesWithCommonPrefix()) != null) {
-            Set<Rule> leftSimilarRules = rulesWithCommonPrefix(baseRule);
+            List<Rule> leftSimilarRules = rulesWithCommonPrefix(baseRule);
             String newVariableName = baseRule.getLeftVariable().toString();
             newVariableName = newVariableName.substring(0, newVariableName.length() - 1) + "-Tail>";
             GrammarSymbol newVariable = new GrammarSymbol(newVariableName);
             List<GrammarSymbol> prefix = commonPrefix(baseRule, leftSimilarRules);
-
-            // System.out.println(prefix);
 
             leftSimilarRules.add(baseRule);
             Integer prefixSize = prefix.size();
@@ -291,11 +300,13 @@ public class LL1Grammar {
         }
     }
 
+
+    /**  Remove the left recursion of the language */
     public void removeLeftRecursion() {
         // A → Aa
         // A → B
-        Set<GrammarSymbol> leftRecursiveVariables = this.getLeftRecursiveVariables();
-        Set<Rule> newRules = new HashSet<>();
+        List<GrammarSymbol> leftRecursiveVariables = this.getLeftRecursiveVariables();
+        List<Rule> newRules = new ArrayList<>();
         for (GrammarSymbol variable : leftRecursiveVariables) {
             // A → UV
             List<GrammarSymbol> rightij = new ArrayList<>(2);
@@ -318,6 +329,7 @@ public class LL1Grammar {
         this.rules.addAll(newRules);
     }
 
+    /** Compute first1 set of all symbols */
     private void computeFirst() {
         assert(this.first == null);
         this.first = new HashMap<GrammarSymbol, Set<GrammarSymbol>>();
@@ -347,6 +359,7 @@ public class LL1Grammar {
         } while(!finished);
     }
 
+    /** Compute follow1 set of all variables */
     private void computeFollow() {
         assert(this.follow == null);
         this.follow = new HashMap<GrammarSymbol, Set<GrammarSymbol>>();
@@ -379,5 +392,42 @@ public class LL1Grammar {
                 }
             }
         } while(!finished);
+    }
+
+    /** return a latex tabular to display first and follow sets */
+    public String firstFollowToLatex() {
+        StringBuilder sb = new StringBuilder();
+        List<GrammarSymbol> symbols = new ArrayList<>();
+        symbols.addAll(getGrammarSymbols());
+        symbols.sort(null);
+
+        sb.append("\\begin{longtable}{r|l|l}\n");
+        sb.append("Symbol $A$ & $First^1(A)$ & $Follow^1(A)$\\verb#");
+        for (GrammarSymbol symbol : symbols) {
+            sb.append("# \\\\ \\hline\n\\verb#");
+            sb.append(symbol.toString());
+            sb.append("# & \\verb#");
+            sb.append(first.get(symbol).toString());
+            sb.append("# & \\verb#");
+            if (!symbol.isTerminal()) {
+                sb.append(follow.get(symbol).toString());
+            }
+        }
+
+        sb.append("\n\\end{longtable}\n");
+        return sb.toString();
+    }
+
+    public void saveLatexFirstFollowToFile(final String path) {
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter(path, "UTF-8");
+            writer.println(this.firstFollowToLatex());
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 }

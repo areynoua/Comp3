@@ -43,13 +43,13 @@
 <If-Tail>           -> endif 
                     -> else <Code> endif 
 <For>               -> for [VarName] from <ExprArith-p0> <For-Tail> 
-<For-Tail>          -> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
-                    -> to <ExprArith-p0> do <Code> done 
+<For-Tail>          -> to <ExprArith-p0> do <Code> done 
+                    -> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
+<ExprArith-p0>      -> <ExprArith-p0-i> <ExprArith-p0-j> 
+<ExprArith-p0-j>    -> epsilon 
 <ExprArith-p1>      -> <ExprArith-p1-i> <ExprArith-p1-j> 
-<Cond-p1-j>         -> epsilon 
+<ExprArith-p1-j>    -> epsilon 
 <Cond-p0>           -> <Cond-p0-i> <Cond-p0-j> 
 <Cond-p0-j>         -> epsilon 
-<ExprArith-p0-j>    -> epsilon 
-<ExprArith-p0>      -> <ExprArith-p0-i> <ExprArith-p0-j> 
 <Cond-p1>           -> <Cond-p1-i> <Cond-p1-j> 
-<ExprArith-p1-j>    -> epsilon 
+<Cond-p1-j>         -> epsilon 

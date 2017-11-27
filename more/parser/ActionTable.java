@@ -17,15 +17,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Store action table
+ */
 public class ActionTable {
 
+    /** action: match the terminal */
     public static final Integer MATCH = -1;
+    /** action: code accepted */
     public static final Integer ACCEPT = -2;
+    /** action: does not match the terminal */
     public static final Integer ERROR = -3;
 
+    /** Action table */
     private Map<List<GrammarSymbol>, Integer> M;
+    /** Source grammar */
     private final LL1Grammar grammar;
 
+    /**
+     * Create an action table from a grammar
+     */
     ActionTable(final LL1Grammar grammar) {
         this.grammar = grammar;
         Map<GrammarSymbol, Set<GrammarSymbol>> first = grammar.getFirst();
@@ -59,10 +70,9 @@ public class ActionTable {
             }
             ++i;
         }
-
-        // System.out.println(this.toString());
     }
 
+    /** Compute Follow1 set */
     Set<GrammarSymbol> computeFirst(List<GrammarSymbol> sequence) {
         Map<GrammarSymbol, Set<GrammarSymbol>> first = grammar.getFirst();
         Set<GrammarSymbol> symbols = new HashSet<>();
@@ -78,10 +88,12 @@ public class ActionTable {
         return symbols;
     }
 
+    /** Get the action from the table */
     Integer get(GrammarSymbol symbol, GrammarSymbol terminal) {
         return M.get(Arrays.asList(symbol, terminal));
     }
 
+    /** Helper function */
     private Set<GrammarSymbol> getTerminals(boolean includeEpsilon) {
         Set<GrammarSymbol> terminals = grammar.getTerminals();
         if (includeEpsilon) {
@@ -93,6 +105,7 @@ public class ActionTable {
         return terminals;
     }
 
+    /** Helper function */
     private Set<GrammarSymbol> getGrammarSymbols() {
         Set<GrammarSymbol> symbols = grammar.getGrammarSymbols();
         symbols.add(GrammarSymbol.EPSILON);
@@ -124,6 +137,7 @@ public class ActionTable {
         return result;
     }
 
+    /** Return latex tabular */
     public String toLatexString() {
         List<GrammarSymbol> variables = new ArrayList();
         List<GrammarSymbol> terminals = new ArrayList();

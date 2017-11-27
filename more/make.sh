@@ -35,7 +35,7 @@ echo $ java Main --at grammars/imp_ll.grammar -o action_table.tex
 java Main --at grammars/imp_ll.grammar -o action_table.tex
 echo
 echo $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree
-java Main grammars/imp_ll.grammar ../test/test-10.imp -o tree.js
+java Main grammars/imp_ll.grammar ../test/test-10.imp -o tree
 
 # Test jar
 echo

@@ -1,10 +1,4 @@
 package parser;
-/**
-* Imp grammar rules
-*
-* @author Antoine Passemiers
-* @author Alexis Reynouard
-*/
 
 import java.lang.String;
 import java.util.ArrayList;
@@ -13,8 +7,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Imp grammar rules
+ *
+ * @author Antoine Passemiers
+ * @author Alexis Reynouard
+ */
 public class Rule {
-    
+
     private GrammarSymbol leftVariable;
     private List<GrammarSymbol> rightSymbols; // Symbols can be either variables or terminals
 
@@ -97,7 +97,7 @@ public class Rule {
             return isEqual;
         }
     }
-    
+
     @Override
     public String toString() {
         String result = leftVariable.toString() + " -> ";
