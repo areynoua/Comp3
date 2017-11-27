@@ -33,8 +33,8 @@ ECHO
 ECHO $ java Main --at grammars/imp_ll.grammar
 java Main --at grammars/imp_ll.grammar
 ECHO
-ECHO $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.tex
-java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.tex
+ECHO $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.js
+java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree.js
 
 REM Delete class files
 ECHO Delete class files

@@ -23,10 +23,12 @@ import lexer.Symbol;
 public class LL1Parser {
 
     private Integer cursor; // Points to the current token from the input token list
-    private Stack<GrammarSymbol> stack; // PDA stack
+    private Stack<Node> stack; // PDA stack
     private LL1Grammar grammar;
     private ActionTable actionTable; // LL 1 parser's action table
     private List<Integer> rulesUsed; // Output
+    private Node root; // Root of parse tree
+    private Integer numNodes;
 
     public LL1Parser(LL1Grammar grammar) {
         this.grammar = grammar;
@@ -38,15 +40,20 @@ public class LL1Parser {
         resetPDA();
         List<GrammarSymbol> symbols = symbolsToGrammarSymbols(tokens);
         GrammarSymbol startVariable = grammar.getRules().get(0).getLeftVariable();
-        stack.push(GrammarSymbol.EOS);
-        stack.push(startVariable);
+        numNodes = 0;
+        root = new Node(startVariable, ++numNodes);
+        Node currentNode = root;
+        stack.push(new Node(GrammarSymbol.EOS, ++numNodes));
+        stack.push(root);
         while (!stack.empty()) {
-            GrammarSymbol tos = stack.peek(); // top of stack
+            currentNode = stack.peek(); // top of stack
+            GrammarSymbol tos = currentNode.getSymbol();
             GrammarSymbol symbol = symbols.get(cursor);
             Integer action = actionTable.get(tos, symbol);
 
             if (action == ActionTable.MATCH) {
-                match();
+                tos = match();
+                // currentNode.addChild(new Node(tos, ++numNodes));
             } else if (action == ActionTable.ACCEPT) {
                 accept();
                 return true;
@@ -54,30 +61,40 @@ public class LL1Parser {
                 error();
                 return false;
             } else {
-                produce(action);
+                List<Node> nodes = produce(action);
+                for (Node node : nodes) {
+                    currentNode.addChild(node);
+                }
                 rulesUsed.add(action);
             }
         }
         return false;
     }
 
-    private void produce(Integer ruleId) {
+    private List<Node> produce(Integer ruleId) {
         stack.pop();
+        List<Node> nodes = new ArrayList<>();
         Rule rule = grammar.getRules().get(ruleId);
         // System.out.println(rule);
+        Integer offset = numNodes;
         Integer nSymbols = rule.getRightSymbols().size();
         for (int i = nSymbols - 1; i > -1; i--) {
             if (!rule.getRightSymbols().get(i).equals(GrammarSymbol.EPSILON)) {
-                stack.push(rule.getRightSymbols().get(i));
+                Node currentNode = new Node(rule.getRightSymbols().get(i), offset + i);
+                stack.push(currentNode);
+                nodes.add(currentNode);
+                ++numNodes;
             }
         }
+        return nodes;
     }
 
-    private void match() {
-        GrammarSymbol tos = stack.pop();
+    private GrammarSymbol match() {
+        GrammarSymbol tos = stack.pop().getSymbol();
         // System.out.print(tos);
         // System.out.print(' ');
         ++cursor;
+        return tos;
     }
 
     private void accept() {
@@ -95,6 +112,8 @@ public class LL1Parser {
         stack = new Stack<>();
         cursor = 0;
         rulesUsed = new ArrayList<>(); // output
+        root = null;
+        numNodes = 0;
     }
 
     @Override
@@ -230,6 +249,39 @@ public class LL1Parser {
             writer.println("\\documentclass[a4paper]{article}\n\\usepackage{tikz}\n\\begin{document}");
             writer.println(this.toLatexTree());
             writer.println("\\end{document}");
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveJavascriptToFile(final String path) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("var nodeDataArray = [\n");
+        //String varName = grammar.getRules().get(rulesUsed.get(ruleUsedIdx)).getLeftVariable().toString();
+        //sb.append("  { key: " + ruleUsedIdx + ", text: \"" + varName + "\", ");
+        //sb.append("fill: \"#f68c06\", stroke: \"#4d90fe\" },\n");
+        Stack<Node> stack = new Stack<>();
+        Node currentNode = root;
+        stack.push(root);
+        while (!stack.empty()) {
+            currentNode = stack.pop();
+            sb.append("  { key: " + currentNode.getId() + ", text: \"" + currentNode.getSymbol().withoutChevrons() + "\", ");
+            sb.append("fill: \"#f68c06\", stroke: \"#4d90fe\" ");
+            if (currentNode.getParent() != null) sb.append(", parent: " + currentNode.getParent().getId());
+            sb.append("},\n");
+            for (Node child : currentNode.getChildren()) {
+                stack.push(child);
+            }
+        }
+
+        sb.append("]");
+        PrintWriter writer;
+        try {
+            writer = new PrintWriter(path, "UTF-8");
+            writer.print(sb.toString());
             writer.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

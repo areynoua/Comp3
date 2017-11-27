@@ -106,11 +106,12 @@ public class Main {
                         boolean success = parser.parse(symbols);
                         if (success) {
                             if (outputFileName != null) {
-                                parser.saveTextTreeToFile(outputFileName + ".txt");
-                                parser.saveLatexTreeToFile(outputFileName + ".tex");
+                                // parser.saveTextTreeToFile(outputFileName + ".txt");
+                                // parser.saveLatexTreeToFile(outputFileName + ".tex");
+                                parser.saveJavascriptToFile("trees/rules.js");
                             }
                             System.out.println("Parsing done");
-                            System.out.println("Rule used:");
+                            System.out.println("Rules used:");
                             System.out.println(parser.rulesUsedToString());
                         }
                         else {

@@ -16,7 +16,7 @@ javac lexer/*.java parser/*.java Main.java
 echo Generate jar
 jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class Main.class
 
-rm -f grammars/imp_ru.grammar grammars/imp_ll.grammar tree.tex
+rm -f grammars/imp_ru.grammar grammars/imp_ll.grammar tree.js
 
 # Test class
 echo Test class
@@ -35,7 +35,7 @@ echo $ java Main --at grammars/imp_ll.grammar -o action_table.tex
 java Main --at grammars/imp_ll.grammar -o action_table.tex
 echo
 echo $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree
-java Main grammars/imp_ll.grammar ../test/test-10.imp -o tree
+java Main grammars/imp_ll.grammar ../test/test-10.imp -o tree.js
 
 # Test jar
 echo

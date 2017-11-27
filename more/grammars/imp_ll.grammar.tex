@@ -37,19 +37,19 @@
   & \varstyle{Print} & print ( [VarName] ) \\
   & \varstyle{Read} & read ( [VarName] ) \\
   & \varstyle{InstList} & \varstyle{Instruction} \varstyle{InstList-Tail} \\
-  & \varstyle{InstList-Tail} & epsilon \\
-  &  & ; \varstyle{InstList} \\
+  & \varstyle{InstList-Tail} & ; \varstyle{InstList} \\
+  &  & epsilon \\
   & \varstyle{If} & if \varstyle{Cond-p0} then \varstyle{Code} \varstyle{If-Tail} \\
   & \varstyle{If-Tail} & endif \\
   &  & else \varstyle{Code} endif \\
   & \varstyle{For} & for [VarName] from \varstyle{ExprArith-p0} \varstyle{For-Tail} \\
   & \varstyle{For-Tail} & by \varstyle{ExprArith-p0} to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
   &  & to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
-  & \varstyle{ExprArith-p0-j} & epsilon \\
-  & \varstyle{Cond-p1} & \varstyle{Cond-p1-i} \varstyle{Cond-p1-j} \\
-  & \varstyle{Cond-p0} & \varstyle{Cond-p0-i} \varstyle{Cond-p0-j} \\
-  & \varstyle{ExprArith-p1-j} & epsilon \\
-  & \varstyle{Cond-p0-j} & epsilon \\
-  & \varstyle{ExprArith-p0} & \varstyle{ExprArith-p0-i} \varstyle{ExprArith-p0-j} \\
   & \varstyle{ExprArith-p1} & \varstyle{ExprArith-p1-i} \varstyle{ExprArith-p1-j} \\
   & \varstyle{Cond-p1-j} & epsilon \\
+  & \varstyle{Cond-p0} & \varstyle{Cond-p0-i} \varstyle{Cond-p0-j} \\
+  & \varstyle{Cond-p0-j} & epsilon \\
+  & \varstyle{ExprArith-p0-j} & epsilon \\
+  & \varstyle{ExprArith-p0} & \varstyle{ExprArith-p0-i} \varstyle{ExprArith-p0-j} \\
+  & \varstyle{Cond-p1} & \varstyle{Cond-p1-i} \varstyle{Cond-p1-j} \\
+  & \varstyle{ExprArith-p1-j} & epsilon \\
