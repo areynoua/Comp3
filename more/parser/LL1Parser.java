@@ -29,6 +29,7 @@ public class LL1Parser {
     private List<Integer> rulesUsed; // Output
     private Node root; // Root of parse tree
     private Integer numNodes;
+    private boolean isSyntaxCorrect;
 
     public LL1Parser(LL1Grammar grammar) {
         this.grammar = grammar;
@@ -84,6 +85,9 @@ public class LL1Parser {
                 stack.push(currentNode);
                 nodes.add(currentNode);
                 ++numNodes;
+            } else {
+                Node currentNode = new Node(GrammarSymbol.EPSILON, offset + i);
+                nodes.add(currentNode);
             }
         }
         return nodes;
@@ -98,11 +102,13 @@ public class LL1Parser {
     }
 
     private void accept() {
+        isSyntaxCorrect = true;
         stack.pop();
         //System.out.println("\nThe sequence of tokens has been accepted");
     }
 
     private void error() {
+        isSyntaxCorrect = false;
         //System.out.println("\nThere is a syntax error in the input program");
         //System.out.println(this);
         //System.exit(1);
@@ -260,23 +266,25 @@ public class LL1Parser {
     public void saveJavascriptToFile(final String path) {
         StringBuilder sb = new StringBuilder();
         sb.append("var nodeDataArray = [\n");
-        //String varName = grammar.getRules().get(rulesUsed.get(ruleUsedIdx)).getLeftVariable().toString();
-        //sb.append("  { key: " + ruleUsedIdx + ", text: \"" + varName + "\", ");
-        //sb.append("fill: \"#f68c06\", stroke: \"#4d90fe\" },\n");
-        Stack<Node> stack = new Stack<>();
-        Node currentNode = root;
-        stack.push(root);
-        while (!stack.empty()) {
-            currentNode = stack.pop();
-            sb.append("  { key: " + currentNode.getId() + ", text: \"" + currentNode.getSymbol().withoutChevrons() + "\", ");
-            sb.append("fill: \"#f68c06\", stroke: \"#4d90fe\" ");
-            if (currentNode.getParent() != null) sb.append(", parent: " + currentNode.getParent().getId());
-            sb.append("},\n");
-            for (Node child : currentNode.getChildren()) {
-                stack.push(child);
+        if (isSyntaxCorrect) {
+            Stack<Node> stack = new Stack<>();
+            Node currentNode = root;
+            stack.push(root);
+            while (!stack.empty()) {
+                currentNode = stack.pop();
+                sb.append("  { key: " + currentNode.getId() + ", text: \"" + currentNode.getSymbol().withoutChevrons() + "\", ");
+                if (!currentNode.getSymbol().equals(GrammarSymbol.EPSILON)) {
+                    sb.append("fill: \"#f68c06\", stroke: \"#4d90fe\" ");
+                } else {
+                    sb.append("fill: \"#f8f8f8\", stroke: \"#4d90fe\" ");
+                }
+                if (currentNode.getParent() != null) sb.append(", parent: " + currentNode.getParent().getId());
+                sb.append("},\n");
+                for (Node child : currentNode.getChildren()) {
+                    stack.push(child);
+                }
             }
         }
-
         sb.append("]");
         PrintWriter writer;
         try {
