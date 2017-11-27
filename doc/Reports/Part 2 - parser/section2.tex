@@ -71,7 +71,10 @@ that rule \varstyle{Code} $\rightarrow \epsilon$ must be used, only by seeing \t
 To keep the table below concise, match and accept does not appear in the table below. Indeed, when the top of stack
 contains a terminal, either the terminal is the same that the one on input and a match is performed (or an accept if the
 terminal is ``\$''; either an error if the two terminals does not match.
-\todo{A-t-on explique la semantique de chaque action?}
+
+Integer values that are positive represent rule numbers, in particular the rule that must be used to produce. The
+action table for the imp language is given below.
+Strictly negative integers represent other types of actions: -1 stands for \textbf{match}, -2 stands for \textbf{accept} and -3 stands for \textbf{error}.
 
 {\small\ttfamily
   \input{../../../more/action_table.tex}
