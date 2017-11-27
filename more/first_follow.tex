@@ -1,70 +1,35 @@
-\begin{longtable}{r|l|l}
-Symbol $A$ & $First^1(A)$ & $Follow^1(A)$\verb## \\ \hline
-\verb#(# & \verb#[(]# & \verb## \\ \hline
-\verb#)# & \verb#[)]# & \verb## \\ \hline
-\verb#*# & \verb#[*]# & \verb## \\ \hline
-\verb#+# & \verb#[+]# & \verb## \\ \hline
-\verb#-# & \verb#[-]# & \verb## \\ \hline
-\verb#/# & \verb#[/]# & \verb## \\ \hline
-\verb#;# & \verb#[;]# & \verb## \\ \hline
-\verb#<# & \verb#[<]# & \verb## \\ \hline
-\verb#=# & \verb#[=]# & \verb## \\ \hline
-\verb#># & \verb#[>]# & \verb## \\ \hline
-\verb#:=# & \verb#[:=]# & \verb## \\ \hline
-\verb#<=# & \verb#[<=]# & \verb## \\ \hline
-\verb#<># & \verb#[<>]# & \verb## \\ \hline
-\verb#>=# & \verb#[>=]# & \verb## \\ \hline
-\verb#by# & \verb#[by]# & \verb## \\ \hline
-\verb#do# & \verb#[do]# & \verb## \\ \hline
-\verb#if# & \verb#[if]# & \verb## \\ \hline
-\verb#or# & \verb#[or]# & \verb## \\ \hline
-\verb#to# & \verb#[to]# & \verb## \\ \hline
-\verb#and# & \verb#[and]# & \verb## \\ \hline
-\verb#end# & \verb#[end]# & \verb## \\ \hline
-\verb#for# & \verb#[for]# & \verb## \\ \hline
-\verb#not# & \verb#[not]# & \verb## \\ \hline
-\verb#<If># & \verb#[if]# & \verb#[else, end, endif, ;, done]# \\ \hline
-\verb#done# & \verb#[done]# & \verb## \\ \hline
-\verb#else# & \verb#[else]# & \verb## \\ \hline
-\verb#from# & \verb#[from]# & \verb## \\ \hline
-\verb#read# & \verb#[read]# & \verb## \\ \hline
-\verb#then# & \verb#[then]# & \verb## \\ \hline
-\verb#<For># & \verb#[for]# & \verb#[else, end, endif, ;, done]# \\ \hline
-\verb#begin# & \verb#[begin]# & \verb## \\ \hline
-\verb#endif# & \verb#[endif]# & \verb## \\ \hline
-\verb#print# & \verb#[print]# & \verb## \\ \hline
-\verb#while# & \verb#[while]# & \verb## \\ \hline
-\verb#<Atom># & \verb#[[VarName], (, -, [Number]]# & \verb#[<=, <>, or, ), *, +, do, then, -, done, /, else, and, by, end, endif, ;, to, <, =, >, >=]# \\ \hline
-\verb#<Code># & \verb#[epsilon, [VarName], print, read, for, while, if]# & \verb#[else, end, endif, done]# \\ \hline
-\verb#<Comp># & \verb#[<=, <>, <, =, >, >=]# & \verb#[[VarName], (, -, [Number]]# \\ \hline
-\verb#<Read># & \verb#[read]# & \verb#[else, end, endif, ;, done]# \\ \hline
-\verb#<Op-p0># & \verb#[+, -]# & \verb#[[VarName], (, -, [Number]]# \\ \hline
-\verb#<Op-p1># & \verb#[*, /]# & \verb#[[VarName], (, -, [Number]]# \\ \hline
-\verb#<Print># & \verb#[print]# & \verb#[else, end, endif, ;, done]# \\ \hline
-\verb#<While># & \verb#[while]# & \verb#[else, end, endif, ;, done]# \\ \hline
-\verb#epsilon# & \verb#[epsilon]# & \verb## \\ \hline
-\verb#<Assign># & \verb#[[VarName]]# & \verb#[else, end, endif, ;, done]# \\ \hline
-\verb#[Number]# & \verb#[[Number]]# & \verb## \\ \hline
-\verb#<Cond-p0># & \verb#[[VarName], not, (, -, [Number]]# & \verb#[do, then]# \\ \hline
-\verb#<Cond-p1># & \verb#[[VarName], not, (, -, [Number]]# & \verb#[or, do, then]# \\ \hline
-\verb#<Cond-p2># & \verb#[[VarName], not, (, -, [Number]]# & \verb#[or, and, do, then]# \\ \hline
-\verb#<If-Tail># & \verb#[else, endif]# & \verb#[else, end, endif, ;, done]# \\ \hline
-\verb#<Program># & \verb#[begin]# & \verb#[epsilon]# \\ \hline
-\verb#[VarName]# & \verb#[[VarName]]# & \verb## \\ \hline
-\verb#<For-Tail># & \verb#[by, to]# & \verb#[else, end, endif, ;, done]# \\ \hline
-\verb#<InstList># & \verb#[[VarName], print, read, for, while, if]# & \verb#[else, end, endif, done]# \\ \hline
-\verb#<Cond-p0-i># & \verb#[[VarName], not, (, -, [Number]]# & \verb#[or, do, then]# \\ \hline
-\verb#<Cond-p0-j># & \verb#[epsilon, or]# & \verb#[do, then]# \\ \hline
-\verb#<Cond-p1-i># & \verb#[[VarName], not, (, -, [Number]]# & \verb#[or, and, do, then]# \\ \hline
-\verb#<Cond-p1-j># & \verb#[epsilon, and]# & \verb#[or, do, then]# \\ \hline
-\verb#<SimpleCond># & \verb#[[VarName], (, -, [Number]]# & \verb#[or, and, do, then]# \\ \hline
-\verb#<Instruction># & \verb#[[VarName], print, read, for, while, if]# & \verb#[else, end, endif, ;, done]# \\ \hline
-\verb#<ExprArith-p0># & \verb#[[VarName], (, -, [Number]]# & \verb#[<=, <>, or, ), do, then, done, else, and, by, end, endif, ;, to, <, =, >, >=]# \\ \hline
-\verb#<ExprArith-p1># & \verb#[[VarName], (, -, [Number]]# & \verb#[<=, <>, or, ), +, do, then, -, done, else, and, by, end, endif, ;, to, <, =, >, >=]# \\ \hline
-\verb#<InstList-Tail># & \verb#[epsilon, ;]# & \verb#[else, end, endif, done]# \\ \hline
-\verb#<ExprArith-p0-i># & \verb#[[VarName], (, -, [Number]]# & \verb#[<=, <>, or, ), +, do, then, -, done, else, and, by, end, endif, ;, to, <, =, >, >=]# \\ \hline
-\verb#<ExprArith-p0-j># & \verb#[epsilon, +, -]# & \verb#[<=, <>, or, ), do, then, done, else, and, by, end, endif, ;, to, <, =, >, >=]# \\ \hline
-\verb#<ExprArith-p1-i># & \verb#[[VarName], (, -, [Number]]# & \verb#[<=, <>, or, ), *, +, do, then, -, done, /, else, and, by, end, endif, ;, to, <, =, >, >=]# \\ \hline
-\verb#<ExprArith-p1-j># & \verb#[epsilon, *, /]# & \verb#[<=, <>, or, ), +, do, then, -, done, else, and, by, end, endif, ;, to, <, =, >, >=]
+\begin{longtable}{r p{7cm} p{7cm}}
+\textnormal{Symbol} $A$ & $First^1(A)$ & $Follow^1(A)$\\ \hline
+<If> & if  & else end endif ; done \\ \hline
+<For> & for  & else end endif ; done \\ \hline
+<Atom> & [VarName] ( - [Number]  & <= <> or ) * + do then - done / else and by end endif ; to < = > >= \\ \hline
+<Code> & epsilon [VarName] print read for while if  & else end endif done \\ \hline
+<Comp> & <= <> < = > >=  & [VarName] ( - [Number] \\ \hline
+<Read> & read  & else end endif ; done \\ \hline
+<Op-p0> & + -  & [VarName] ( - [Number] \\ \hline
+<Op-p1> & * /  & [VarName] ( - [Number] \\ \hline
+<Print> & print  & else end endif ; done \\ \hline
+<While> & while  & else end endif ; done \\ \hline
+<Assign> & [VarName]  & else end endif ; done \\ \hline
+<Cond-p0> & [VarName] not ( - [Number]  & do then \\ \hline
+<Cond-p1> & [VarName] not ( - [Number]  & or do then \\ \hline
+<Cond-p2> & [VarName] not ( - [Number]  & or and do then \\ \hline
+<If-Tail> & else endif  & else end endif ; done \\ \hline
+<Program> & begin  & epsilon \\ \hline
+<For-Tail> & by to  & else end endif ; done \\ \hline
+<InstList> & [VarName] print read for while if  & else end endif done \\ \hline
+<Cond-p0-i> & [VarName] not ( - [Number]  & or do then \\ \hline
+<Cond-p0-j> & epsilon or  & do then \\ \hline
+<Cond-p1-i> & [VarName] not ( - [Number]  & or and do then \\ \hline
+<Cond-p1-j> & epsilon and  & or do then \\ \hline
+<SimpleCond> & [VarName] ( - [Number]  & or and do then \\ \hline
+<Instruction> & [VarName] print read for while if  & else end endif ; done \\ \hline
+<ExprArith-p0> & [VarName] ( - [Number]  & <= <> or ) do then done else and by end endif ; to < = > >= \\ \hline
+<ExprArith-p1> & [VarName] ( - [Number]  & <= <> or ) + do then - done else and by end endif ; to < = > >= \\ \hline
+<InstList-Tail> & epsilon ;  & else end endif done \\ \hline
+<ExprArith-p0-i> & [VarName] ( - [Number]  & <= <> or ) + do then - done else and by end endif ; to < = > >= \\ \hline
+<ExprArith-p0-j> & epsilon + -  & <= <> or ) do then done else and by end endif ; to < = > >= \\ \hline
+<ExprArith-p1-i> & [VarName] ( - [Number]  & <= <> or ) * + do then - done / else and by end endif ; to < = > >= \\ \hline
+<ExprArith-p1-j> & epsilon * /  & <= <> or ) + do then - done else and by end endif ; to < = > >= 
 \end{longtable}
 

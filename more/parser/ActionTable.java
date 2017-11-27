@@ -179,31 +179,40 @@ public class ActionTable {
         terminals.add(GrammarSymbol.EPSILON);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("\\begin{tabular}{r|");
-        sb.append(String.join("", Collections.nCopies(terminals.size(), "@{\\hskip0.12em}c")));
-        sb.append("}\n");
-        for (GrammarSymbol terminal : terminals) {
-            sb.append(" & \\verb=");
-            sb.append(terminal.toString());
-            sb.append("=");
-        }
-        sb.append("\\\\\n");
 
-        // First half of the table, mapping input tokens to variables
-        for (GrammarSymbol row : variables) {
-            sb.append("\\verb=");
-            sb.append(row);
-            sb.append("=");
-            for (GrammarSymbol terminal : terminals) {
-                Integer action = get(row, terminal);
+        int t1Size = terminals.size() / 2 + 6;
+        int t2Size = terminals.size() - t1Size;
+        for (int l = 0; l < 2; ++l) {
+            int t1 = 1 - l;
+            int t2 = l;
+            int size = t1*t1Size+t2*t2Size;
+            int begin = t2*t1Size;
+            int end = begin + size;
+            sb.append("\\begin{tabular}{r|");
+            sb.append(String.join("", Collections.nCopies(size, "c@{ }")));
+            sb.append("}\n");
+
+            for (int i = begin; i < end; ++i) {
                 sb.append(" & ");
-                sb.append(action != ActionTable.ERROR ? action : " ");
+                sb.append(terminals.get(i).equals(GrammarSymbol.EOS) ? "\\$" :  terminals.get(i));
             }
-            sb.append(" \\\\\n");
+            sb.append(" \\\\\\hline\n");
+            // First half of the table, mapping input tokens to variables
+            for (GrammarSymbol row : variables) {
+                sb.append(row);
+                for (int i = begin; i < end; ++i) {
+                    Integer action = get(row, terminals.get(i));
+                    sb.append(" & ");
+                    sb.append(action != ActionTable.ERROR ? action : " ");
+                }
+                sb.append(" \\\\\\hline\n");
+            }
+            sb.append("\\end{tabular}\n\n\n");
         }
-        sb.append("\\hline\n");
+
+        //sb.append("\\hline\n");
         // First half of the table, mapping input tokens to terminals
-        for (GrammarSymbol row : terminals) {
+        /*for (GrammarSymbol row : terminals) {
             if (row.equals(GrammarSymbol.EPSILON))
                 continue;
             sb.append("\\verb=");
@@ -215,9 +224,9 @@ public class ActionTable {
                 sb.append(action != ActionTable.ERROR ? action : " ");
             }
             sb.append("\\\\\n");
-        }
+        }*/
 
-        sb.append("\\end{tabular}");
+        //sb.append("\\end{tabular}");
         return sb.toString();
     }
 }

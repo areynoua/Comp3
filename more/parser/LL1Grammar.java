@@ -398,19 +398,25 @@ public class LL1Grammar {
     public String firstFollowToLatex() {
         StringBuilder sb = new StringBuilder();
         List<GrammarSymbol> symbols = new ArrayList<>();
-        symbols.addAll(getGrammarSymbols());
+        symbols.addAll(getVariables());
         symbols.sort(null);
 
-        sb.append("\\begin{longtable}{r|l|l}\n");
-        sb.append("Symbol $A$ & $First^1(A)$ & $Follow^1(A)$\\verb#");
+        sb.append("\\begin{longtable}{r p{7cm} p{7cm}}\n");
+        sb.append("\\textnormal{Symbol} $A$ & $First^1(A)$ & $Follow^1(A)$");
         for (GrammarSymbol symbol : symbols) {
-            sb.append("# \\\\ \\hline\n\\verb#");
+            sb.append("\\\\ \\hline\n");
             sb.append(symbol.toString());
-            sb.append("# & \\verb#");
-            sb.append(first.get(symbol).toString());
-            sb.append("# & \\verb#");
-            if (!symbol.isTerminal()) {
-                sb.append(follow.get(symbol).toString());
+            sb.append(" & ");
+            Set<GrammarSymbol> f = first.get(symbol);
+            for (GrammarSymbol fs : f) {
+                sb.append(fs.toString());
+                sb.append(" ");
+            }
+            sb.append(" & ");
+            f = follow.get(symbol);
+            for (GrammarSymbol fs : f) {
+                sb.append(fs.toString());
+                sb.append(" ");
             }
         }
 
