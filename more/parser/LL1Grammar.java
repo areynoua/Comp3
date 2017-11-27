@@ -394,6 +394,15 @@ public class LL1Grammar {
         } while(!finished);
     }
 
+    /** Performs some basic checks to see if the grammar is LL1. No garentees! */
+    public boolean check() {
+        if (hasRulesWithCommonPrefix() != null) {
+            System.err.println("The grammar has some rules with a common prefix\nYou should use the --ll argument");
+            return false;
+        }
+        return true;
+    }
+
     /** return a latex tabular to display first and follow sets */
     public String firstFollowToLatex() {
         StringBuilder sb = new StringBuilder();

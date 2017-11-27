@@ -38,6 +38,9 @@ public class LL1Parser {
     }
 
     public boolean parse(List<Symbol> tokens) {
+        if (!this.grammar.check()) {
+            System.exit(1);
+        }
         resetPDA();
         List<GrammarSymbol> symbols = symbolsToGrammarSymbols(tokens);
         GrammarSymbol startVariable = grammar.getRules().get(0).getLeftVariable();
@@ -54,7 +57,6 @@ public class LL1Parser {
 
             if (action == ActionTable.MATCH) {
                 tos = match();
-                // currentNode.addChild(new Node(tos, ++numNodes));
             } else if (action == ActionTable.ACCEPT) {
                 accept();
                 return true;
@@ -76,7 +78,6 @@ public class LL1Parser {
         stack.pop();
         List<Node> nodes = new ArrayList<>();
         Rule rule = grammar.getRules().get(ruleId);
-        // System.out.println(rule);
         Integer offset = numNodes;
         Integer nSymbols = rule.getRightSymbols().size();
         for (int i = nSymbols - 1; i > -1; i--) {
@@ -92,8 +93,6 @@ public class LL1Parser {
 
     private GrammarSymbol match() {
         GrammarSymbol tos = stack.pop().getSymbol();
-        // System.out.print(tos);
-        // System.out.print(' ');
         ++cursor;
         return tos;
     }
@@ -101,14 +100,10 @@ public class LL1Parser {
     private void accept() {
         isSyntaxCorrect = true;
         stack.pop();
-        //System.out.println("\nThe sequence of tokens has been accepted");
     }
 
     private void error() {
         isSyntaxCorrect = false;
-        //System.out.println("\nThere is a syntax error in the input program");
-        //System.out.println(this);
-        //System.exit(1);
     }
 
     private void resetPDA() {

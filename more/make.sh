@@ -59,6 +59,13 @@ java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-10.imp -o
 
 
 
+# Tests
+echo
+echo Test parsing with bad grammar
+echo -----------------------------
+echo
+java -jar ../dist/impCompiler.jar grammars/imp.grammar ../test/test-10.imp
+
 
 
 
