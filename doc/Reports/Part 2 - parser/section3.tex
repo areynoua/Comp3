@@ -2,7 +2,7 @@
 
 \subsection{Theoretical considerations}
 
-The objective is to implement a \textbf{top-down parser} that tells whether a word (sequence of tokens)
+The objective is to implement a \textbf{recursive descent LL(1) parser} that tells whether a word (sequence of tokens)
 is part of the language (Imp grammar) or not. This parser begins with the start variable and builds the
 tree in a depth-first fashion using \textbf{production rules}. More specifically, it consists of a pushdown
 automaton (PDA) that accepts the language by empty stack. Let's define this PDA formally:
@@ -28,11 +28,13 @@ automaton (PDA) that accepts the language by empty stack. Let's define this PDA 
   \item The set of accepting states is empty since we are not accepting words by accepting states, but by empty stack.
 \end{itemize}
 
-\todo{Comment ca marche ?}
+We implemented the parser using a stack instead of hard coding each rule as a unique Java method. Instead of making
+\textbf{explicit recursive calls to functions}, each symbol that composes the right-hand part of the current rule is pushed
+on the stack. This yields the same results than what we could get after implementing a
 
 \subsection{Automating the process, but not too much}
 
-Hard coding is bad. That is the reason why we did not described the grammar in the source code itself.
+We think that hard coding is bad. That is the reason why we did not described the grammar in the source code itself.
 We encoded the Imp grammar (as it was presented in the project statement) in a dedicated \textit{more/grammars} folder and called \textit{imp.grammar}.
 After that, we checked for useless rules and symbols (and found nothing) by hand but also programmatically, and finally dealed with
 the operators priority and associativity by hand. The resulting grammar file, called \textit{imp\_prim.grammar} is used as input by our program.
@@ -63,10 +65,34 @@ Integer values that are positive represent rule numbers, in particular the rule 
 action table for the imp language is given below. Strictly negative integers
 represent other types of actions: -1 stands for \textbf{match}, -2 stands for \textbf{accept} and -3 stands for \textbf{error}.
 
+In source code, \textit{LL1Parser} class contains a stack, a reference to the action table, and the root of the tree. Also, it possesses helper
+methods to export the parse to txt, javascript and latex.
 
-\subsection{LL(1) parser}
+We implemented our parser and parse tree as follows:
+\begin{itemize}
+  \item Push the \$ symbol on the stack and append the \$ symbol to the input sequence of tokens. Then, push the start symbol \varstyle{Program}
+        on the stack.
+  \item Look at the top of the stack, as well as to the next input token. Then combine the two symbols in a list and use it as a key to the
+        action table. The action table returns an integer value that represents the action to apply. If the value is positive, then the parser 
+        \textbf{produces}. If the value is -1, then the parser does a \textbf{match}. Finally if the value is -2, it means that both symbols
+        are \$, and that the sequence of tokens has been \textbf{accepted by empty stack}. In all other cases, it produces a \textbf{syntax error}.
+        Set the current node as the top of the stack.
+  \item In case of a \textbf{produce}, use the integer value as the identifier of the rule to apply, then push all the symbols from the 
+        right-hand side of the rule on the stack. Also, push a symbol only if it is not $\epsilon$. Create a new node containing the symbol
+        and add it to the children list of the current node.
+  \item In case of a \textbf{match}, pop the stack and look at the next token from the inputs.
+  \item Repeat from second step, until an error occurs or the sequence of tokens gets accepted.
+\end{itemize}
 
-\subsection{How to use the parser}
+\section{Parse tree}
+
+The parse tree is obviously built during parsing. Each \textit{Node} object is composed of a grammar symbol that represents it,
+an identifier, a parent \textit{Node} object, and a list of children. Because children are \textbf{not created in the right order},
+we implemented a \textit{NodeComparator} to be able to compare nodes by identifiers. Every time a new child is added to a parent node,
+the latter sorts its children list using the \textit{NodeComparator}. Once the tree is built, we compile it to Javascript to be able
+to display it in the browser.
+
+\section{How to use the parser}
 
 \begin{lstlisting}
 Arguments :
@@ -81,3 +107,12 @@ Arguments :
 \end{lstlisting}
 
 \todo{todo}
+
+\section{Visualize parse trees}
+
+Because comparing rule identifiers from the command line to rules from a list can be tedious,
+\textbf{we recommand you to use the parse tree}. We used Go.js for visualization.
+To see the parse tree of the last Imp program that has been parsed, just open \textit{more/trees/tree.html}
+in your browser (you will need an internet connection for that).
+It is pretty straightforward to compare your input Imp program with the parse tree since all terminals
+are aligned.
