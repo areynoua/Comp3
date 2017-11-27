@@ -85,9 +85,6 @@ public class LL1Parser {
                 stack.push(currentNode);
                 nodes.add(currentNode);
                 ++numNodes;
-            } else {
-                Node currentNode = new Node(GrammarSymbol.EPSILON, offset + i);
-                nodes.add(currentNode);
             }
         }
         return nodes;
@@ -282,6 +279,11 @@ public class LL1Parser {
                 sb.append("},\n");
                 for (Node child : currentNode.getChildren()) {
                     stack.push(child);
+                }
+                if (currentNode.isLeaf() && (!currentNode.getSymbol().isTerminal())) {
+                    Node epsilonNode = new Node(GrammarSymbol.EPSILON, ++numNodes);
+                    currentNode.addChild(epsilonNode);
+                    stack.push(epsilonNode);
                 }
             }
         }
