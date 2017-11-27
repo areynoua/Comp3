@@ -232,7 +232,21 @@ The changes to apply to deal with priorities of operators \{or, and, not\} \text
 
 \subsection{Operator associativity}
 
-\todo{Dire que les regles qu'on a ajoutees sont recursives à gauche, donc associatives à gauche, pour ce qui est des parentheses, l'associativite n'a pas de sens. Enfin pour le - unaire, montrer que c'est bon aussi}
+Because \textbf{we introduced left-recursive rules to remove ambiguities}, the latter are left-associative.
+Let's take the example of $4 + 5 + 8$. The following rule will be applied to that expression:
+
+\begin{tabular}{lll}
+  \varstyle{ExprArith-p0} & $\rightarrow$ & \varstyle{ExprArith-p0} \varstyle{Op-p0} \varstyle{ExprArith-p1}
+\end{tabular}
+
+where \varstyle{Op-p0} will then produce a +. Because the only variable that can produce a sum is 
+\varstyle{ExprArith-p0}, this same rule will be applied one again, with $4 + 5$ being \varstyle{ExprArith-p0}.
+It follows that the expression will be evaluated as $(4 + 5) + 8$.
+
+The case of parentheses is trivial because there is no order in parentheses associativity.
+The fact that the rule is left-recursive or right-recursive has no effect on it.
+Finally, it makes no sense to speak about associativity for unary operators. It results that
+we did not have to deal with the right-associativity of the unary minus.
 
 \section{Removing left-recursion and applying factorization}
 
@@ -278,18 +292,43 @@ To achieve this, we take all the variables \varstyle{A} that appear in a rule of
 
 \subsection{Left-factoring}
 
-\todo{Pareil, expliquer}
+Left-factoring consists in removing groups of rules that have the following form:
 
 \begin{tabular}{lll}
-  \varstyle{If} & $\rightarrow$ & if \varstyle{Cond} then \varstyle{Code} \varstyle{IfTail} \\
-  \varstyle{IfTail} & $\rightarrow$ & endif \\
+  \varstyle{A} & $\rightarrow$ & $\alpha \beta$ \\
+  \varstyle{A} & $\rightarrow$ & $\alpha \gamma$ \\
+\end{tabular}
+
+where $\alpha, \beta, \gamma$ are sequences of symbols $\in (T \cup V)^{*}$. The problem of these
+rules is that \textbf{they consume some look-ahead} and make the grammar non-LL(1).
+More specifically, if $\alpha$ produces at least one terminal (and not only $\epsilon$),
+it follows that the rule to used becomes unpredictable based only on the LL(1) action table.
+If the first terminal produced by $\alpha$ is, let's say token \textit{for}, it will be the case
+for all rules where the right-hand part starts with $\alpha$. Using a look-ahead of one symbol,
+the parser can see that the next input token is \textit{for}, but that is not sufficient to
+decide which rule to use. Such a grammar would be LL(p), where $p$ is the maximal number of terminals
+that can be produced using any of the previous rules.
+
+Let's call $\alpha$ the common prefix. We implemented the left-factoring algorithm as follows:
+For rules sharing a common prefix, we replaced the parts that followed the common prefix
+by a common variable $U$, and then for each rule sharing the prefix, replaced it by a new rule
+where $U$ produces the part that follows the common prefix. This yields the following new rules:
+
+\begin{tabular}{lll}
+  \varstyle{InstList} & $\rightarrow$ & \varstyle{Instruction} \varstyle{InstList-Tail} \\
+  \varstyle{InstList-Tail} & $\rightarrow$ & ; \varstyle{InstList} \\
+  & $\rightarrow$ & epsilon \\
+  \varstyle{If} & $\rightarrow$ & if \varstyle{Cond-p0} then \varstyle{Code} \varstyle{If-Tail} \\
+  \varstyle{If-Tail} & $\rightarrow$ & endif \\
   & $\rightarrow$ & else \varstyle{Code} endif \\
-  \varstyle{For} & $\rightarrow$ & for [VarName] from \varstyle{ExprArith} \varstyle{ForTail} \\
-  \varstyle{ForTail} & $\rightarrow$ & \varstyle{ExprArith} to \varstyle{ExprArith} do \varstyle{Code} done \\
-  & $\rightarrow$ & \varstyle{ExprArith} do \varstyle{Code} done \\
+  \varstyle{For} & $\rightarrow$ & for [VarName] from \varstyle{ExprArith-p0} \varstyle{For-Tail} \\
+  \varstyle{For-Tail} & $\rightarrow$ & to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
+  & $\rightarrow$ & by \varstyle{ExprArith-p0} to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
 \end{tabular}
 
 \section{Resulting grammar}
+
+The final unambiguous LL(1) grammar is as follows:
 
 \newcounter{Rule}
 \newsavebox{\varbox}

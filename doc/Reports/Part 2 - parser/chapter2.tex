@@ -41,13 +41,33 @@ before to be able to find first terminals.
 
 The algorithm that computes first sets has been implemented as a \textbf{fixed-point iteration}: it starts by computing, for each terminal, 
 its first set as the set containing only the terminal itself. Then it proceeds by reduction: for each rule producing sequences of symbols
-from which first sets are known, it computes the first set of the left-hand variable the following way:
-\begin{itemize}
-  \item TODO
-\end{itemize}
+from which first sets are known, it computes the first set of the left-hand variable.
+The first set of a variable is then the \textbf{concatenation of first sets obtained} in all rules where this variable is in left-hand part, 
+except for first sets containing $\epsilon$ (for the reason given earlier).
 
 \section{Follow sets}
 
+Because the right-hand part if a rule may produce $\epsilon$, the first set is \textbf{not sufficient} to predict which rule to use.
+Let's consider rule $A \rightarrow w$, where the first set of w is the empty word. On that case, one can not infer the first terminal
+to be produced after A has been pushed on the stack. Actually, this terminal comes after $A$. So we define the follow set of $A$ as
+the set of terminals such that there exists a derivation from the root that gives $A a B$, where $a$ is a terminal.
+
+Let's take our first example again. We get that $Follow^1(<Code>)$ is $\{$ \textit{end} $\}$ because the only rule where \varstyle{Code}
+is on right-hand side contains a \textit{end} right after \varstyle{Code}. This implies that, when \varstyle{Code} $\rightarrow \epsilon$
+is applied, the terminal that follows is \textit{end}. We must build the action table is such a way that the parser becomes able to predict
+that rule \varstyle{Code} $\rightarrow \epsilon$ must be used, only by seeing \textit{end} as the next input token (look-ahead).
+
 \section{Action table}
 
-\section{Proving that Imp grammar is now LL(1)}
+\todo{mettre table}
+
+\subsection{Imp grammar is now LL(1)}
+
+One is able to prove that Imp grammar is now LL(1), only by checking that there is no conflict in the action table.
+Two actions located in the same cell of the table would mean that, based on the same look-ahead token, 
+there is two possible actions. When multiple actions can be performed without any additional information,
+the parser becomes \textbf{non-deterministic}, and eventually make \textbf{wrong guesses} about which rule to apply.
+
+Since each cell of our action table contains at most one possible action, there can be only one rule to apply to produce
+any terminal from the input buffer. Since we use only \textbf{one symbol of look-ahead}, we can conclude
+that the grammar is LL(1).
