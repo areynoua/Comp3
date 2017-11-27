@@ -1,8 +1,8 @@
-\documentclass[12pt]{report}
+\documentclass[11pt]{article}
 
 \usepackage[english]{babel}
-\usepackage{times}
 \usepackage{fullpage}
+\usepackage[pass,left=1em]{geometry}
 \usepackage[bottom]{footmisc}
 \usepackage{chngcntr}
 \usepackage{etoolbox}
@@ -14,16 +14,57 @@
 \usepackage{caption}
 \usepackage{float}
 \usepackage{titlesec}
-\usepackage{amssymb} 
+\usepackage{amssymb}
 \usepackage{makecell}
 \usepackage{color}
 \usepackage{enumerate}
 \usepackage{array}
 \usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{tocloft}
+\usepackage{listings}
+\usepackage{adjustbox}
+
+\usepackage{fontspec}
+\usepackage{unicode-math}
+
+\setmainfont{STIXGeneral}[
+  Extension = .otf ,
+  Path = stix/ ,
+  UprightFont = *-Regular ,
+  BoldFont = *-Bold ,
+  ItalicFont = *-Italic ,
+  BoldItalicFont = *-BoldItalic ,
+]
+\setsansfont{calibri}[
+  Extension = .ttf ,
+  Path = calibri/ ,
+  BoldFont = *b ,
+  ItalicFont = *i ,
+  BoldItalicFont = *z ,
+]
+\setmonofont{DroidSansMono}[
+  Extension = .ttf ,
+  Path = droid/ ,
+  Scale=MatchLowercase ,
+]
+\setmathfont{STIX Math}
+
+\setlength{\cftbeforesecskip}{3pt}
+\setlist{nosep}
 
 \newcommand\todo[1]{\textcolor{red}{TODO: #1}}
 
-\titleformat{\chapter}{\normalfont\huge}{\thechapter.}{20pt}{\huge}
+\newenvironment{changemargin}[2]{%
+\begin{list}{}{%
+\setlength{\topsep}{0pt}%
+\setlength{\leftmargin}{#1}%
+\setlength{\rightmargin}{#2}%
+\setlength{\listparindent}{\parindent}%
+\setlength{\itemindent}{\parindent}%
+\setlength{\parsep}{\parskip}%
+}%
+\item[]}{\end{list}}
 
 \title{Introduction to language theory and compiling \\ Project -- Part 2}
 \author{Antoine Passemiers \\ Alexis Reynouard}
@@ -36,7 +77,6 @@
 \pagenumbering{Roman}
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
-\setcounter{chapter}{0}
 \pagenumbering{arabic}
 
 \newcommand{\varstyle}[1]{\notblank{#1}{\textsf{$<$#1$>$}}{}}
@@ -45,16 +85,17 @@
 
 \begin{document}
 \maketitle
+\thispagestyle{empty}
 \tableofcontents
 \thispagestyle{empty}
 \pagebreak
 \setcounter{page}{1}
 \clearpage
 
-\include{chapter1}
+\input{section1}
 
-\include{chapter2}
+\input{section2}
 
-\include{chapter3}
+\input{section3}
 
 \end{document}
