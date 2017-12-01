@@ -12,6 +12,15 @@ Program
 | | + ;
 | | + <InstList>
 | | + <Instruction>
+| | | + <Read>
+| | | + read
+| | | + (
+| | | + [VarName]
+| | | + )
+| | + <InstList-Tail>
+| | + ;
+| | + <InstList>
+| | + <Instruction>
 | | | + <While>
 | | | + while
 | | | + <Cond-p0>
@@ -64,8 +73,116 @@ Program
 | | | | | + <ExprArith-p0-j>
 | | | | | + epsilon
 | | | | + <InstList-Tail>
+| | | | + ;
+| | | | + <InstList>
+| | | | + <Instruction>
+| | | | | + <While>
+| | | | | + while
+| | | | | + <Cond-p0>
+| | | | | | + <Cond-p0-i>
+| | | | | | | + <Cond-p1>
+| | | | | | | + <Cond-p1-i>
+| | | | | | | | + <Cond-p2>
+| | | | | | | | + <SimpleCond>
+| | | | | | | | + <ExprArith-p0>
+| | | | | | | | | + <ExprArith-p0-i>
+| | | | | | | | | | + <ExprArith-p1>
+| | | | | | | | | | + <ExprArith-p1-i>
+| | | | | | | | | | | + <Atom>
+| | | | | | | | | | | + [VarName]
+| | | | | | | | | | + <ExprArith-p1-j>
+| | | | | | | | | | + epsilon
+| | | | | | | | | + <ExprArith-p0-j>
+| | | | | | | | | + epsilon
+| | | | | | | | + <Comp>
+| | | | | | | | | + >=
+| | | | | | | | + <ExprArith-p0>
+| | | | | | | | + <ExprArith-p0-i>
+| | | | | | | | | + <ExprArith-p1>
+| | | | | | | | | + <ExprArith-p1-i>
+| | | | | | | | | | + <Atom>
+| | | | | | | | | | + [VarName]
+| | | | | | | | | + <ExprArith-p1-j>
+| | | | | | | | | + epsilon
+| | | | | | | | + <ExprArith-p0-j>
+| | | | | | | | + epsilon
+| | | | | | | + <Cond-p1-j>
+| | | | | | | + epsilon
+| | | | | | + <Cond-p0-j>
+| | | | | | + epsilon
+| | | | | + do
+| | | | | + <Code>
+| | | | | | + <InstList>
+| | | | | | + <Instruction>
+| | | | | | | + <Assign>
+| | | | | | | + [VarName]
+| | | | | | | + :=
+| | | | | | | + <ExprArith-p0>
+| | | | | | | + <ExprArith-p0-i>
+| | | | | | | | + <ExprArith-p1>
+| | | | | | | | + <ExprArith-p1-i>
+| | | | | | | | | + <Atom>
+| | | | | | | | | + [VarName]
+| | | | | | | | + <ExprArith-p1-j>
+| | | | | | | | + epsilon
+| | | | | | | + <ExprArith-p0-j>
+| | | | | | | + <Op-p0>
+| | | | | | | | + -
+| | | | | | | + <ExprArith-p1>
+| | | | | | | + <ExprArith-p1-i>
+| | | | | | | | + <Atom>
+| | | | | | | | + [VarName]
+| | | | | | | + <ExprArith-p1-j>
+| | | | | | | + epsilon
+| | | | | | + <InstList-Tail>
+| | | | | | + epsilon
+| | | | | + done
+| | | | + <InstList-Tail>
+| | | | + ;
+| | | | + <InstList>
+| | | | + <Instruction>
+| | | | | + <Assign>
+| | | | | + [VarName]
+| | | | | + :=
+| | | | | + <ExprArith-p0>
+| | | | | + <ExprArith-p0-i>
+| | | | | | + <ExprArith-p1>
+| | | | | | + <ExprArith-p1-i>
+| | | | | | | + <Atom>
+| | | | | | | + [VarName]
+| | | | | | + <ExprArith-p1-j>
+| | | | | | + epsilon
+| | | | | + <ExprArith-p0-j>
+| | | | | + epsilon
+| | | | + <InstList-Tail>
+| | | | + ;
+| | | | + <InstList>
+| | | | + <Instruction>
+| | | | | + <Assign>
+| | | | | + [VarName]
+| | | | | + :=
+| | | | | + <ExprArith-p0>
+| | | | | + <ExprArith-p0-i>
+| | | | | | + <ExprArith-p1>
+| | | | | | + <ExprArith-p1-i>
+| | | | | | | + <Atom>
+| | | | | | | + [VarName]
+| | | | | | + <ExprArith-p1-j>
+| | | | | | + epsilon
+| | | | | + <ExprArith-p0-j>
+| | | | | + epsilon
+| | | | + <InstList-Tail>
 | | | | + epsilon
 | | | + done
+| | + <InstList-Tail>
+| | + ;
+| | + <InstList>
+| | + <Instruction>
+| | | + <Print>
+| | | + print
+| | | + (
+| | | + [VarName]
+| | | + )
 | | + <InstList-Tail>
 | | + epsilon
 | + end

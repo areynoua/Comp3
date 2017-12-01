@@ -6,6 +6,7 @@ import lexer.LexicalAnalyzer;
 import lexer.Symbol;
 import parser.LL1Grammar;
 import parser.LL1Parser;
+import generator.CodeGenerator;
 
 /**
  * Entry point of the compiler
@@ -88,6 +89,7 @@ public class Main {
             LexicalAnalyzer scanner = null;
             LL1Grammar grammar = null;
             LL1Parser parser = null;
+            CodeGenerator codeGenerator = null;
 
             try {
                 grammar = new LL1Grammar(inputGrammarFileName);
@@ -130,6 +132,8 @@ public class Main {
                             System.out.println("Syntax error");
                             System.out.println(parser);
                         }
+                        codeGenerator = new CodeGenerator("templates/template.ll");
+                        codeGenerator.generate(symbols, parser.getParseTree(), "main.ll");
                         break;
                     default :
                         System.out.println("Unknown action");

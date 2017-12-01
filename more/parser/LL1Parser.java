@@ -114,6 +114,10 @@ public class LL1Parser {
         numNodes = 0;
     }
 
+    public Node getParseTree() {
+        return root;
+    }
+
     @Override
     public String toString() {
         StringJoiner stackSj = new StringJoiner("', '", "[ '", "' ]"); 

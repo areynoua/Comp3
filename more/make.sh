@@ -6,7 +6,7 @@ java -jar jflex-1.6.1.jar -d lexer lexer/LexicalAnalyzer.flex
 
 # Compile java
 echo Compile Java
-javac lexer/*.java parser/*.java Main.java
+javac lexer/*.java parser/*.java generator/*.java Main.java
 
 # Generate javadoc
 echo Generate javadoc
@@ -14,7 +14,7 @@ javadoc -quiet -d ../doc/ lexer/*.java
 
 # Generate jar
 echo Generate jar
-jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class Main.class
+jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class generator/*.class Main.class
 
 rm -f grammars/imp_ru.grammar grammars/imp_ll.grammar tree.js
 
