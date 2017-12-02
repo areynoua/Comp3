@@ -121,9 +121,9 @@ public class LL1Parser {
     @Override
     public String toString() {
         StringJoiner stackSj = new StringJoiner("', '", "[ '", "' ]"); 
-        Stack<GrammarSymbol> stack = (Stack<GrammarSymbol>) this.stack.clone();
+        Stack<Node> stack = (Stack<Node>) this.stack.clone();
         while (!stack.empty()) {
-            stackSj.add(stack.pop().toString());
+            stackSj.add(stack.pop().getSymbol().toString());
         }
 
         StringJoiner sj = new StringJoiner("\n    ","LL1Parser:\n    ","\n");
@@ -370,7 +370,8 @@ public class LL1Parser {
         conversions.put(LexicalUnit.EOS, "$");
 
         for (Symbol symbol : symbols) {
-            grammarSymbols.add(new GrammarSymbol(conversions.get(symbol.getType())));
+            GrammarSymbol grammarSymbol = new GrammarSymbol(conversions.get(symbol.getType()));
+            grammarSymbols.add(grammarSymbol);
         }
         grammarSymbols.add(GrammarSymbol.EOS);
         return grammarSymbols;

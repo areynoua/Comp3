@@ -53,6 +53,10 @@ import java.util.List;
     public List<Symbol> getTokens() {
         return symbols;
     }
+
+    public HashMap<Integer, Symbol> getIdentifiers() {
+        return identifiers;
+    }
 %}
 
 %eof{

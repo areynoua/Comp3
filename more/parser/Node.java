@@ -90,7 +90,7 @@ public class Node {
     public class NodeComparator implements Comparator<Node> {
         @Override
         public int compare(Node node1, Node node2) {
-            return node2.getId() - node1.getId();
+            return node1.getId() - node2.getId();
         }
     }
 }

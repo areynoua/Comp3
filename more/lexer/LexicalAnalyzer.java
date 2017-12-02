@@ -332,6 +332,10 @@ public class LexicalAnalyzer {
         return symbols;
     }
 
+    public HashMap<Integer, Symbol> getIdentifiers() {
+        return identifiers;
+    }
+
 
   /**
    * Creates a new scanner

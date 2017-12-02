@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 import lexer.BadTerminalContextException;
 import lexer.BadTerminalException;
 import lexer.LexicalAnalyzer;
@@ -117,6 +118,7 @@ public class Main {
                         }
                         parser = new LL1Parser(grammar);
                         List<Symbol> symbols = scanner.getTokens();
+                        HashMap<Integer, Symbol> identifiers = scanner.getIdentifiers();
                         boolean success = parser.parse(symbols);
                         if (success) {
                             if (outputFileName != null) {
@@ -133,7 +135,7 @@ public class Main {
                             System.out.println(parser);
                         }
                         codeGenerator = new CodeGenerator("templates/template.ll");
-                        codeGenerator.generate(symbols, parser.getParseTree(), "main.ll");
+                        codeGenerator.generate(symbols, parser.getParseTree(), identifiers, "main.ll");
                         break;
                     default :
                         System.out.println("Unknown action");

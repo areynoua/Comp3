@@ -1,5 +1,7 @@
 package parser;
 
+import lexer.Symbol;
+
 /**
 * Imp grammar symbols (variables or terminals)
 *

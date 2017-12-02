@@ -5,20 +5,24 @@ echo Generate Java
 java -jar jflex-1.6.1.jar -d lexer lexer/LexicalAnalyzer.flex
 
 # Compile java
+echo
 echo Compile Java
 javac lexer/*.java parser/*.java generator/*.java Main.java
 
 # Generate javadoc
+echo
 echo Generate javadoc
 javadoc -quiet -d ../doc/ lexer/*.java
 
 # Generate jar
+echo
 echo Generate jar
 jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class generator/*.class Main.class
 
 rm -f grammars/imp_ru.grammar grammars/imp_ll.grammar tree.js
 
 # Test class
+echo
 echo Test class
 echo ----------
 echo
@@ -55,24 +59,28 @@ echo $ java -jar ../dist/impCompiler.jar --at grammars/imp_ll.grammar -o action_
 java -jar ../dist/impCompiler.jar --at grammars/imp_ll.grammar -o action_table.tex
 echo
 echo $ java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-1.imp -o tree
-java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-10.imp -o tree
-
-
-
-# Tests
 echo
-echo Test parsing with bad grammar
-echo -----------------------------
+java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-s.imp -o tree
+echo $ java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-1.imp -o tree
+java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-s.imp -o tree
+
+
+# Compile LLVM file
 echo
-java -jar ../dist/impCompiler.jar grammars/imp.grammar ../test/test-10.imp
+echo Compile LLVM main file
+echo ----------------------
+echo
+llvm-as main.ll -o=main.bc
+lli main.bc
 
 
 
-
-
-
-
-
+# Grammar tests
+# echo
+# echo Test parsing with bad grammar
+# echo -----------------------------
+# echo
+# java -jar ../dist/impCompiler.jar grammars/imp.grammar ../test/test-10.imp
 
 
 
