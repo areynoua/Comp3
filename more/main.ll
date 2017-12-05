@@ -61,8 +61,9 @@ define i32 @main() {
     %4 = call i32 @readInt()
     store i32 %4, i32* %a
     
-    %5 = add i32 0, 78
-    store i32 null, i32* %b
+    ; b := stuff
+    %5 = add i32 0, 42
+    store i32 %5, i32* %b
     
 
     ret i32 0    

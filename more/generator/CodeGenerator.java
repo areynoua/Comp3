@@ -99,6 +99,7 @@ public class CodeGenerator {
         assert(node.getChildren().size() == 4);
         String varName = (String) consumeOneToken().getValue(); // [VarName]
         consumeOneToken(); // :=
+        this.templateEngine.oneLineComment(varName + " := stuff"); // TODO: print Imp instruction
         String tempVarName = generateFromExprArithP0(node.getChildren().get(2));
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
     }
@@ -160,8 +161,8 @@ public class CodeGenerator {
     }
 
     private String generateFromExprArithP1(final Node node) {
-        generateFromExprArithP1I(node.getChildren().get(0));
-        String tempVarName = generateFromExprArithP1J(node.getChildren().get(1));
+        String tempVarName = generateFromExprArithP1I(node.getChildren().get(0));
+        generateFromExprArithP1J(node.getChildren().get(1));
         return tempVarName;
         // return null; // TODO: Must return the name of the variable to be used for assignation: (a := 4 + 8) will yield %a
     }
@@ -194,13 +195,17 @@ public class CodeGenerator {
             // TODO
         } else if (symbolName.equals("[Number]")) {
             String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables));
-            String instruction = tempVarName + " = add i32 0, 78";
+            Integer number = Integer.parseInt((String) consumeOneToken().getValue());
+            String instruction = tempVarName + " = add i32 0, " + number;
             this.templateEngine.insert(instruction);
             this.templateEngine.newLine();
             this.nUnnamedVariables++;
+            System.out.println(tempVarName);
             return tempVarName;
         } else if (symbolName.equals("(")) {
-            // TODO
+            consumeOneToken(); // (
+            generateFromExprArithP0(node.getChildren().get(1));
+            consumeOneToken(); // )
         } else if (symbolName.equals("-")) {
             // TODO
         }
