@@ -156,6 +156,10 @@ public class Main {
                 System.out.println(e.getMessage());
                 System.out.println(e);
             }
+            catch (java.io.UnsupportedEncodingException e) {
+                System.out.println(e.getMessage());
+                System.out.println(e);
+            }
             catch (BadTerminalException e) {
                 System.out.println("Unknown terminal:");
                 System.out.println(e);

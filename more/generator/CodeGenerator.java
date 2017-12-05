@@ -30,11 +30,13 @@ public class CodeGenerator {
 
     private Symbol consumeOneToken() {
         Symbol token = this.tokens.get(0);
-        this.tokens = this.tokens.subList(1, this.tokens.size());
+        this.tokens.remove(0);
         return token;
     }
 
-    public void generate(final List<Symbol> tokens, final Node parseTree, final HashMap<Integer, Symbol>  identifiers, final String filepath) {
+    public void generate(final List<Symbol> tokens, final Node parseTree,
+            final HashMap<Integer, Symbol>  identifiers, final String filepath)
+            throws FileNotFoundException, UnsupportedEncodingException {
         this.templateEngine.init();
         this.identifiers = identifiers;
         allocateVariables();
@@ -42,16 +44,9 @@ public class CodeGenerator {
         this.tokens = new ArrayList<Symbol>(tokens);
         generateFromProgram(parseTree);
 
-        PrintWriter writer;
-        try {
-            writer = new PrintWriter(filepath, "UTF-8");
-            writer.println(this.templateEngine.finish());
-            writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        PrintWriter writer = new PrintWriter(filepath, "UTF-8");
+        writer.println(this.templateEngine.finish());
+        writer.close();
     }
 
     private void allocateVariables() {
@@ -65,7 +60,7 @@ public class CodeGenerator {
     }
 
     private void generateFromProgram(final Node node) {
-        consumeOneToken(); // begin
+        consumeOneToken(); // begin TODO: check ?
         generateFromCode(node.getChildren().get(1));
         consumeOneToken(); // end
     }
