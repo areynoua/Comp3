@@ -48,21 +48,21 @@ define i32 @main() {
     ; Allocate memory for Imp variables
     %a = alloca i32
     %b = alloca i32
+    %c = alloca i32
     
     ; Read ( a ) 
     %2 = call i32 @readInt()
     store i32 %2, i32* %a
     
-    ; Print ( a ) 
-    %3 = load i32, i32* %a
-    call void @println(i32 %3)
+    ; Read ( b ) 
+    %3 = call i32 @readInt()
+    store i32 %3, i32* %b
     
-    ; Read ( a ) 
-    %4 = call i32 @readInt()
-    store i32 %4, i32* %a
     
-    %5 = add i32 0, 78
-    store i32 null, i32* %b
+    
+    ; Print ( 0 ) 
+    %4 = load i32, i32* %0
+    call void @println(i32 %4)
     
 
     ret i32 0    
