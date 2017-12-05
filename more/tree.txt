@@ -18,6 +18,32 @@ Program
 | | | + [VarName]
 | | | + )
 | | + <InstList-Tail>
+| | + ;
+| | + <InstList>
+| | + <Instruction>
+| | | + <Read>
+| | | + read
+| | | + (
+| | | + [VarName]
+| | | + )
+| | + <InstList-Tail>
+| | + ;
+| | + <InstList>
+| | + <Instruction>
+| | | + <Assign>
+| | | + [VarName]
+| | | + :=
+| | | + <ExprArith-p0>
+| | | + <ExprArith-p0-i>
+| | | | + <ExprArith-p1>
+| | | | + <ExprArith-p1-i>
+| | | | | + <Atom>
+| | | | | + [Number]
+| | | | + <ExprArith-p1-j>
+| | | | + epsilon
+| | | + <ExprArith-p0-j>
+| | | + epsilon
+| | + <InstList-Tail>
 | | + epsilon
 | + end
 $

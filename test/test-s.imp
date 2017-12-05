@@ -1,4 +1,6 @@
 begin
   read(a);
-  print(a)
+  print(a);
+  read(a);
+  b := 78
 end
