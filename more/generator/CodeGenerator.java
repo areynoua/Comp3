@@ -77,6 +77,7 @@ public class CodeGenerator {
         for (Node child: node.getChildren()) {
             if (child.getSymbol().withoutChevrons().equals("Instruction")) {
                 generateFromInstruction(child);
+                this.templateEngine.newLine();
             } else if (child.getSymbol().withoutChevrons().equals("InstList-Tail")) {
                 generateFromInstListTail(child);
             }
@@ -119,14 +120,12 @@ public class CodeGenerator {
         this.templateEngine.insert(tempVarName + " = call i32 @readInt()");
         this.templateEngine.newLine();
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
-        this.templateEngine.newLine();
         this.nUnnamedVariables++;
         consumeOneToken(); // )
     }
 
     private void generateFromPrint(final Node node) {
         assert(node.getChildren().size() == 4);
-        for (Symbol token: this.tokens) System.out.println(token);
         consumeOneToken(); // Print
         consumeOneToken(); // (
         String varName = (String) consumeOneToken().getValue();
@@ -152,9 +151,10 @@ public class CodeGenerator {
     }
 
     private String generateFromExprArithP0(final Node node) {
-        generateFromExprArithP0I(node.getChildren().get(0));
+        String tempVarName = generateFromExprArithP0I(node.getChildren().get(0));
         generateFromExprArithP0J(node.getChildren().get(1));
-        return null; // TODO: Must return the name of the variable to be used for assignation: (a := 4 + 8) will yield %a
+        return tempVarName; 
+        // TODO: assignation: (a := 4 + 8) will yield %a
     }
 
     private String generateFromExprArithP0I(final Node node) {
@@ -162,17 +162,18 @@ public class CodeGenerator {
     }
 
     private String generateFromExprArithP0J(final Node node) {
-        if (node.getChildren().size() > 0) {
+        if (node.getChildren().size() > 1) {
             generateFromOpP0(node.getChildren().get(0));
-            generateFromExprArithP1(node.getChildren().get(1));
+            return generateFromExprArithP1(node.getChildren().get(1));
         }
         return null; // TODO
     }
 
     private String generateFromExprArithP1(final Node node) {
         generateFromExprArithP1I(node.getChildren().get(0));
-        generateFromExprArithP1J(node.getChildren().get(1));
-        return null; // TODO: Must return the name of the variable to be used for assignation: (a := 4 + 8) will yield %a
+        String tempVarName = generateFromExprArithP1J(node.getChildren().get(1));
+        return tempVarName;
+        // return null; // TODO: Must return the name of the variable to be used for assignation: (a := 4 + 8) will yield %a
     }
 
     private String generateFromOpP0(final Node node) {
@@ -180,13 +181,15 @@ public class CodeGenerator {
     }
 
     private String generateFromExprArithP1I(final Node node) {
-        return generateFromAtom(node.getChildren().get(0));
+        String tempVarName = generateFromAtom(node.getChildren().get(0));
+        return tempVarName;
     }
 
     private String generateFromExprArithP1J(final Node node) {
-        if (node.getChildren().size() > 0) {
+        if (node.getChildren().size() > 1) {
             generateFromOpP1(node.getChildren().get(0));
-            generateFromAtom(node.getChildren().get(1));
+            String tempVarName = generateFromAtom(node.getChildren().get(1));
+            return tempVarName;
         }
         return null; // TODO
     }
@@ -196,6 +199,22 @@ public class CodeGenerator {
     }
 
     private String generateFromAtom(final Node node) {
+        String symbolName = node.getChildren().get(0).getSymbol().withoutChevrons();
+        if (symbolName.equals("[VarName]")) {
+            // TODO
+        } else if (symbolName.equals("[Number]")) {
+            String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables));
+            String instruction = tempVarName + " = add i32 0, 78";
+            this.templateEngine.insert(instruction);
+            this.templateEngine.newLine();
+            this.nUnnamedVariables++;
+            System.out.println(tempVarName);
+            return tempVarName;
+        } else if (symbolName.equals("(")) {
+            // TODO
+        } else if (symbolName.equals("-")) {
+            // TODO
+        }
         return null; // TODO
     }
 
