@@ -57,13 +57,14 @@ define i32 @main() {
     %3 = load i32, i32* %a
     call void @println(i32 %3)
     
-    ; Read ( a ) 
-    %4 = call i32 @readInt()
-    store i32 %4, i32* %a
-    
     ; b := stuff
-    %5 = add i32 0, 42
-    store i32 %5, i32* %b
+    %4 = add i32 0, 42
+    store i32 %4, i32* %b
+    
+    ; a := stuff
+    %5 = add i32 0, 5
+    %6 = sub i32 0, %5
+    store i32 %6, i32* %a
     
 
     ret i32 0    

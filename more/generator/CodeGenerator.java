@@ -110,11 +110,10 @@ public class CodeGenerator {
         consumeOneToken(); // (
         String varName = (String) consumeOneToken().getValue();
         this.templateEngine.oneLineComment("Read ( " + varName + " ) ");
-        String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables));
+        String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
         this.templateEngine.insert(tempVarName + " = call i32 @readInt()");
         this.templateEngine.newLine();
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
-        this.nUnnamedVariables++;
         consumeOneToken(); // )
     }
 
@@ -123,13 +122,12 @@ public class CodeGenerator {
         consumeOneToken(); // Print
         consumeOneToken(); // (
         String varName = (String) consumeOneToken().getValue();
-        String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables));
+        String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
         this.templateEngine.oneLineComment("Print ( " + varName + " ) ");
         this.templateEngine.insert(tempVarName + " = load i32, i32* " + llvmVarName(varName));
         this.templateEngine.newLine();
         String instruction = "call void @println(i32 " + tempVarName + ")";
         this.templateEngine.insert(instruction);
-        this.nUnnamedVariables++;
         consumeOneToken(); // )
     }
 
@@ -191,25 +189,30 @@ public class CodeGenerator {
 
     private String generateFromAtom(final Node node) {
         String symbolName = node.getChildren().get(0).getSymbol().withoutChevrons();
+        String tempVarName;
         if (symbolName.equals("[VarName]")) {
-            // TODO
+            tempVarName = null; // TODO
         } else if (symbolName.equals("[Number]")) {
-            String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables));
+            tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
             Integer number = Integer.parseInt((String) consumeOneToken().getValue());
             String instruction = tempVarName + " = add i32 0, " + number;
             this.templateEngine.insert(instruction);
             this.templateEngine.newLine();
-            this.nUnnamedVariables++;
-            System.out.println(tempVarName);
-            return tempVarName;
         } else if (symbolName.equals("(")) {
             consumeOneToken(); // (
-            generateFromExprArithP0(node.getChildren().get(1));
+            tempVarName = generateFromExprArithP0(node.getChildren().get(1));
             consumeOneToken(); // )
         } else if (symbolName.equals("-")) {
-            // TODO
+            consumeOneToken(); // -
+            String atomVarName = generateFromAtom(node.getChildren().get(1));
+            tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+            String instruction = tempVarName + " = sub i32 0, " + atomVarName;
+            this.templateEngine.insert(instruction);
+            this.templateEngine.newLine();
+        } else {
+            tempVarName = null; // TODO: raise exception
         }
-        return null; // TODO
+        return tempVarName;
     }
 
     private String llvmVarName(final String varName) {

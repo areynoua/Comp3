@@ -1,5 +1,6 @@
 begin
   read(a);
   print(a);
-  b := 42
+  b := 42;
+  a := -5
 end
