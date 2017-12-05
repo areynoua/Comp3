@@ -66,22 +66,15 @@ public class CodeGenerator {
     }
 
     private void generateFromCode(final Node node) {
-        for (Node child: node.getChildren()) {
-            if (child.getSymbol().withoutChevrons().equals("InstList")) {
-                generateFromInstList(child);
-            }
+        if (node.getChildren().get(0).getSymbol().withoutChevrons().equals("InstList")) {
+            generateFromInstList(node.getChildren().get(0));
         }
     }
 
     private void generateFromInstList(final Node node) {
-        for (Node child: node.getChildren()) {
-            if (child.getSymbol().withoutChevrons().equals("Instruction")) {
-                generateFromInstruction(child);
-                this.templateEngine.newLine();
-            } else if (child.getSymbol().withoutChevrons().equals("InstList-Tail")) {
-                generateFromInstListTail(child);
-            }
-        }
+        generateFromInstruction(node.getChildren().get(0));
+        this.templateEngine.newLine();
+        generateFromInstListTail(node.getChildren().get(1));
     }
 
     private void generateFromInstruction(final Node node) {
@@ -140,13 +133,10 @@ public class CodeGenerator {
     }
 
     private void generateFromInstListTail(final Node node) {
-        for (Node child: node.getChildren()) {
-            if (child.getSymbol().withoutChevrons().equals(";")) {
-                consumeOneToken(); // ;
-                this.templateEngine.newLine();
-            } else if (child.getSymbol().withoutChevrons().equals("InstList")) {
-                generateFromInstList(child);
-            }
+        if (node.getChildren().size() > 1) {
+            consumeOneToken(); // ;
+            this.templateEngine.newLine();
+            generateFromInstList(node.getChildren().get(1));
         }
     }
 
@@ -208,7 +198,6 @@ public class CodeGenerator {
             this.templateEngine.insert(instruction);
             this.templateEngine.newLine();
             this.nUnnamedVariables++;
-            System.out.println(tempVarName);
             return tempVarName;
         } else if (symbolName.equals("(")) {
             // TODO

@@ -33,11 +33,5 @@ ECHO
 ECHO $ java Main --at grammars/imp_ll.grammar
 java Main --at grammars/imp_ll.grammar
 ECHO
-ECHO $ java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree
-java Main grammars/imp_ll.grammar ../test/test-1.imp -o tree
-
-REM Test jar
-REM ECHO[
-REM ECHO Test jar
-REM ECHO --------
-REM java -jar ../dist/impCompiler.jar ../test/test-1.imp
+ECHO $ java Main grammars/imp_ll.grammar ../test/test-s.imp -o tree
+java Main grammars/imp_ll.grammar ../test/test-s.imp -o tree
