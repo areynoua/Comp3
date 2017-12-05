@@ -89,12 +89,11 @@ public class CodeGenerator {
     }
 
     private void generateFromInstruction(final Node node) {
-        assert(node.getChildren().size() == 1);
         String instructionName = node.getChildren().get(0).getSymbol().withoutChevrons();
         if (instructionName.equals("Assign")) {
             generateFromAssign(node.getChildren().get(0));
         } else if (instructionName.equals("If")) {
-            // TODO
+            generateFromIf(node.getChildren().get(0));
         } else if (instructionName.equals("While")) {
             // TODO
         } else if (instructionName.equals("For")) {
@@ -107,7 +106,6 @@ public class CodeGenerator {
     }
 
     private void generateFromAssign(final Node node) {
-        assert(node.getChildren().size() == 4);
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         consumeOneToken(LexicalUnit.ASSIGN);
         this.templateEngine.oneLineComment(varName + " := stuff"); // TODO: print Imp instruction
@@ -116,7 +114,6 @@ public class CodeGenerator {
     }
 
     private void generateFromRead(final Node node) {
-        assert(node.getChildren().size() == 4);
         consumeOneToken(LexicalUnit.READ);
         consumeOneToken(LexicalUnit.LPAREN);
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
@@ -129,7 +126,6 @@ public class CodeGenerator {
     }
 
     private void generateFromPrint(final Node node) {
-        assert(node.getChildren().size() == 4);
         consumeOneToken(LexicalUnit.PRINT);
         consumeOneToken(LexicalUnit.LPAREN);
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
@@ -140,6 +136,14 @@ public class CodeGenerator {
         String instruction = "call void @println(i32 " + tempVarName + ")";
         this.templateEngine.insert(instruction);
         consumeOneToken(LexicalUnit.RPAREN);
+    }
+
+    private void generateFromIf(final Node node) {
+        consumeOneToken(LexicalUnit.IF);
+        // TODO: cond-p0
+        consumeOneToken(LexicalUnit.THEN);
+        generateFromCode(node.getChildren().get(3));
+        // TODO: if-tail
     }
 
     private void generateFromInstListTail(final Node node) {
