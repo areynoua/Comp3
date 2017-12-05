@@ -6,6 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import lexer.LexicalUnit;
 import lexer.Symbol;
 import parser.Node;
 
@@ -30,6 +32,15 @@ public class CodeGenerator {
 
     private Symbol consumeOneToken() {
         Symbol token = this.tokens.get(0);
+        this.tokens.remove(0);
+        return token;
+    }
+
+    private Symbol consumeOneToken(LexicalUnit type) {
+        Symbol token = this.tokens.get(0);
+        if (type != token.getType()) {
+            // TODO: raise exception
+        }
         this.tokens.remove(0);
         return token;
     }
@@ -60,9 +71,9 @@ public class CodeGenerator {
     }
 
     private void generateFromProgram(final Node node) {
-        consumeOneToken(); // begin TODO: check ?
+        consumeOneToken(LexicalUnit.BEGIN);
         generateFromCode(node.getChildren().get(1));
-        consumeOneToken(); // end
+        consumeOneToken(LexicalUnit.END);
     }
 
     private void generateFromCode(final Node node) {
@@ -97,8 +108,8 @@ public class CodeGenerator {
 
     private void generateFromAssign(final Node node) {
         assert(node.getChildren().size() == 4);
-        String varName = (String) consumeOneToken().getValue(); // [VarName]
-        consumeOneToken(); // :=
+        String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
+        consumeOneToken(LexicalUnit.ASSIGN);
         this.templateEngine.oneLineComment(varName + " := stuff"); // TODO: print Imp instruction
         String tempVarName = generateFromExprArithP0(node.getChildren().get(2));
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
@@ -106,34 +117,34 @@ public class CodeGenerator {
 
     private void generateFromRead(final Node node) {
         assert(node.getChildren().size() == 4);
-        consumeOneToken(); // Read
-        consumeOneToken(); // (
-        String varName = (String) consumeOneToken().getValue();
+        consumeOneToken(LexicalUnit.READ);
+        consumeOneToken(LexicalUnit.LPAREN);
+        String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         this.templateEngine.oneLineComment("Read ( " + varName + " ) ");
         String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
         this.templateEngine.insert(tempVarName + " = call i32 @readInt()");
         this.templateEngine.newLine();
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
-        consumeOneToken(); // )
+        consumeOneToken(LexicalUnit.RPAREN);
     }
 
     private void generateFromPrint(final Node node) {
         assert(node.getChildren().size() == 4);
-        consumeOneToken(); // Print
-        consumeOneToken(); // (
-        String varName = (String) consumeOneToken().getValue();
+        consumeOneToken(LexicalUnit.PRINT);
+        consumeOneToken(LexicalUnit.LPAREN);
+        String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
         this.templateEngine.oneLineComment("Print ( " + varName + " ) ");
         this.templateEngine.insert(tempVarName + " = load i32, i32* " + llvmVarName(varName));
         this.templateEngine.newLine();
         String instruction = "call void @println(i32 " + tempVarName + ")";
         this.templateEngine.insert(instruction);
-        consumeOneToken(); // )
+        consumeOneToken(LexicalUnit.RPAREN);
     }
 
     private void generateFromInstListTail(final Node node) {
         if (node.getChildren().size() > 1) {
-            consumeOneToken(); // ;
+            consumeOneToken(LexicalUnit.SEMICOLON);
             this.templateEngine.newLine();
             generateFromInstList(node.getChildren().get(1));
         }
@@ -141,69 +152,95 @@ public class CodeGenerator {
 
     private String generateFromExprArithP0(final Node node) {
         String tempVarName = generateFromExprArithP0I(node.getChildren().get(0));
-        generateFromExprArithP0J(node.getChildren().get(1));
-        return tempVarName; 
-        // TODO: assignation: (a := 4 + 8) will yield %a
+        tempVarName = generateFromExprArithP0J(node.getChildren().get(1), tempVarName);
+        return tempVarName;
     }
 
     private String generateFromExprArithP0I(final Node node) {
         return generateFromExprArithP1(node.getChildren().get(0));
     }
 
-    private String generateFromExprArithP0J(final Node node) {
+    private String generateFromExprArithP0J(final Node node, final String leftVarName) {
         if (node.getChildren().size() > 1) {
-            generateFromOpP0(node.getChildren().get(0));
-            return generateFromExprArithP1(node.getChildren().get(1));
+            String opName = generateFromOpP0(node.getChildren().get(0));
+            String rightVarName = generateFromExprArithP1(node.getChildren().get(1));
+            String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+            String instruction = null;
+            if (opName.equals("+")) {
+                instruction = tempVarName + " = add i32 " + leftVarName + ", " + rightVarName;
+            } else if (opName.equals("-")) {
+                instruction = tempVarName + " = sub i32 " + leftVarName + ", " + rightVarName;
+            } else {
+                // TODO: raise exception
+            }
+            this.templateEngine.insert(instruction);
+            this.templateEngine.newLine();
+            return tempVarName;
+        } else {
+            return leftVarName;
         }
-        return null; // TODO
     }
 
     private String generateFromExprArithP1(final Node node) {
         String tempVarName = generateFromExprArithP1I(node.getChildren().get(0));
-        generateFromExprArithP1J(node.getChildren().get(1));
+        tempVarName = generateFromExprArithP1J(node.getChildren().get(1), tempVarName);
         return tempVarName;
-        // return null; // TODO: Must return the name of the variable to be used for assignation: (a := 4 + 8) will yield %a
     }
 
     private String generateFromOpP0(final Node node) {
-        return null; // TODO
+        return (String) consumeOneToken().getValue();
     }
 
     private String generateFromExprArithP1I(final Node node) {
-        String tempVarName = generateFromAtom(node.getChildren().get(0));
-        return tempVarName;
+        return generateFromAtom(node.getChildren().get(0));
     }
 
-    private String generateFromExprArithP1J(final Node node) {
+    private String generateFromExprArithP1J(final Node node, final String leftVarName) {
         if (node.getChildren().size() > 1) {
-            generateFromOpP1(node.getChildren().get(0));
-            String tempVarName = generateFromAtom(node.getChildren().get(1));
+            String opName = generateFromOpP1(node.getChildren().get(0));
+            String rightVarName = generateFromAtom(node.getChildren().get(1));
+            String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+            String instruction = null;
+            if (opName.equals("*")) {
+                instruction = tempVarName + " = mul i32 " + leftVarName + ", " + rightVarName;
+            } else if (opName.equals("/")) {
+                instruction = tempVarName + " = sdiv i32 " + leftVarName + ", " + rightVarName;
+            } else {
+                // TODO: raise exception
+            }
+            this.templateEngine.insert(instruction);
+            this.templateEngine.newLine();
             return tempVarName;
+        } else {
+            return leftVarName;
         }
-        return null; // TODO
     }
 
     private String generateFromOpP1(final Node node) {
-        return null; // TODO
+        return (String) consumeOneToken().getValue();
     }
 
     private String generateFromAtom(final Node node) {
         String symbolName = node.getChildren().get(0).getSymbol().withoutChevrons();
         String tempVarName;
         if (symbolName.equals("[VarName]")) {
-            tempVarName = null; // TODO
+            tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+            String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
+            String instruction = tempVarName + " = load i32, i32* " + varName;
+            this.templateEngine.insert(instruction);
+            this.templateEngine.newLine();
         } else if (symbolName.equals("[Number]")) {
             tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
-            Integer number = Integer.parseInt((String) consumeOneToken().getValue());
+            Integer number = Integer.parseInt((String) consumeOneToken(LexicalUnit.NUMBER).getValue());
             String instruction = tempVarName + " = add i32 0, " + number;
             this.templateEngine.insert(instruction);
             this.templateEngine.newLine();
         } else if (symbolName.equals("(")) {
-            consumeOneToken(); // (
+            consumeOneToken(LexicalUnit.LPAREN);
             tempVarName = generateFromExprArithP0(node.getChildren().get(1));
-            consumeOneToken(); // )
+            consumeOneToken(LexicalUnit.RPAREN);
         } else if (symbolName.equals("-")) {
-            consumeOneToken(); // -
+            consumeOneToken(LexicalUnit.MINUS);
             String atomVarName = generateFromAtom(node.getChildren().get(1));
             tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
             String instruction = tempVarName + " = sub i32 0, " + atomVarName;

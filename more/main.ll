@@ -66,6 +66,26 @@ define i32 @main() {
     %6 = sub i32 0, %5
     store i32 %6, i32* %a
     
+    ; b := stuff
+    %7 = load i32, i32* a
+    store i32 %7, i32* %b
+    
+    ; b := stuff
+    %8 = load i32, i32* a
+    %9 = add i32 0, 8
+    %10 = add i32 %8, %9
+    store i32 %10, i32* %b
+    
+    ; b := stuff
+    %11 = add i32 0, 5
+    %12 = load i32, i32* a
+    %13 = load i32, i32* a
+    %14 = add i32 0, 9
+    %15 = sdiv i32 %13, %14
+    %16 = mul i32 %12, %15
+    %17 = sub i32 %11, %16
+    store i32 %17, i32* %b
+    
 
     ret i32 0    
 }
