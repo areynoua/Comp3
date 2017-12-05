@@ -1,4 +1,4 @@
-* Le Main instancie maintenant un CodeGenerator et lui passe la table des symboles, la liste des tokens, et le parse tree.
+* Le Main instancie mnt un CodeGenerator et lui passe la table des symboles, la liste des tokens, et le parse tree.
 
 * le CodeGenerator instancie un TemplateEngine qui charge un fichier template LLVM, reçoit les instructions à écrire, 
   au fur et à mesure, gère l'indentation, et renvoie le fichier final sous forme de string.
