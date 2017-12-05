@@ -15,6 +15,9 @@ more/tree.tex
 /Part1.pdf
 /Symbol.java
 
+# LLVM
+*.bc
+
 # Eclipse
 .project
 *.prefs
