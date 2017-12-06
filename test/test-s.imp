@@ -10,5 +10,8 @@ begin
     a := 55
   else
     a := 44
-  endif
+  endif;
+  while a < 200 do
+    a := a + 1
+  done
 end

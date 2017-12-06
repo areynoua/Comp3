@@ -93,21 +93,40 @@ entry:
     %20 = add i32 0, 100
     %21 = add i32 %19, %20
     %22 = icmp slt i32 %18, %21
-    br i1 %22, label label1t, label label1f
+    br i1 %22, label %if.n1.true, label %if.n1.false
     
-label1t:
+if.n1.true:
     ; a := stuff
     %23 = add i32 0, 55
     store i32 %23, i32* %a
-    br label label1
+    br label %if.n1
     
-label1f:
+if.n1.false:
     ; a := stuff
     %24 = add i32 0, 44
     store i32 %24, i32* %a
-    br label label1
+    br label %if.n1
     
-label1:
+if.n1:
+    
+    
+    br label %while.n2.cond
+    
+while.n2.cond:
+    %25 = load i32, i32* a
+    %26 = add i32 0, 200
+    %27 = icmp slt i32 %25, %26
+    br i1 %27, label %while.n2.cond.body, label %while.n2.cond.end
+    
+while.n2.cond.body:
+    ; a := stuff
+    %28 = load i32, i32* a
+    %29 = add i32 0, 1
+    %30 = add i32 %28, %29
+    store i32 %30, i32* %a
+    br label %while.n2.cond
+    
+while.n2.cond.end:
     
     
 
