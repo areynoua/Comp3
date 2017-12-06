@@ -24,6 +24,7 @@ public class CodeGenerator {
     private TemplateEngine templateEngine;
 
     private Integer nUnnamedVariables;
+    private Integer nConditions;
 
     public CodeGenerator(final String templateFilepath) {
         this.templateEngine = new TemplateEngine(templateFilepath);
@@ -49,9 +50,11 @@ public class CodeGenerator {
             final HashMap<Integer, Symbol>  identifiers, final String filepath)
             throws FileNotFoundException, UnsupportedEncodingException {
         this.templateEngine.init();
+        this.templateEngine.addLabel("entry");
         this.identifiers = identifiers;
         allocateVariables();
         this.nUnnamedVariables = 2;
+        this.nConditions = 0;
         this.tokens = new ArrayList<Symbol>(tokens);
         generateFromProgram(parseTree);
 
@@ -139,11 +142,125 @@ public class CodeGenerator {
     }
 
     private void generateFromIf(final Node node) {
+        String condName = "label" + String.valueOf(++this.nConditions);
+        String trueLabelName = condName + "t";
+        String falseLabelName;
+        if (node.getChildren().get(4).getChildren().size() > 1) {
+            falseLabelName = condName + "f";
+        } else {
+            falseLabelName = condName;
+        }
         consumeOneToken(LexicalUnit.IF);
-        // TODO: cond-p0
+
+        String condVarName = generateFromCondP0(node.getChildren().get(1));
+        String instruction = "br i1 " + condVarName + ", label " + trueLabelName + ", label " + falseLabelName;
+        this.templateEngine.insert(instruction);
+        this.templateEngine.newLine();
+
         consumeOneToken(LexicalUnit.THEN);
+        this.templateEngine.addLabel(trueLabelName);
         generateFromCode(node.getChildren().get(3));
-        // TODO: if-tail
+        this.templateEngine.insert("br label " + condName);
+        this.templateEngine.newLine();
+        generateFromIfTail(node.getChildren().get(4));
+        this.templateEngine.addLabel(condName);
+    }
+
+    private String generateFromCondP0(final Node node) {
+        String tempVarName = generateFromCondP0I(node.getChildren().get(0));
+        return generateFromCondP0J(node.getChildren().get(1), tempVarName);
+    }
+
+    private String generateFromCondP0I(final Node node) {
+        return generateFromCondP1(node.getChildren().get(0));
+    }
+
+    private String generateFromCondP0J(final Node node, final String leftVarName) {
+        if (node.getChildren().size() > 1) {
+            String rightVarName = generateFromExprArithP1(node.getChildren().get(1));
+            String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+            String instruction = tempVarName + " = sub i32 " + leftVarName + ", " + rightVarName;
+            this.templateEngine.insert(instruction);
+            this.templateEngine.newLine();
+            return tempVarName;
+        } else {
+            return leftVarName;
+        }
+    }
+
+    private String generateFromCondP1(final Node node) {
+        String tempVarName = generateFromCondP1I(node.getChildren().get(0));
+        return generateFromCondP1J(node.getChildren().get(1), tempVarName);
+    }
+
+    private String generateFromCondP1I(final Node node) {
+        return generateFromCondP2(node.getChildren().get(0));
+    }
+
+    private String generateFromCondP1J(final Node node, final String leftVarName) {
+        if (node.getChildren().size() > 1) {
+            String rightVarName = generateFromCondP2(node.getChildren().get(1));
+            String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+            String instruction = tempVarName + " = sdiv i32 " + leftVarName + ", " + rightVarName;
+            this.templateEngine.insert(instruction);
+            this.templateEngine.newLine();
+            return tempVarName;
+        } else {
+            return leftVarName;
+        }
+    }
+
+    private String generateFromCondP2(final Node node) {
+        if (node.getChildren().size() > 1) {
+            return generateFromSimpleCond(node.getChildren().get(1));
+        } else {
+            return generateFromSimpleCond(node.getChildren().get(0));
+        }
+    }
+
+    private String generateFromSimpleCond(final Node node) {
+        String leftVarName = generateFromExprArithP0(node.getChildren().get(0));
+        String opName = generateFromComp(node.getChildren().get(1));
+        String rightVarName = generateFromExprArithP0(node.getChildren().get(2));
+        String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+        String instruction = null;
+        if (opName.equals("=")) {
+            instruction = tempVarName + " = icmp eq i32 " + leftVarName + ", " + rightVarName;
+        } else if (opName.equals(">=")) {
+            instruction = tempVarName + " = icmp sge i32 " + leftVarName + ", " + rightVarName;
+        } else if (opName.equals(">")) {
+            instruction = tempVarName + " = icmp sgt i32 " + leftVarName + ", " + rightVarName;
+        } else if (opName.equals("<=")) {
+            instruction = tempVarName + " = icmp sle i32 " + leftVarName + ", " + rightVarName;
+        } else if (opName.equals("<")) {
+            instruction = tempVarName + " = icmp slt i32 " + leftVarName + ", " + rightVarName;
+        } else if (opName.equals("<>")) {
+            instruction = tempVarName + " = icmp ne i32 " + leftVarName + ", " + rightVarName;
+        } else {
+            // TODO: raise exception
+        }
+        this.templateEngine.insert(instruction);
+        this.templateEngine.newLine();
+        return tempVarName;
+    }
+
+    private String generateFromComp(final Node node) {
+        return (String) consumeOneToken().getValue();
+    }
+
+    private void generateFromIfTail(final Node node) {
+        if (node.getChildren().size() > 1) {
+            String condName = "label" + String.valueOf(this.nConditions);
+            String falseLabelName = condName + "f";
+            consumeOneToken(LexicalUnit.ELSE);
+            this.templateEngine.addLabel(falseLabelName);
+            generateFromCode(node.getChildren().get(1));
+            consumeOneToken(LexicalUnit.ENDIF);
+            this.templateEngine.insert("br label " + condName);
+            this.templateEngine.newLine();
+        } else {
+            consumeOneToken(LexicalUnit.ENDIF);
+        }
     }
 
     private void generateFromInstListTail(final Node node) {
@@ -156,8 +273,7 @@ public class CodeGenerator {
 
     private String generateFromExprArithP0(final Node node) {
         String tempVarName = generateFromExprArithP0I(node.getChildren().get(0));
-        tempVarName = generateFromExprArithP0J(node.getChildren().get(1), tempVarName);
-        return tempVarName;
+        return generateFromExprArithP0J(node.getChildren().get(1), tempVarName);
     }
 
     private String generateFromExprArithP0I(final Node node) {

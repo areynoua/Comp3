@@ -31,7 +31,7 @@ public class TemplateEngine {
 
     public void init() {
         this.body = "";
-        this.bodyIndentLevel = 1;
+        this.bodyIndentLevel = 0;
 
         File file = new File(this.templateFilepath);
         FileInputStream fis;
@@ -64,8 +64,15 @@ public class TemplateEngine {
         }
     }
 
-    public void newLine() {
+    public void addLabel(String label) {
         String indent = indentFromLevel(this.bodyIndentLevel);
+        this.body += ("\n" + indent);
+        insert(label + ":");
+        newLine();
+    }
+
+    public void newLine() {
+        String indent = indentFromLevel(this.bodyIndentLevel + 1);
         this.body += ("\n" + indent);
     }
 

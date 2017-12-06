@@ -5,5 +5,10 @@ begin
   a := -5;
   b := a;
   b := (a + 8);
-  b := (5 - a * (a / 9))
+  b := (5 - a * (a / 9));
+  if a < (b + 100) then
+    a := 55
+  else
+    a := 44
+  endif
 end

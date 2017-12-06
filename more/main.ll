@@ -45,6 +45,8 @@ define i32 @main() {
     %1 = call i32 @time(i32* null)
     call void @srand(i32 %1)
 
+    
+entry:
     ; Allocate memory for Imp variables
     %a = alloca i32
     %b = alloca i32
@@ -85,6 +87,28 @@ define i32 @main() {
     %16 = mul i32 %12, %15
     %17 = sub i32 %11, %16
     store i32 %17, i32* %b
+    
+    %18 = load i32, i32* a
+    %19 = load i32, i32* b
+    %20 = add i32 0, 100
+    %21 = add i32 %19, %20
+    %22 = icmp slt i32 %18, %21
+    br i1 %22, label label1t, label label1f
+    
+label1t:
+    ; a := stuff
+    %23 = add i32 0, 55
+    store i32 %23, i32* %a
+    br label label1
+    
+label1f:
+    ; a := stuff
+    %24 = add i32 0, 44
+    store i32 %24, i32* %a
+    br label label1
+    
+label1:
+    
     
 
     ret i32 0    
