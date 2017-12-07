@@ -195,6 +195,27 @@ public class CodeGenerator {
         // TODO: for-tail
     }
 
+    private void generateFromForTail(final Node node) {
+        if (node.getChildren().size() > 5) {
+            consumeOneToken(LexicalUnit.BY);
+            // TODO: exprarith-p0
+            consumeOneToken(LexicalUnit.TO);
+            // TODO: exprarith-p0
+            consumeOneToken(LexicalUnit.DO);
+            generateFromCode(node.getChildren().get(5));
+            consumeOneToken(LexicalUnit.DONE);
+        } else {
+            consumeOneToken(LexicalUnit.TO);
+            // TODO: exprarith-p0
+            consumeOneToken(LexicalUnit.DO);
+            generateFromCode(node.getChildren().get(5));
+            consumeOneToken(LexicalUnit.DONE);
+        }
+    }
+
+    <For-Tail>          -> to <ExprArith-p0> do <Code> done 
+                    -> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
+
     private String generateFromCondP0(final Node node) {
         String tempVarName = generateFromCondP0I(node.getChildren().get(0));
         return generateFromCondP0J(node.getChildren().get(1), tempVarName);
