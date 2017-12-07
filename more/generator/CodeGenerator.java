@@ -213,9 +213,6 @@ public class CodeGenerator {
         }
     }
 
-    <For-Tail>          -> to <ExprArith-p0> do <Code> done 
-                    -> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
-
     private String generateFromCondP0(final Node node) {
         String tempVarName = generateFromCondP0I(node.getChildren().get(0));
         return generateFromCondP0J(node.getChildren().get(1), tempVarName);
