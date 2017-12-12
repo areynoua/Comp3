@@ -50,10 +50,9 @@ public class CodeGenerator {
             final HashMap<Integer, Symbol>  identifiers, final String filepath)
             throws FileNotFoundException, UnsupportedEncodingException {
         this.templateEngine.init();
-        this.templateEngine.addLabel("entry");
         this.identifiers = identifiers;
         allocateVariables();
-        this.nUnnamedVariables = 2;
+        this.nUnnamedVariables = 1;
         this.nConditions = 0;
         this.tokens = new ArrayList<Symbol>(tokens);
         generateFromProgram(parseTree);
@@ -393,7 +392,7 @@ public class CodeGenerator {
         if (symbolName.equals("[VarName]")) {
             tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
             String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
-            String instruction = tempVarName + " = load i32, i32* " + varName;
+            String instruction = tempVarName + " = load i32, i32* " + llvmVarName(varName);
             this.templateEngine.insert(instruction);
             this.templateEngine.newLine();
         } else if (symbolName.equals("[Number]")) {

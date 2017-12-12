@@ -41,70 +41,64 @@ define i32 @getNumber(){
 }
 
 define i32 @main() {
-    ; RNG initialization
-    %1 = call i32 @time(i32* null)
-    call void @srand(i32 %1)
-
-    
 entry:
+    ; RNG initialization
+    %0 = call i32 @time(i32* null)
+    call void @srand(i32 %0)
+
     ; Allocate memory for Imp variables
     %a = alloca i32
     %b = alloca i32
     
     ; Read ( a ) 
-    %2 = call i32 @readInt()
-    store i32 %2, i32* %a
+    %1 = call i32 @readInt()
+    store i32 %1, i32* %a
     
-    ; Print ( a ) 
+    ; b := stuff
+    %2 = add i32 0, 42
+    store i32 %2, i32* %b
+    
+    ; b := stuff
     %3 = load i32, i32* %a
-    call void @println(i32 %3)
+    store i32 %3, i32* %b
     
     ; b := stuff
-    %4 = add i32 0, 42
-    store i32 %4, i32* %b
-    
-    ; a := stuff
-    %5 = add i32 0, 5
-    %6 = sub i32 0, %5
-    store i32 %6, i32* %a
+    %4 = load i32, i32* %a
+    %5 = add i32 0, 8
+    %6 = add i32 %4, %5
+    store i32 %6, i32* %b
     
     ; b := stuff
-    %7 = load i32, i32* a
-    store i32 %7, i32* %b
+    %7 = add i32 0, 5
+    %8 = load i32, i32* %a
+    %9 = load i32, i32* %a
+    %10 = add i32 0, 9
+    %11 = sdiv i32 %9, %10
+    %12 = mul i32 %8, %11
+    %13 = sub i32 %7, %12
+    store i32 %13, i32* %b
     
-    ; b := stuff
-    %8 = load i32, i32* a
-    %9 = add i32 0, 8
-    %10 = add i32 %8, %9
-    store i32 %10, i32* %b
+    ; Print ( b ) 
+    %14 = load i32, i32* %b
+    call void @println(i32 %14)
     
-    ; b := stuff
-    %11 = add i32 0, 5
-    %12 = load i32, i32* a
-    %13 = load i32, i32* a
-    %14 = add i32 0, 9
-    %15 = sdiv i32 %13, %14
-    %16 = mul i32 %12, %15
-    %17 = sub i32 %11, %16
-    store i32 %17, i32* %b
-    
-    %18 = load i32, i32* a
-    %19 = load i32, i32* b
-    %20 = add i32 0, 100
-    %21 = add i32 %19, %20
-    %22 = icmp slt i32 %18, %21
-    br i1 %22, label %if.n1.true, label %if.n1.false
+    %15 = load i32, i32* %a
+    %16 = load i32, i32* %b
+    %17 = add i32 0, 100
+    %18 = add i32 %16, %17
+    %19 = icmp slt i32 %15, %18
+    br i1 %19, label %if.n1.true, label %if.n1.false
     
 if.n1.true:
     ; a := stuff
-    %23 = add i32 0, 55
-    store i32 %23, i32* %a
+    %20 = add i32 0, 55
+    store i32 %20, i32* %a
     br label %if.n1
     
 if.n1.false:
     ; a := stuff
-    %24 = add i32 0, 44
-    store i32 %24, i32* %a
+    %21 = add i32 0, 44
+    store i32 %21, i32* %a
     br label %if.n1
     
 if.n1:
@@ -113,21 +107,25 @@ if.n1:
     br label %while.n2.cond
     
 while.n2.cond:
-    %25 = load i32, i32* a
-    %26 = add i32 0, 200
-    %27 = icmp slt i32 %25, %26
-    br i1 %27, label %while.n2.cond.body, label %while.n2.cond.end
+    %22 = load i32, i32* %a
+    %23 = add i32 0, 200
+    %24 = icmp slt i32 %22, %23
+    br i1 %24, label %while.n2.cond.body, label %while.n2.cond.end
     
 while.n2.cond.body:
     ; a := stuff
-    %28 = load i32, i32* a
-    %29 = add i32 0, 1
-    %30 = add i32 %28, %29
-    store i32 %30, i32* %a
+    %25 = load i32, i32* %a
+    %26 = add i32 0, 1
+    %27 = add i32 %25, %26
+    store i32 %27, i32* %a
     br label %while.n2.cond
     
 while.n2.cond.end:
     
+    
+    ; Print ( a ) 
+    %28 = load i32, i32* %a
+    call void @println(i32 %28)
     
 
     ret i32 0    

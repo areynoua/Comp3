@@ -41,9 +41,10 @@ define i32 @getNumber(){
 }
 
 define i32 @main() {
+entry:
     ; RNG initialization
-    %1 = call i32 @time(i32* null)
-    call void @srand(i32 %1)
+    %0 = call i32 @time(i32* null)
+    call void @srand(i32 %0)
 
     @@body@@
 
