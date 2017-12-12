@@ -49,24 +49,29 @@ entry:
     ; Allocate memory for Imp variables
     %a = alloca i32
     %b = alloca i32
+    %i = alloca i32
     
     ; Read ( a ) 
     %1 = call i32 @readInt()
     store i32 %1, i32* %a
     
+    
     ; b := stuff
     %2 = add i32 0, 42
     store i32 %2, i32* %b
     
+    
     ; b := stuff
     %3 = load i32, i32* %a
     store i32 %3, i32* %b
+    
     
     ; b := stuff
     %4 = load i32, i32* %a
     %5 = add i32 0, 8
     %6 = add i32 %4, %5
     store i32 %6, i32* %b
+    
     
     ; b := stuff
     %7 = add i32 0, 5
@@ -78,9 +83,11 @@ entry:
     %13 = sub i32 %7, %12
     store i32 %13, i32* %b
     
+    
     ; Print ( b ) 
     %14 = load i32, i32* %b
     call void @println(i32 %14)
+    
     
     %15 = load i32, i32* %a
     %16 = load i32, i32* %b
@@ -93,12 +100,14 @@ if.n1.true:
     ; a := stuff
     %20 = add i32 0, 55
     store i32 %20, i32* %a
+    
     br label %if.n1
     
 if.n1.false:
     ; a := stuff
     %21 = add i32 0, 44
     store i32 %21, i32* %a
+    
     br label %if.n1
     
 if.n1:
@@ -118,6 +127,7 @@ while.n2.cond.body:
     %26 = add i32 0, 1
     %27 = add i32 %25, %26
     store i32 %27, i32* %a
+    
     br label %while.n2.cond
     
 while.n2.cond.end:
@@ -126,6 +136,57 @@ while.n2.cond.end:
     ; Print ( a ) 
     %28 = load i32, i32* %a
     call void @println(i32 %28)
+    
+    
+    %29 = add i32 0, 2
+    store i32 %29, i32* %i
+    %30 = add i32 0, 2
+    %31 = add i32 0, 12
+    br label %for.n3.cond
+    
+for.n3.cond.body:
+    ; Print ( i ) 
+    %32 = load i32, i32* %i
+    call void @println(i32 %32)
+    
+    %33 = load i32, i32* %i
+    %34 = add i32 %33, %30
+    store i32 %34, i32* %i
+    br label %for.n3.cond
+    
+for.n3.cond:
+    %35 = load i32, i32* %i
+    %36 = icmp ne i32 %35, %31
+    br i1 %36, label %for.n3.cond.body, label %for.n3.cond.end
+    
+for.n3.cond.end:
+    
+    
+    %37 = add i32 0, 27
+    store i32 %37, i32* %i
+    %38 = add i32 0, 3
+    %39 = sub i32 0, %38
+    %40 = add i32 0, 3
+    %41 = sub i32 0, %40
+    br label %for.n4.cond
+    
+for.n4.cond.body:
+    ; Print ( i ) 
+    %42 = load i32, i32* %i
+    call void @println(i32 %42)
+    
+    %43 = load i32, i32* %i
+    %44 = add i32 %43, %39
+    store i32 %44, i32* %i
+    br label %for.n4.cond
+    
+for.n4.cond:
+    %45 = load i32, i32* %i
+    %46 = icmp ne i32 %45, %41
+    br i1 %46, label %for.n4.cond.body, label %for.n4.cond.end
+    
+for.n4.cond.end:
+    
     
 
     ret i32 0    

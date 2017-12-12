@@ -51,11 +51,11 @@ public class TemplateEngine {
 
     public void oneLineComment(String comment) {
         insert("; " + comment);
-        newLine();
     }
 
     public void insert(String word) {
         insert(word, BODY);
+        newLine();
     }
 
     public void insert(String word, String tag) {
@@ -68,7 +68,6 @@ public class TemplateEngine {
         String indent = indentFromLevel(this.bodyIndentLevel);
         this.body += ("\n" + indent);
         insert(label + ":");
-        newLine();
     }
 
     public void newLine() {

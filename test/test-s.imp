@@ -13,5 +13,13 @@ begin
   while a < 200 do
     a := a + 1
   done;
-  print(a)
+  print(a);
+
+  for i from 2 by 2 to 12 do
+    print(i)
+  done;
+
+  for i from 27 by -3 to -3 do
+    print(i)
+  done 
 end

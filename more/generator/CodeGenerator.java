@@ -67,7 +67,6 @@ public class CodeGenerator {
         for (Integer index : identifiers.keySet()) {
             String identifierName = (String) identifiers.get(index).getValue();
             this.templateEngine.insert(llvmVarName(identifierName) + " = alloca i32");
-            this.templateEngine.newLine();
         }
         this.templateEngine.newLine();
     }
@@ -122,7 +121,6 @@ public class CodeGenerator {
         this.templateEngine.oneLineComment("Read ( " + varName + " ) ");
         String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
         this.templateEngine.insert(tempVarName + " = call i32 @readInt()");
-        this.templateEngine.newLine();
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
         consumeOneToken(LexicalUnit.RPAREN);
     }
@@ -134,7 +132,6 @@ public class CodeGenerator {
         String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
         this.templateEngine.oneLineComment("Print ( " + varName + " ) ");
         this.templateEngine.insert(tempVarName + " = load i32, i32* " + llvmVarName(varName));
-        this.templateEngine.newLine();
         String instruction = "call void @println(i32 " + tempVarName + ")";
         this.templateEngine.insert(instruction);
         consumeOneToken(LexicalUnit.RPAREN);
@@ -154,13 +151,11 @@ public class CodeGenerator {
         String condVarName = generateFromCondP0(node.getChildren().get(1));
         String instruction = "br i1 " + condVarName + ", label %" + trueLabelName + ", label %" + falseLabelName;
         this.templateEngine.insert(instruction);
-        this.templateEngine.newLine();
 
         consumeOneToken(LexicalUnit.THEN);
         this.templateEngine.addLabel(trueLabelName);
         generateFromCode(node.getChildren().get(3));
         this.templateEngine.insert("br label %" + condName);
-        this.templateEngine.newLine();
         generateFromIfTail(node.getChildren().get(4));
         this.templateEngine.addLabel(condName);
     }
@@ -170,44 +165,76 @@ public class CodeGenerator {
         String trueLabelName = condName + ".body";
         String falseLabelName = condName + ".end";
         this.templateEngine.insert("br label %" + condName);
-        this.templateEngine.newLine();
         consumeOneToken(LexicalUnit.WHILE);
         this.templateEngine.addLabel(condName);
         String condVarName = generateFromCondP0(node.getChildren().get(1));
         String instruction = "br i1 " + condVarName + ", label %" + trueLabelName + ", label %" + falseLabelName;
         this.templateEngine.insert(instruction);
-        this.templateEngine.newLine();
         consumeOneToken(LexicalUnit.DO);
         this.templateEngine.addLabel(trueLabelName);
         generateFromCode(node.getChildren().get(3));
         this.templateEngine.insert("br label %" + condName);
-        this.templateEngine.newLine();
         consumeOneToken(LexicalUnit.DONE);
         this.templateEngine.addLabel(falseLabelName);
     }
 
     private void generateFromFor(final Node node) {
+        String condName = "for.n" + String.valueOf(++this.nConditions) + ".cond";
+        String trueLabelName = condName + ".body";
+        String falseLabelName = condName + ".end";
         consumeOneToken(LexicalUnit.FOR);
-        // TODO: [VarName]
+        String counterVarName = llvmVarName((String) consumeOneToken(LexicalUnit.VARNAME).getValue());
         consumeOneToken(LexicalUnit.FROM);
-        // TODO: exprarith-p0
-        // TODO: for-tail
+        String initVarName = generateFromExprArithP0(node.getChildren().get(3));
+        this.templateEngine.insert("store i32 " + initVarName + ", i32* " + counterVarName);
+        String[] varnames = generateFromForTail(node.getChildren().get(4), counterVarName);
+        this.templateEngine.insert("br label %" + condName);
+        this.templateEngine.addLabel(trueLabelName);
+        generateCodeOnlyFromForTail(node.getChildren().get(4));
+        
+        // Increment/decrement counter
+        String incrementVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+        this.templateEngine.insert(incrementVarName + " = load i32, i32* " + counterVarName);
+        String result = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+        this.templateEngine.insert(result + " = add i32 " + incrementVarName + ", " + varnames[1]);
+        this.templateEngine.insert("store i32 " + result + ", i32* " + counterVarName);
+
+        this.templateEngine.insert("br label %" + condName);
+        this.templateEngine.addLabel(condName);
+        String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+        this.templateEngine.insert(tempVarName + " = load i32, i32* " + counterVarName);
+        String condVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+        String instruction = condVarName + " = icmp ne i32 " + tempVarName + ", " + varnames[0];
+        this.templateEngine.insert(instruction);
+        instruction = "br i1 " + condVarName + ", label %" + trueLabelName + ", label %" + falseLabelName;
+        this.templateEngine.insert(instruction);
+        this.templateEngine.addLabel(falseLabelName);
     }
 
-    private void generateFromForTail(final Node node) {
+    private String[] generateFromForTail(final Node node, final String counterVarName) {
+        String[] varnames;
         if (node.getChildren().size() > 5) {
             consumeOneToken(LexicalUnit.BY);
-            // TODO: exprarith-p0
+            String stepVarName = generateFromExprArithP0(node.getChildren().get(1));
             consumeOneToken(LexicalUnit.TO);
-            // TODO: exprarith-p0
+            String limitVarName = generateFromExprArithP0(node.getChildren().get(3));
             consumeOneToken(LexicalUnit.DO);
+            varnames = new String[] { limitVarName, stepVarName };
+        } else {
+            consumeOneToken(LexicalUnit.TO);
+            String limitVarName = generateFromExprArithP0(node.getChildren().get(1));
+            consumeOneToken(LexicalUnit.DO);
+            varnames = new String[] { limitVarName, "1" };
+        }
+        return varnames;
+    }
+
+    private void generateCodeOnlyFromForTail(final Node node) {
+        if (node.getChildren().size() > 5) {
             generateFromCode(node.getChildren().get(5));
             consumeOneToken(LexicalUnit.DONE);
         } else {
-            consumeOneToken(LexicalUnit.TO);
-            // TODO: exprarith-p0
-            consumeOneToken(LexicalUnit.DO);
-            generateFromCode(node.getChildren().get(5));
+            generateFromCode(node.getChildren().get(3));
             consumeOneToken(LexicalUnit.DONE);
         }
     }
@@ -227,7 +254,6 @@ public class CodeGenerator {
             String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
             String instruction = tempVarName + " = or i32 " + leftVarName + ", " + rightVarName;
             this.templateEngine.insert(instruction);
-            this.templateEngine.newLine();
             return tempVarName;
         } else {
             return leftVarName;
@@ -249,7 +275,6 @@ public class CodeGenerator {
             String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
             String instruction = tempVarName + " = and i32 " + leftVarName + ", " + rightVarName;
             this.templateEngine.insert(instruction);
-            this.templateEngine.newLine();
             return tempVarName;
         } else {
             return leftVarName;
@@ -286,7 +311,6 @@ public class CodeGenerator {
             // TODO: raise exception
         }
         this.templateEngine.insert(instruction);
-        this.templateEngine.newLine();
         return tempVarName;
     }
 
@@ -303,7 +327,6 @@ public class CodeGenerator {
             generateFromCode(node.getChildren().get(1));
             consumeOneToken(LexicalUnit.ENDIF);
             this.templateEngine.insert("br label %" + condName);
-            this.templateEngine.newLine();
         } else {
             consumeOneToken(LexicalUnit.ENDIF);
         }
@@ -340,7 +363,6 @@ public class CodeGenerator {
                 // TODO: raise exception
             }
             this.templateEngine.insert(instruction);
-            this.templateEngine.newLine();
             return tempVarName;
         } else {
             return leftVarName;
@@ -375,7 +397,6 @@ public class CodeGenerator {
                 // TODO: raise exception
             }
             this.templateEngine.insert(instruction);
-            this.templateEngine.newLine();
             return tempVarName;
         } else {
             return leftVarName;
@@ -394,13 +415,11 @@ public class CodeGenerator {
             String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
             String instruction = tempVarName + " = load i32, i32* " + llvmVarName(varName);
             this.templateEngine.insert(instruction);
-            this.templateEngine.newLine();
         } else if (symbolName.equals("[Number]")) {
             tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
             Integer number = Integer.parseInt((String) consumeOneToken(LexicalUnit.NUMBER).getValue());
             String instruction = tempVarName + " = add i32 0, " + number;
             this.templateEngine.insert(instruction);
-            this.templateEngine.newLine();
         } else if (symbolName.equals("(")) {
             consumeOneToken(LexicalUnit.LPAREN);
             tempVarName = generateFromExprArithP0(node.getChildren().get(1));
@@ -411,7 +430,6 @@ public class CodeGenerator {
             tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
             String instruction = tempVarName + " = sub i32 0, " + atomVarName;
             this.templateEngine.insert(instruction);
-            this.templateEngine.newLine();
         } else {
             tempVarName = null; // TODO: raise exception
         }
