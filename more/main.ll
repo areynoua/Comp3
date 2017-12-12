@@ -56,30 +56,34 @@ entry:
     store i32 %1, i32* %a
     
     
-    ; b := stuff
+    ; Assignation of variable b
     %2 = add i32 0, 42
     store i32 %2, i32* %b
     
     
-    ; b := stuff
+    ; Assignation of variable b
     %3 = load i32, i32* %a
     store i32 %3, i32* %b
     
     
-    ; b := stuff
+    ; Assignation of variable b
     %4 = load i32, i32* %a
     %5 = add i32 0, 8
+    ; Arithmetic operation +
     %6 = add i32 %4, %5
     store i32 %6, i32* %b
     
     
-    ; b := stuff
+    ; Assignation of variable b
     %7 = add i32 0, 5
     %8 = load i32, i32* %a
     %9 = load i32, i32* %a
     %10 = add i32 0, 9
+    ; Arithmetic operation /
     %11 = sdiv i32 %9, %10
+    ; Arithmetic operation *
     %12 = mul i32 %8, %11
+    ; Arithmetic operation -
     %13 = sub i32 %7, %12
     store i32 %13, i32* %b
     
@@ -92,19 +96,21 @@ entry:
     %15 = load i32, i32* %a
     %16 = load i32, i32* %b
     %17 = add i32 0, 100
+    ; Arithmetic operation +
     %18 = add i32 %16, %17
+    ; Logical operation <
     %19 = icmp slt i32 %15, %18
     br i1 %19, label %if.n1.true, label %if.n1.false
     
 if.n1.true:
-    ; a := stuff
+    ; Assignation of variable a
     %20 = add i32 0, 55
     store i32 %20, i32* %a
     
     br label %if.n1
     
 if.n1.false:
-    ; a := stuff
+    ; Assignation of variable a
     %21 = add i32 0, 44
     store i32 %21, i32* %a
     
@@ -118,13 +124,15 @@ if.n1:
 while.n2.cond:
     %22 = load i32, i32* %a
     %23 = add i32 0, 200
+    ; Logical operation <
     %24 = icmp slt i32 %22, %23
     br i1 %24, label %while.n2.cond.body, label %while.n2.cond.end
     
 while.n2.cond.body:
-    ; a := stuff
+    ; Assignation of variable a
     %25 = load i32, i32* %a
     %26 = add i32 0, 1
+    ; Arithmetic operation +
     %27 = add i32 %25, %26
     store i32 %27, i32* %a
     
@@ -149,6 +157,7 @@ for.n3.cond.body:
     %32 = load i32, i32* %i
     call void @println(i32 %32)
     
+    ; Increment counter %i
     %33 = load i32, i32* %i
     %34 = add i32 %33, %30
     store i32 %34, i32* %i
@@ -175,6 +184,7 @@ for.n4.cond.body:
     %42 = load i32, i32* %i
     call void @println(i32 %42)
     
+    ; Increment counter %i
     %43 = load i32, i32* %i
     %44 = add i32 %43, %39
     store i32 %44, i32* %i
