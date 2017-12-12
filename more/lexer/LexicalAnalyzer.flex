@@ -135,6 +135,7 @@ Identifier     = {Alpha}{AlphaNumeric}*
     "to"           { addSymbol(LexicalUnit.TO); }
     "print"        { addSymbol(LexicalUnit.PRINT); }
     "read"         { addSymbol(LexicalUnit.READ); }
+    "rand"         { addSymbol(LexicalUnit.RAND); }
     {Identifier}   { addSymbol(LexicalUnit.VARNAME); }
     {Number}         { addSymbol(LexicalUnit.NUMBER); }
     {CommentBegin} { yybegin(COMMENT);}

@@ -34,5 +34,6 @@ public enum LexicalUnit{
     TO,
     PRINT,
     READ,
-    EOS
+    RAND,
+    EOS,
 }

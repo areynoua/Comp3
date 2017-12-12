@@ -20,6 +20,11 @@ begin
   done;
 
   for i from 27 by -3 to -3 do
-    print(i)
-  done 
+    for j from 0 to 2 do
+      print(i)
+    done
+  done;
+
+  rand(c);
+  print(c)
 end

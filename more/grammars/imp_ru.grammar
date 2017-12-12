@@ -9,6 +9,7 @@
                     -> <For> 
                     -> <Print> 
                     -> <Read> 
+                    -> <Rand> 
 <Assign>            -> [VarName] := <ExprArith> 
 <ExprArith>         -> [VarName] 
                     -> [Number] 
@@ -38,3 +39,4 @@
                     -> for [VarName] from <ExprArith> to <ExprArith> do <Code> done 
 <Print>             -> print ( [VarName] ) 
 <Read>              -> read ( [VarName] ) 
+<Rand>              -> rand ( [VarName] ) 

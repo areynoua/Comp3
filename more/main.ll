@@ -50,6 +50,8 @@ entry:
     %a = alloca i32
     %b = alloca i32
     %i = alloca i32
+    %j = alloca i32
+    %c = alloca i32
     
     ; Read ( a ) 
     %1 = call i32 @readInt()
@@ -180,22 +182,51 @@ for.n3.cond.end:
     br label %for.n4.cond
     
 for.n4.cond.body:
+    %42 = add i32 0, 0
+    store i32 %42, i32* %j
+    %43 = add i32 0, 2
+    br label %for.n5.cond
+    
+for.n5.cond.body:
     ; Print ( i ) 
-    %42 = load i32, i32* %i
-    call void @println(i32 %42)
+    %44 = load i32, i32* %i
+    call void @println(i32 %44)
+    
+    ; Increment counter %j
+    %45 = load i32, i32* %j
+    %46 = add i32 %45, 1
+    store i32 %46, i32* %j
+    br label %for.n5.cond
+    
+for.n5.cond:
+    %47 = load i32, i32* %j
+    %48 = icmp ne i32 %47, %43
+    br i1 %48, label %for.n5.cond.body, label %for.n5.cond.end
+    
+for.n5.cond.end:
     
     ; Increment counter %i
-    %43 = load i32, i32* %i
-    %44 = add i32 %43, %39
-    store i32 %44, i32* %i
+    %49 = load i32, i32* %i
+    %50 = add i32 %49, %39
+    store i32 %50, i32* %i
     br label %for.n4.cond
     
 for.n4.cond:
-    %45 = load i32, i32* %i
-    %46 = icmp ne i32 %45, %41
-    br i1 %46, label %for.n4.cond.body, label %for.n4.cond.end
+    %51 = load i32, i32* %i
+    %52 = icmp ne i32 %51, %41
+    br i1 %52, label %for.n4.cond.body, label %for.n4.cond.end
     
 for.n4.cond.end:
+    
+    
+    ; Rand ( c ) 
+    %53 = call i32 @rand()
+    store i32 %53, i32* %c
+    
+    
+    ; Print ( c ) 
+    %54 = load i32, i32* %c
+    call void @println(i32 %54)
     
     
 

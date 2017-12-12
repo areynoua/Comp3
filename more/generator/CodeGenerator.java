@@ -157,6 +157,8 @@ public class CodeGenerator {
             generateFromPrint(node.getChildren().get(0));
         } else if (instructionName.equals("Read")) {
             generateFromRead(node.getChildren().get(0));
+        } else if (instructionName.equals("Rand")) {
+            generateFromRand(node.getChildren().get(0));
         }
     }
 
@@ -204,6 +206,22 @@ public class CodeGenerator {
         String instruction = "call void @println(i32 " + tempVarName + ")";
         this.templateEngine.insert(instruction);
         consumeOneToken(LexicalUnit.RPAREN);
+    }
+
+    /**
+     * Generates llvm code from a <Rand> node of the parse tree.
+     * 
+     * @param node Current node (must be <Rand>)
+     */
+    private void generateFromRand(final Node node) {
+        consumeOneToken(LexicalUnit.RAND);
+        consumeOneToken(LexicalUnit.LPAREN);
+        String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
+        this.templateEngine.oneLineComment("Rand ( " + varName + " ) ");
+        String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+        consumeOneToken(LexicalUnit.RPAREN);
+        this.templateEngine.insert(tempVarName + " = call i32 @rand()");
+        this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
     }
 
     /**
