@@ -83,6 +83,11 @@ public class CodeGenerator {
         this.nUnnamedVariables = 1; // Already one variable for the seed of the RNG
         this.nConditions = 0;
         this.tokens = new ArrayList<Symbol>(tokens);
+
+        for (Symbol token : tokens) {
+            System.out.println(token);
+        }
+
         generateFromProgram(parseTree); // Generates llvm from the root of the parse tree
         // Write to the output file after writing the code and
         // asking the template engine to pretty print the result
@@ -159,6 +164,10 @@ public class CodeGenerator {
             generateFromRead(node.getChildren().get(0));
         } else if (instructionName.equals("Rand")) {
             generateFromRand(node.getChildren().get(0));
+        } else if (instructionName.equals("Define")) {
+            generateFromDefine(node.getChildren().get(0));
+        } else if (instructionName.equals("Call")) {
+            generateFromCall(node.getChildren().get(0));
         }
     }
 
@@ -175,13 +184,52 @@ public class CodeGenerator {
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
     }
 
+    private void generateFromCall(final Node node) {
+        // TODO
+    }
+
+    private void generateFromDefine(final Node node) {
+        // function [FuncName] ( [VarName] ) do <Code> end
+        consumeOneToken(LexicalUnit.FUNCTION);
+        String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
+        consumeOneToken(LexicalUnit.LPAREN);
+
+        // TODO: arg list
+        String argVarName = llvmVarName((String) consumeOneToken(LexicalUnit.VARNAME).getValue());
+    
+        consumeOneToken(LexicalUnit.RPAREN);
+        consumeOneToken(LexicalUnit.DO);
+        this.templateEngine.setTag(this.templateEngine.FUNCTIONS);
+        Integer unv = this.nUnnamedVariables;
+        this.nUnnamedVariables = 0;
+        this.templateEngine.insert("define i32 " + funcName + "(" + "i32* " + argVarName + ") {"); // TODO
+        this.templateEngine.addLabel("entry");
+
+        this.templateEngine.oneLineComment("Allocate memory for Imp variables");
+        for (Integer index : identifiers.keySet()) { // For each symbol from the table
+            String identifierName = llvmVarName((String) identifiers.get(index).getValue());
+            if (!argVarName.equals(identifierName)) {
+                this.templateEngine.insert(identifierName + " = alloca i32");
+            }
+        }
+        this.templateEngine.newLine();
+
+        generateFromCode(node.getChildren().get(6));
+        this.templateEngine.newLine();
+        this.templateEngine.insert("ret i32 0"); // TODO: ret void
+        this.templateEngine.insert("}");
+        this.nUnnamedVariables = unv;
+        this.templateEngine.setTag(this.templateEngine.BODY);
+        consumeOneToken(LexicalUnit.END);
+    }
+
     /**
      * Generates llvm code from a <Read> node of the parse tree.
      * 
      * @param node Current node (must be <Read>)
      */
     private void generateFromRead(final Node node) {
-        consumeOneToken(LexicalUnit.READ);
+        consumeOneToken(LexicalUnit.VARNAME);
         consumeOneToken(LexicalUnit.LPAREN);
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         this.templateEngine.oneLineComment("Read ( " + varName + " ) ");
@@ -197,7 +245,7 @@ public class CodeGenerator {
      * @param node Current node (must be <Print>)
      */
     private void generateFromPrint(final Node node) {
-        consumeOneToken(LexicalUnit.PRINT);
+        consumeOneToken(LexicalUnit.VARNAME);
         consumeOneToken(LexicalUnit.LPAREN);
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
@@ -214,7 +262,7 @@ public class CodeGenerator {
      * @param node Current node (must be <Rand>)
      */
     private void generateFromRand(final Node node) {
-        consumeOneToken(LexicalUnit.RAND);
+        consumeOneToken(LexicalUnit.VARNAME);
         consumeOneToken(LexicalUnit.LPAREN);
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         this.templateEngine.oneLineComment("Rand ( " + varName + " ) ");

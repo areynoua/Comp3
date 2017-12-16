@@ -9,7 +9,11 @@
               -> <For>
               -> <Print>
               -> <Read>
-              -> <Rand>
+              -> <Rand> 
+              -> <Define>
+              -> <Call>
+<Define>      -> function [FuncName] ( [VarName] ) do <Code> end
+<Call>        -> [FuncName] ( [VarName] )
 <Assign>      -> [VarName] := <ExprArith>
 <ExprArith>   -> [VarName]
               -> [Number]

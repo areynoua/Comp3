@@ -201,8 +201,8 @@ public class LL1Grammar {
 
     /**
      * Removes inaccessible variables
-     * NOTE: this methods makes the assumption that the left
-     * variable of the rule in this.rules is the start variable
+     * NOTE: this method makes the assumption that the left
+     * variable of the first rule in this.rules is the start variable
      * of the grammar.
      */
     public void removeInaccessible() {

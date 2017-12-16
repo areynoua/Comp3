@@ -368,6 +368,8 @@ public class LL1Parser {
         conversions.put(LexicalUnit.PRINT, "print");
         conversions.put(LexicalUnit.READ, "read");
         conversions.put(LexicalUnit.RAND, "rand");
+        conversions.put(LexicalUnit.FUNCTION, "function");
+        conversions.put(LexicalUnit.FUNCNAME, "[FuncName]");
         conversions.put(LexicalUnit.EOS, "$");
 
         for (Symbol symbol : symbols) {

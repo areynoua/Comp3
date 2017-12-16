@@ -40,6 +40,8 @@ define i32 @getNumber(){
       ret i32 %1
 }
 
+@@functions@@
+
 define i32 @main() {
 entry:
     ; RNG initialization

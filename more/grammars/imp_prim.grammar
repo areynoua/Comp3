@@ -7,9 +7,13 @@
                     -> <If> 
                     -> <While> 
                     -> <For> 
-                    -> <Print> 
-                    -> <Read> 
-                    -> <Rand>
+                    -> <Print>
+                    -> <Read>
+                    -> <Rand> 
+                    -> <Define>
+                    -> <Call>
+<Define>            -> function [FuncName] ( [VarName] ) do <Code> end
+<Call>              -> [FuncName] ( [VarName] )
 <Assign>            -> [VarName] := <ExprArith-p0> 
 <ExprArith-p0>      -> <ExprArith-p0> <Op-p0> <ExprArith-p1> 
                     -> <ExprArith-p1>
@@ -37,10 +41,10 @@
                     -> < 
                     -> <> 
 <While>             -> while <Cond-p0> do <Code> done 
-<Print>             -> print ( [VarName] ) 
-<Read>              -> read ( [VarName] )
-<Rand>              -> rand ( [VarName] )
 <If>                -> if <Cond-p0> then <Code> else <Code> endif 
                     -> if <Cond-p0> then <Code> endif 
 <For>               -> for [VarName] from <ExprArith-p0> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
                     -> for [VarName] from <ExprArith-p0> to <ExprArith-p0> do <Code> done 
+<Print>             -> print ( [VarName] )
+<Read>              -> read ( [VarName] )
+<Rand>              -> rand ( [VarName] )

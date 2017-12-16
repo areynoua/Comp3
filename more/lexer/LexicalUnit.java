@@ -35,5 +35,7 @@ public enum LexicalUnit{
     PRINT,
     READ,
     RAND,
+    FUNCTION,
+    FUNCNAME,
     EOS,
 }

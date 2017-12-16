@@ -40,6 +40,39 @@ define i32 @getNumber(){
       ret i32 %1
 }
 
+define i32 @foo(i32* %a) {
+    
+entry:
+    ; Allocate memory for Imp variables
+    %b = alloca i32
+    %i = alloca i32
+    %j = alloca i32
+    %c = alloca i32
+    %0 = add i32 0, 0
+    store i32 %0, i32* %i
+    %1 = add i32 0, 5
+    br label %for.n6.cond
+    
+for.n6.cond.body:
+    ; Print ( a ) 
+    %2 = load i32, i32* %a
+    call void @println(i32 %2)
+    ; Increment counter %i
+    %3 = load i32, i32* %i
+    %4 = add i32 %3, 1
+    store i32 %4, i32* %i
+    br label %for.n6.cond
+    
+for.n6.cond:
+    %5 = load i32, i32* %i
+    %6 = icmp ne i32 %5, %1
+    br i1 %6, label %for.n6.cond.body, label %for.n6.cond.end
+    
+for.n6.cond.end:
+    ret i32 0
+    }
+    
+
 define i32 @main() {
 entry:
     ; RNG initialization
@@ -227,6 +260,12 @@ for.n4.cond.end:
     ; Print ( c ) 
     %54 = load i32, i32* %c
     call void @println(i32 %54)
+    
+    
+    
+    
+    
+    
     
     
 

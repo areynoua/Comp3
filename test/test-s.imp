@@ -26,5 +26,11 @@ begin
   done;
 
   rand(c);
-  print(c)
+  print(c);
+
+  function @foo(a) do
+    for i from 0 to 5 do
+      print(a)
+    done
+  end
 end

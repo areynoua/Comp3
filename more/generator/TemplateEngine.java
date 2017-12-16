@@ -22,9 +22,14 @@ public class TemplateEngine {
 
     // Tag placed in the template file to locate where to write the main function
     public static final String BODY = "@@body@@";
+    public static final String FUNCTIONS = "@@functions@@";
+    private String currentTag;
 
     private String body; // Code contained in the main function
     private Integer bodyIndentLevel; // Current number of indents
+
+    private String functions; // Section containing function definitions
+    private Integer functionsIndentLevel; // Current number of indents
 
     private String templateFilepath; // Path to the template file
     private String data;
@@ -46,6 +51,9 @@ public class TemplateEngine {
     public void init() {
         this.body = "";
         this.bodyIndentLevel = 0;
+        this.functions = "";
+        this.functionsIndentLevel = 0;
+        this.currentTag = BODY;
 
         File file = new File(this.templateFilepath);
         FileInputStream fis;
@@ -73,29 +81,30 @@ public class TemplateEngine {
     }
 
     /**
-     * Inserts code at current cursor position in main function.
+     * Inserts code at current cursor position in main function or
+     * in function definition section.
      * After insertion, the cursor position is moved to the location
      * of the last inserted character.
      *
      * @param content Code to add
      */
     public void insert(String content) {
-        insert(content, BODY);
-        newLine();
+        if (this.currentTag.equals(BODY)) {
+            this.body += content;
+        } else if (this.currentTag.equals(FUNCTIONS)) {
+            this.functions += content;
+        }
+        newLine(this.currentTag);
     }
 
     /**
-     * Inserts code at current cursor position of the given tag
-     * After insertion, the cursor position is moved to the location
-     * of the last inserted character.
+     * Sets current tag. After calling this method, every new piece of code
+     * will be appended to the output file at the location of current tag.
      *
-     * @param content Code to add
-     * @param tag Tag that gives the location where to write
+     * @param tag  Tag where to write code in template llvm file
      */
-    public void insert(String word, String tag) {
-        if (tag.equals(BODY)) {
-            this.body += word;
-        }
+    public void setTag(String tag) {
+        this.currentTag = tag;
     }
 
     /**
@@ -104,15 +113,30 @@ public class TemplateEngine {
      * @param label Label to add to the main function
      */
     public void addLabel(String label) {
-        String indent = indentFromLevel(this.bodyIndentLevel);
-        this.body += ("\n" + indent);
+        if (this.currentTag.equals(BODY)) {
+            String indent = indentFromLevel(this.bodyIndentLevel);
+            this.body += ("\n" + indent);
+        } else if (this.currentTag.equals(FUNCTIONS)) {
+            String indent = indentFromLevel(this.functionsIndentLevel);
+            this.functions += ("\n" + indent);
+        }
         insert(label + ":");
     }
 
-    /** Add a new line to the code */
+    /** Add a new line to main function */
     public void newLine() {
-        String indent = indentFromLevel(this.bodyIndentLevel + 1);
-        this.body += ("\n" + indent);
+        newLine(BODY);
+    }
+
+    /** Add a new line to the code */
+    public void newLine(String tag) {
+        if (tag.equals(BODY)) {
+            String indent = indentFromLevel(this.bodyIndentLevel + 1);
+            this.body += ("\n" + indent);
+        } else if (tag.equals(FUNCTIONS)) {
+            String indent = indentFromLevel(this.functionsIndentLevel + 1);
+            this.functions += ("\n" + indent);
+        }
     }
 
     /** Returns tabs, given the current indentation level */
@@ -134,6 +158,7 @@ public class TemplateEngine {
     /** Returns the whole code as a string */
     public String finish() {
         finishBlock(BODY, body);
+        finishBlock(FUNCTIONS, functions);
         return this.data;
     }
 }
