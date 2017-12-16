@@ -141,6 +141,7 @@ ModuleName     = _{Identifier}
     "function"     { addSymbol(LexicalUnit.FUNCTION); }
     "return"       { addSymbol(LexicalUnit.RETURN); }
     "import"       { addSymbol(LexicalUnit.IMPORT); }
+    ","            { addSymbol(LexicalUnit.COMMA); }
     {ModuleName}   { addSymbol(LexicalUnit.MODULENAME); }
     {FuncName}     { addSymbol(LexicalUnit.FUNCNAME); }
     {Identifier}   { addSymbol(LexicalUnit.VARNAME); }

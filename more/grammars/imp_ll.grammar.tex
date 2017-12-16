@@ -12,10 +12,12 @@
   &  & \varstyle{Return} \\
   &  & \varstyle{Call} \\
   &  & \varstyle{Import} \\
-  & \varstyle{Define} & function [FuncName] ( [VarName] ) do \varstyle{Code} end \\
+  & \varstyle{Define} & function [FuncName] ( \varstyle{ParamList} ) do \varstyle{Code} end \\
   & \varstyle{Return} & return \varstyle{ExprArith-p0} \\
   & \varstyle{Import} & import [ModuleName] \\
-  & \varstyle{Call} & [FuncName] ( \varstyle{ExprArith-p0} ) \\
+  & \varstyle{Call} & [FuncName] ( \varstyle{ArgList} ) \\
+  & \varstyle{ArgList} & epsilon \\
+  & \varstyle{ParamList} & epsilon \\
   & \varstyle{Assign} & [VarName] := \varstyle{ExprArith-p0} \\
   & \varstyle{ExprArith-p0-j} & \varstyle{Op-p0} \varstyle{ExprArith-p1} \\
   & \varstyle{ExprArith-p0-i} & \varstyle{ExprArith-p1} \\
@@ -49,6 +51,12 @@
   & \varstyle{InstList} & \varstyle{Instruction} \varstyle{InstList-Tail} \\
   & \varstyle{InstList-Tail} & ; \varstyle{InstList} \\
   &  & epsilon \\
+  & \varstyle{ArgList} & \varstyle{ExprArith-p0} \varstyle{ArgList-Tail} \\
+  & \varstyle{ArgList-Tail} & epsilon \\
+  &  & , \varstyle{ArgList} \\
+  & \varstyle{ParamList} & [VarName] \varstyle{ParamList-Tail} \\
+  & \varstyle{ParamList-Tail} & epsilon \\
+  &  & , \varstyle{ParamList} \\
   & \varstyle{If} & if \varstyle{Cond-p0} then \varstyle{Code} \varstyle{If-Tail} \\
   & \varstyle{If-Tail} & endif \\
   &  & else \varstyle{Code} endif \\

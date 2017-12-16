@@ -14,9 +14,12 @@
                     -> <Return> 
                     -> <Call> 
                     -> <Import> 
-<Define>            -> function [FuncName] ( [VarName] ) do <Code> end 
+<Define>            -> function [FuncName] ( <ArgList> ) do <Code> end 
 <Return>            -> return <ExprArith> 
-<Call>              -> [FuncName] ( <ExprArith> ) 
+<Call>              -> [FuncName] ( <ArgList> ) 
+<ArgList>           -> <ExprArith> , <ArgList> 
+                    -> <ExprArith> 
+                    -> epsilon 
 <Import>            -> import [ModuleName] 
 <Assign>            -> [VarName] := <ExprArith> 
 <ExprArith>         -> [VarName] 

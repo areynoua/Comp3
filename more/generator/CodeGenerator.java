@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringJoiner;
 
 import lexer.LexicalUnit;
 import lexer.Symbol;
@@ -25,6 +26,7 @@ public class CodeGenerator {
 
     private Integer nUnnamedVariables; // Number of llvm unnamed variables currently used
     private Integer nConditions; // Number of llvm conditions currently generated
+    private Integer nCalls; // Number of functions calls generated
 
     /**
      * Initializes the recursive descent code generator. 
@@ -57,6 +59,7 @@ public class CodeGenerator {
     private Symbol consumeOneToken(LexicalUnit type) {
         Symbol token = this.tokens.get(0);
         if (type != token.getType()) {
+            System.out.println(token);
             // TODO: raise exception
         }
         this.tokens.remove(0);
@@ -82,6 +85,7 @@ public class CodeGenerator {
         allocateVariables();
         this.nUnnamedVariables = 1; // Already one variable for the seed of the RNG
         this.nConditions = 0;
+        this.nCalls = 0;
         this.tokens = new ArrayList<Symbol>(tokens);
 
         generateFromProgram(parseTree); // Generates llvm from the root of the parse tree
@@ -185,44 +189,29 @@ public class CodeGenerator {
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
     }
 
-    private void generateFromCall(final Node node) {
-        // [FuncName] ( <ExprArith-p0> )
-        String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
-        consumeOneToken(LexicalUnit.LPAREN);
-        String tempVarName = generateFromExprArithP0(node.getChildren().get(2));
-        consumeOneToken(LexicalUnit.RPAREN);
-        this.templateEngine.insert("store i32 " + tempVarName + ", i32* %tmp"); // TODO
-        String varName = llvmVarName(String.valueOf(this.nUnnamedVariables++)); // TODO: assignation
-        this.templateEngine.insert("call i32 " + funcName + "(i32* " + "%tmp" + ")");
-    }
-
-    private void generateFromReturn(final Node node) {
-        consumeOneToken(LexicalUnit.RETURN);
-        String tempVarName = generateFromExprArithP0(node.getChildren().get(1));
-        this.templateEngine.insert("ret i32 " + tempVarName);
-    }
-
     private void generateFromDefine(final Node node) {
-        // function [FuncName] ( [VarName] ) do <Code> end
         consumeOneToken(LexicalUnit.FUNCTION);
         String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
         consumeOneToken(LexicalUnit.LPAREN);
 
-        // TODO: arg list
-        String argVarName = llvmVarName((String) consumeOneToken(LexicalUnit.VARNAME).getValue());
+        List<String> args = generateFromParamList(node.getChildren().get(3));
+        StringJoiner sj = new StringJoiner(", ", "", "");
+        for (String argument : args) {
+            sj.add("i32* " + argument);
+        }
     
         consumeOneToken(LexicalUnit.RPAREN);
         consumeOneToken(LexicalUnit.DO);
         this.templateEngine.setTag(this.templateEngine.FUNCTIONS);
         Integer unv = this.nUnnamedVariables;
         this.nUnnamedVariables = 0;
-        this.templateEngine.insert("define i32 " + funcName + "(" + "i32* " + argVarName + ") {"); // TODO
+        this.templateEngine.insert("define i32 " + funcName + "(" + sj.toString() + ") {");
         this.templateEngine.addLabel("entry");
 
         this.templateEngine.oneLineComment("Allocate memory for Imp variables");
         for (Integer index : identifiers.keySet()) { // For each symbol from the table
             String identifierName = llvmVarName((String) identifiers.get(index).getValue());
-            if (!argVarName.equals(identifierName)) {
+            if (!args.contains(identifierName)) {
                 this.templateEngine.insert(identifierName + " = alloca i32");
             }
         }
@@ -236,7 +225,68 @@ public class CodeGenerator {
         consumeOneToken(LexicalUnit.END);
     }
 
+    private void generateFromCall(final Node node) {
+        // [FuncName] ( <ExprArith-p0> )
+        String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
+        consumeOneToken(LexicalUnit.LPAREN);
+        List<String> args = generateFromArgList(node.getChildren().get(2));
+        consumeOneToken(LexicalUnit.RPAREN);
+        StringJoiner sj = new StringJoiner(", ", "", "");
+        for (int i = 0; i < args.size(); i++) {
+            String tempVarName = llvmVarName("c" + nCalls + "c" + i);
+            this.templateEngine.insert(tempVarName + " = alloca i32");
+            this.templateEngine.insert("store i32 " + args.get(i) + ", i32* " + tempVarName);
+            sj.add("i32* " + tempVarName);
+        }
+        this.templateEngine.insert("call i32 " + funcName + "(" + sj.toString() +  ")");
+        this.nCalls++;
+    }
+
+    private List<String> generateFromArgList(final Node node) {
+        List<String> args = new ArrayList<>();
+        if (node.getChildren().size() > 1) {
+            args.add(generateFromExprArithP0(node.getChildren().get(0)));
+            args.addAll(generateFromArgListTail(node.getChildren().get(1)));
+        }
+        return args;
+    }
+
+    private List<String> generateFromArgListTail(final Node node) {
+        List<String> args = new ArrayList<>();
+        if (node.getChildren().size() > 1) {
+            consumeOneToken(LexicalUnit.COMMA);
+            args.addAll(generateFromArgList(node.getChildren().get(1)));
+        }
+        return args;
+    }
+
+    private List<String> generateFromParamList(final Node node) {
+        List<String> args = new ArrayList<>();
+        if (node.getChildren().size() > 1) {
+            String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
+            args.add(llvmVarName(varName));
+            args.addAll(generateFromParamListTail(node.getChildren().get(1)));
+        }
+        return args;
+    }
+
+    private List<String> generateFromParamListTail(final Node node) {
+        List<String> args = new ArrayList<>();
+        if (node.getChildren().size() > 1) {
+            consumeOneToken(LexicalUnit.COMMA);
+            args.addAll(generateFromParamList(node.getChildren().get(1)));
+        }
+        return args;
+    }
+
+    private void generateFromReturn(final Node node) {
+        consumeOneToken(LexicalUnit.RETURN);
+        String tempVarName = generateFromExprArithP0(node.getChildren().get(1));
+        this.templateEngine.insert("ret i32 " + tempVarName);
+    }
+
     private void generateFromImport(final Node node) {
+        // TODO
         consumeOneToken(LexicalUnit.IMPORT);
         String moduleName = llvmVarName((String) consumeOneToken(LexicalUnit.MODULENAME).getValue());
         System.out.println(moduleName);
@@ -248,7 +298,7 @@ public class CodeGenerator {
      * @param node Current node (must be <Read>)
      */
     private void generateFromRead(final Node node) {
-        consumeOneToken(LexicalUnit.VARNAME);
+        consumeOneToken(LexicalUnit.READ);
         consumeOneToken(LexicalUnit.LPAREN);
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         this.templateEngine.oneLineComment("Read ( " + varName + " ) ");
@@ -264,7 +314,7 @@ public class CodeGenerator {
      * @param node Current node (must be <Print>)
      */
     private void generateFromPrint(final Node node) {
-        consumeOneToken(LexicalUnit.VARNAME);
+        consumeOneToken(LexicalUnit.PRINT);
         consumeOneToken(LexicalUnit.LPAREN);
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
@@ -281,7 +331,7 @@ public class CodeGenerator {
      * @param node Current node (must be <Rand>)
      */
     private void generateFromRand(final Node node) {
-        consumeOneToken(LexicalUnit.VARNAME);
+        consumeOneToken(LexicalUnit.RAND);
         consumeOneToken(LexicalUnit.LPAREN);
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         this.templateEngine.oneLineComment("Rand ( " + varName + " ) ");

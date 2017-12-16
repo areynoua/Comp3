@@ -14,9 +14,12 @@
   &  & \varstyle{Return} \\
   &  & \varstyle{Call} \\
   &  & \varstyle{Import} \\
-  & \varstyle{Define} & function [FuncName] ( [VarName] ) do \varstyle{Code} end \\
+  & \varstyle{Define} & function [FuncName] ( \varstyle{ArgList} ) do \varstyle{Code} end \\
   & \varstyle{Return} & return \varstyle{ExprArith} \\
-  & \varstyle{Call} & [FuncName] ( \varstyle{ExprArith} ) \\
+  & \varstyle{Call} & [FuncName] ( \varstyle{ArgList} ) \\
+  & \varstyle{ArgList} & \varstyle{ExprArith} , \varstyle{ArgList} \\
+  &  & \varstyle{ExprArith} \\
+  &  & epsilon \\
   & \varstyle{Import} & import [ModuleName] \\
   & \varstyle{Assign} & [VarName] := \varstyle{ExprArith} \\
   & \varstyle{ExprArith} & [VarName] \\

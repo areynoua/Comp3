@@ -40,7 +40,7 @@ define i32 @getNumber(){
       ret i32 %1
 }
 
-define i32 @foo(i32* %a) {
+define i32 @foo(i32* %a, i32* %k) {
     
 entry:
     ; Allocate memory for Imp variables
@@ -51,7 +51,7 @@ entry:
     %x = alloca i32
     ; Assignation of variable x
     %0 = load i32, i32* %a
-    %1 = add i32 0, 5
+    %1 = load i32, i32* %k
     ; Arithmetic operation +
     %2 = add i32 %0, %1
     store i32 %2, i32* %x
@@ -96,6 +96,7 @@ entry:
     %i = alloca i32
     %j = alloca i32
     %c = alloca i32
+    %k = alloca i32
     %x = alloca i32
     %tmp = alloca i32
     
@@ -300,16 +301,12 @@ for.n4.cond.end:
     
     
     %58 = load i32, i32* %b
-    store i32 %58, i32* %tmp
-    call i32 @foo(i32* %tmp)
-    
-    
-    %60 = add i32 0, 45
-    %61 = add i32 0, 8
-    ; Arithmetic operation -
-    %62 = sub i32 %60, %61
-    store i32 %62, i32* %tmp
-    call i32 @foo(i32* %tmp)
+    %59 = load i32, i32* %c
+    %c0c0 = alloca i32
+    store i32 %58, i32* %c0c0
+    %c0c1 = alloca i32
+    store i32 %59, i32* %c0c1
+    call i32 @foo(i32* %c0c0, i32* %c0c1)
     
     
 

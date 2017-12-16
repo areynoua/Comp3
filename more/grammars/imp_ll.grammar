@@ -12,10 +12,12 @@
                     -> <Return> 
                     -> <Call> 
                     -> <Import> 
-<Define>            -> function [FuncName] ( [VarName] ) do <Code> end 
+<Define>            -> function [FuncName] ( <ParamList> ) do <Code> end 
 <Return>            -> return <ExprArith-p0> 
 <Import>            -> import [ModuleName] 
-<Call>              -> [FuncName] ( <ExprArith-p0> ) 
+<Call>              -> [FuncName] ( <ArgList> ) 
+<ArgList>           -> epsilon 
+<ParamList>         -> epsilon 
 <Assign>            -> [VarName] := <ExprArith-p0> 
 <ExprArith-p0-j>    -> <Op-p0> <ExprArith-p1> 
 <ExprArith-p0-i>    -> <ExprArith-p1> 
@@ -49,6 +51,12 @@
 <InstList>          -> <Instruction> <InstList-Tail> 
 <InstList-Tail>     -> ; <InstList> 
                     -> epsilon 
+<ArgList>           -> <ExprArith-p0> <ArgList-Tail> 
+<ArgList-Tail>      -> epsilon 
+                    -> , <ArgList> 
+<ParamList>         -> [VarName] <ParamList-Tail> 
+<ParamList-Tail>    -> epsilon 
+                    -> , <ParamList> 
 <If>                -> if <Cond-p0> then <Code> <If-Tail> 
 <If-Tail>           -> endif 
                     -> else <Code> endif 

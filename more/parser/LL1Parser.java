@@ -373,6 +373,7 @@ public class LL1Parser {
         conversions.put(LexicalUnit.RETURN, "return");
         conversions.put(LexicalUnit.IMPORT, "import");
         conversions.put(LexicalUnit.MODULENAME, "[ModuleName]");
+        conversions.put(LexicalUnit.COMMA, ",");
         conversions.put(LexicalUnit.EOS, "$");
 
         for (Symbol symbol : symbols) {
