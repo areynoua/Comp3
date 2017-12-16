@@ -81,6 +81,8 @@ public class CodeGenerator {
             final HashMap<Integer, Symbol>  identifiers, final String filepath)
             throws FileNotFoundException, UnsupportedEncodingException {
         this.templateEngine.init();
+        this.templateEngine.importModule("_random");
+        this.templateEngine.importModule("_stdio");
         this.identifiers = identifiers;
         allocateVariables();
         this.nUnnamedVariables = 1; // Already one variable for the seed of the RNG
@@ -189,17 +191,24 @@ public class CodeGenerator {
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
     }
 
+    /**
+     * Generates llvm code from a <Define> node of the parse tree.
+     * 
+     * @param node Current node (must be <Define>)
+     */
     private void generateFromDefine(final Node node) {
         consumeOneToken(LexicalUnit.FUNCTION);
         String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
         consumeOneToken(LexicalUnit.LPAREN);
 
+        // Create llvm parameter list
         List<String> args = generateFromParamList(node.getChildren().get(3));
         StringJoiner sj = new StringJoiner(", ", "", "");
         for (String argument : args) {
             sj.add("i32* " + argument);
         }
-    
+
+        // Create llvm function signature
         consumeOneToken(LexicalUnit.RPAREN);
         consumeOneToken(LexicalUnit.DO);
         this.templateEngine.setTag(this.templateEngine.FUNCTIONS);
@@ -208,6 +217,7 @@ public class CodeGenerator {
         this.templateEngine.insert("define i32 " + funcName + "(" + sj.toString() + ") {");
         this.templateEngine.addLabel("entry");
 
+        // Allocate memory for other variables
         this.templateEngine.oneLineComment("Allocate memory for Imp variables");
         for (Integer index : identifiers.keySet()) { // For each symbol from the table
             String identifierName = llvmVarName((String) identifiers.get(index).getValue());
@@ -217,7 +227,9 @@ public class CodeGenerator {
         }
         this.templateEngine.newLine();
 
+        // Write the body of the function
         generateFromCode(node.getChildren().get(6));
+        this.templateEngine.insert("ret i32 0");
         this.templateEngine.newLine();
         this.templateEngine.insert("}");
         this.nUnnamedVariables = unv;
@@ -225,6 +237,11 @@ public class CodeGenerator {
         consumeOneToken(LexicalUnit.END);
     }
 
+    /**
+     * Generates llvm code from a <Call> node of the parse tree.
+     * 
+     * @param node Current node (must be <Call>)
+     */
     private void generateFromCall(final Node node) {
         // [FuncName] ( <ExprArith-p0> )
         String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
@@ -242,6 +259,12 @@ public class CodeGenerator {
         this.nCalls++;
     }
 
+    /**
+     * Generates llvm code from a <ArgList> node of the parse tree.
+     * 
+     * @param node Current node (must be <ArgList>)
+     * @return List of llvm arg names
+     */
     private List<String> generateFromArgList(final Node node) {
         List<String> args = new ArrayList<>();
         if (node.getChildren().size() > 1) {
@@ -251,6 +274,12 @@ public class CodeGenerator {
         return args;
     }
 
+    /**
+     * Generates llvm code from a <ArgListTail> node of the parse tree.
+     * 
+     * @param node Current node (must be <ArgListTail>)
+     * @return List of llvm arg names
+     */
     private List<String> generateFromArgListTail(final Node node) {
         List<String> args = new ArrayList<>();
         if (node.getChildren().size() > 1) {
@@ -260,6 +289,12 @@ public class CodeGenerator {
         return args;
     }
 
+    /**
+     * Generates llvm code from a <ParamList> node of the parse tree.
+     * 
+     * @param node Current node (must be <ParamList>)
+     * @return List of llvm function parameter names
+     */
     private List<String> generateFromParamList(final Node node) {
         List<String> args = new ArrayList<>();
         if (node.getChildren().size() > 1) {
@@ -270,6 +305,12 @@ public class CodeGenerator {
         return args;
     }
 
+    /**
+     * Generates llvm code from a <ParamListTail> node of the parse tree.
+     * 
+     * @param node Current node (must be <ParamListTail>)
+     * @return List of llvm function parameter names
+     */
     private List<String> generateFromParamListTail(final Node node) {
         List<String> args = new ArrayList<>();
         if (node.getChildren().size() > 1) {
@@ -279,17 +320,27 @@ public class CodeGenerator {
         return args;
     }
 
+    /**
+     * Generates llvm code from a <Return> node of the parse tree.
+     * 
+     * @param node Current node (must be <Return>)
+     */
     private void generateFromReturn(final Node node) {
         consumeOneToken(LexicalUnit.RETURN);
         String tempVarName = generateFromExprArithP0(node.getChildren().get(1));
         this.templateEngine.insert("ret i32 " + tempVarName);
+        this.nUnnamedVariables++; // Hacky stuff
     }
 
+    /**
+     * Generates llvm code from a <Import> node of the parse tree.
+     * 
+     * @param node Current node (must be <Import>)
+     */
     private void generateFromImport(final Node node) {
-        // TODO
         consumeOneToken(LexicalUnit.IMPORT);
         String moduleName = llvmVarName((String) consumeOneToken(LexicalUnit.MODULENAME).getValue());
-        System.out.println(moduleName);
+        this.templateEngine.importModule(moduleName);
     }
 
     /**

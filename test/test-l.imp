@@ -1,0 +1,14 @@
+begin
+
+  function @min(a, b) do
+    if a >= b then
+      return b
+    else
+      return a
+    endif
+  end;
+
+  a := 78;
+  print(a);
+  @min(a, 8)
+end

@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.lang.StringBuilder;
 import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * Template engine used to make a pretty string representation of
@@ -34,6 +36,8 @@ public class TemplateEngine {
     private String templateFilepath; // Path to the template file
     private String data;
 
+    private List<String> importedModules;
+
     /**
      * Initialization of the template engine.
      *
@@ -55,6 +59,8 @@ public class TemplateEngine {
         this.functionsIndentLevel = 0;
         this.currentTag = BODY;
 
+        this.importedModules = new ArrayList<>();        
+
         File file = new File(this.templateFilepath);
         FileInputStream fis;
         byte[] data = null;
@@ -68,6 +74,37 @@ public class TemplateEngine {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Imports module given its name, and copy its content at the beginning
+     * of the target llvm file.
+     *
+     * @param moduleName Name of the module to be included
+     */
+    public void importModule(String moduleName) {
+        System.out.println(moduleName);
+        if (!importedModules.contains(moduleName)) {
+            String pathToLibrary = "imp_stdlib/" + moduleName + ".ll";
+            File file = new File(pathToLibrary);
+            FileInputStream fis;
+            byte[] data = null;
+            try {
+                fis = new FileInputStream(file);
+                data = new byte[(int) file.length()];
+                fis.read(data);
+                fis.close();
+                String tag = currentTag;
+                this.setTag(FUNCTIONS);
+                this.insert(new String(data, "UTF-8"));
+                this.setTag(tag);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            importedModules.add(moduleName);
         }
     }
 

@@ -1,7 +1,4 @@
 begin
-  import _hpp;
-  import _gpp;
-
   read(a);
   b := 42;
   b := a;

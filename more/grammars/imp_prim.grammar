@@ -24,7 +24,7 @@
 <ParamList>         -> [VarName] , <ParamList>
                     -> [VarName]
                     -> epsilon
-<Assign>            -> [VarName] := <ExprArith-p0> 
+<Assign>            -> [VarName] := <ExprArith-p0>
 <ExprArith-p0>      -> <ExprArith-p0> <Op-p0> <ExprArith-p1> 
                     -> <ExprArith-p1>
 <ExprArith-p1>      -> <ExprArith-p1> <Op-p1> <Atom>
