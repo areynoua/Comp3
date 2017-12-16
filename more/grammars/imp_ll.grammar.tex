@@ -18,7 +18,6 @@
   & \varstyle{Call} & [FuncName] ( \varstyle{ArgList} ) \\
   & \varstyle{ArgList} & epsilon \\
   & \varstyle{ParamList} & epsilon \\
-  & \varstyle{Assign} & [VarName] := \varstyle{ExprArith-p0} \\
   & \varstyle{ExprArith-p0-j} & \varstyle{Op-p0} \varstyle{ExprArith-p1} \\
   & \varstyle{ExprArith-p0-i} & \varstyle{ExprArith-p1} \\
   & \varstyle{ExprArith-p1-j} & \varstyle{Op-p1} \varstyle{Atom} \\
@@ -57,6 +56,9 @@
   & \varstyle{ParamList} & [VarName] \varstyle{ParamList-Tail} \\
   & \varstyle{ParamList-Tail} & epsilon \\
   &  & , \varstyle{ParamList} \\
+  & \varstyle{Assign} & [VarName] := \varstyle{Assign-Tail} \\
+  & \varstyle{Assign-Tail} & \varstyle{Call} \\
+  &  & \varstyle{ExprArith-p0} \\
   & \varstyle{If} & if \varstyle{Cond-p0} then \varstyle{Code} \varstyle{If-Tail} \\
   & \varstyle{If-Tail} & endif \\
   &  & else \varstyle{Code} endif \\

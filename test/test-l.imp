@@ -1,14 +1,25 @@
 begin
 
   function @min(a, b) do
-    if a >= b then
-      return b
+    if a <= b then
+      c := a
     else
-      return a
-    endif
+      c := b
+    endif;
+    return c
   end;
 
-  a := 78;
+  function @max(a, b) do
+    if a >= b then
+      c := a
+    else
+      c := b
+    endif;
+    return c
+  end;
+
+  a := 5;
   print(a);
-  @min(a, 8)
+  b := @max(a, 8);
+  print(b)
 end

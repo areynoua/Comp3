@@ -18,7 +18,6 @@
 <Call>              -> [FuncName] ( <ArgList> ) 
 <ArgList>           -> epsilon 
 <ParamList>         -> epsilon 
-<Assign>            -> [VarName] := <ExprArith-p0> 
 <ExprArith-p0-j>    -> <Op-p0> <ExprArith-p1> 
 <ExprArith-p0-i>    -> <ExprArith-p1> 
 <ExprArith-p1-j>    -> <Op-p1> <Atom> 
@@ -57,6 +56,9 @@
 <ParamList>         -> [VarName] <ParamList-Tail> 
 <ParamList-Tail>    -> epsilon 
                     -> , <ParamList> 
+<Assign>            -> [VarName] := <Assign-Tail> 
+<Assign-Tail>       -> <Call> 
+                    -> <ExprArith-p0> 
 <If>                -> if <Cond-p0> then <Code> <If-Tail> 
 <If-Tail>           -> endif 
                     -> else <Code> endif 

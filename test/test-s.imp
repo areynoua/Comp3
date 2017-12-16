@@ -1,4 +1,6 @@
 begin
+  import _math;
+
   read(a);
   b := 42;
   b := a;
@@ -38,5 +40,9 @@ begin
   end;
 
   b := (c + 1);
-  @foo(b, c)
+  @foo(b, c);
+  b := @min((7 * 5), 8);
+  print(b);
+  b := @max((7 * 5), 8);
+  print(b)
 end

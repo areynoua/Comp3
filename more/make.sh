@@ -61,8 +61,8 @@ echo
 echo $ java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-1.imp -o tree
 echo
 
-echo $ java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-l.imp -o tree
-java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-l.imp -o tree
+echo $ java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-s.imp -o tree
+java -jar ../dist/impCompiler.jar grammars/imp_ll.grammar ../test/test-s.imp -o tree
 
 
 # Compile LLVM file

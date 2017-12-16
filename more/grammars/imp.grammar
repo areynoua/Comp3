@@ -25,6 +25,7 @@
               -> epsilon
 <Import>      -> import [ModuleName]
 <Assign>      -> [VarName] := <ExprArith>
+              -> [VarName] := <Call>
 <ExprArith>   -> [VarName]
               -> [Number]
               -> ( <ExprArith> )

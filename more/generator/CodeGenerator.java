@@ -27,6 +27,7 @@ public class CodeGenerator {
     private Integer nUnnamedVariables; // Number of llvm unnamed variables currently used
     private Integer nConditions; // Number of llvm conditions currently generated
     private Integer nCalls; // Number of functions calls generated
+    private boolean inFunc; // Indicates if the generator is inside a user-defined function or not
 
     /**
      * Initializes the recursive descent code generator. 
@@ -88,6 +89,7 @@ public class CodeGenerator {
         this.nUnnamedVariables = 1; // Already one variable for the seed of the RNG
         this.nConditions = 0;
         this.nCalls = 0;
+        this.inFunc = false;
         this.tokens = new ArrayList<Symbol>(tokens);
 
         generateFromProgram(parseTree); // Generates llvm from the root of the parse tree
@@ -186,9 +188,26 @@ public class CodeGenerator {
     private void generateFromAssign(final Node node) {
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         consumeOneToken(LexicalUnit.ASSIGN);
+        generateFromAssignTail(node.getChildren().get(2), varName);
+    }
+
+    /**
+     * Generates llvm code from a <AssignTail> node of the parse tree.
+     * 
+     * @param node Current node (must be <AssignTail>)
+     * @param varName 
+     */
+    private void generateFromAssignTail(final Node node, final String varName) {
+        String symbolName = node.getChildren().get(0).getSymbol().withoutChevrons();
         this.templateEngine.oneLineComment("Assignation of variable " + varName);
-        String tempVarName = generateFromExprArithP0(node.getChildren().get(2));
-        this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
+        if (symbolName.equals("ExprArith-p0")) {
+            String tempVarName = generateFromExprArithP0(node.getChildren().get(0));
+            this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
+        } else {
+            System.out.println(this.nUnnamedVariables);
+            String tempVarName = generateFromCall(node.getChildren().get(0));
+            this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));      
+        }
     }
 
     /**
@@ -213,6 +232,7 @@ public class CodeGenerator {
         consumeOneToken(LexicalUnit.DO);
         this.templateEngine.setTag(this.templateEngine.FUNCTIONS);
         Integer unv = this.nUnnamedVariables;
+        this.inFunc = true;
         this.nUnnamedVariables = 0;
         this.templateEngine.insert("define i32 " + funcName + "(" + sj.toString() + ") {");
         this.templateEngine.addLabel("entry");
@@ -233,6 +253,7 @@ public class CodeGenerator {
         this.templateEngine.newLine();
         this.templateEngine.insert("}");
         this.nUnnamedVariables = unv;
+        this.inFunc = false;
         this.templateEngine.setTag(this.templateEngine.BODY);
         consumeOneToken(LexicalUnit.END);
     }
@@ -241,8 +262,9 @@ public class CodeGenerator {
      * Generates llvm code from a <Call> node of the parse tree.
      * 
      * @param node Current node (must be <Call>)
+     * @return Name of the variable containing the fonction result
      */
-    private void generateFromCall(final Node node) {
+    private String generateFromCall(final Node node) {
         // [FuncName] ( <ExprArith-p0> )
         String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
         consumeOneToken(LexicalUnit.LPAREN);
@@ -255,8 +277,11 @@ public class CodeGenerator {
             this.templateEngine.insert("store i32 " + args.get(i) + ", i32* " + tempVarName);
             sj.add("i32* " + tempVarName);
         }
-        this.templateEngine.insert("call i32 " + funcName + "(" + sj.toString() +  ")");
         this.nCalls++;
+        String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
+        this.templateEngine.insert(tempVarName + " = call i32 " + funcName + "(" + sj.toString() +  ")");
+        return tempVarName;
+
     }
 
     /**
@@ -329,7 +354,7 @@ public class CodeGenerator {
         consumeOneToken(LexicalUnit.RETURN);
         String tempVarName = generateFromExprArithP0(node.getChildren().get(1));
         this.templateEngine.insert("ret i32 " + tempVarName);
-        this.nUnnamedVariables++; // Hacky stuff
+        if (this.inFunc) this.nUnnamedVariables++; // Hacky stuff
     }
 
     /**
@@ -339,7 +364,7 @@ public class CodeGenerator {
      */
     private void generateFromImport(final Node node) {
         consumeOneToken(LexicalUnit.IMPORT);
-        String moduleName = llvmVarName((String) consumeOneToken(LexicalUnit.MODULENAME).getValue());
+        String moduleName = (String) consumeOneToken(LexicalUnit.MODULENAME).getValue();
         this.templateEngine.importModule(moduleName);
     }
 
