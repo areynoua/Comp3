@@ -371,6 +371,8 @@ public class LL1Parser {
         conversions.put(LexicalUnit.FUNCTION, "function");
         conversions.put(LexicalUnit.FUNCNAME, "[FuncName]");
         conversions.put(LexicalUnit.RETURN, "return");
+        conversions.put(LexicalUnit.IMPORT, "import");
+        conversions.put(LexicalUnit.MODULENAME, "[ModuleName]");
         conversions.put(LexicalUnit.EOS, "$");
 
         for (Symbol symbol : symbols) {

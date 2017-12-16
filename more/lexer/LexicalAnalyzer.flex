@@ -96,6 +96,7 @@ AlphaNumeric   = {Alpha}|{Digit}
 Number         = {Digit}+
 Identifier     = {Alpha}{AlphaNumeric}*
 FuncName       = @{Identifier}
+ModuleName     = _{Identifier}
 
 %state COMMENT
 
@@ -139,10 +140,12 @@ FuncName       = @{Identifier}
     "rand"         { addSymbol(LexicalUnit.RAND); }
     "function"     { addSymbol(LexicalUnit.FUNCTION); }
     "return"       { addSymbol(LexicalUnit.RETURN); }
+    "import"       { addSymbol(LexicalUnit.IMPORT); }
+    {ModuleName}   { addSymbol(LexicalUnit.MODULENAME); }
     {FuncName}     { addSymbol(LexicalUnit.FUNCNAME); }
     {Identifier}   { addSymbol(LexicalUnit.VARNAME); }
     {Number}       { addSymbol(LexicalUnit.NUMBER); }
-    {CommentBegin} { yybegin(COMMENT);}
+    {CommentBegin} { yybegin(COMMENT); }
     "\*\)"         { throw new BadTerminalContextException("'*)' occured without '(*'"); }
     {Space}        { /* ignore */ }
 }

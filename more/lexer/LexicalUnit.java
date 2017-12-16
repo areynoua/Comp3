@@ -38,5 +38,7 @@ public enum LexicalUnit{
     FUNCTION,
     FUNCNAME,
     RETURN,
+    IMPORT,
+    MODULENAME,
     EOS,
 }

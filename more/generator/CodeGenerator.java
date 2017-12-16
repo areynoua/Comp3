@@ -102,6 +102,7 @@ public class CodeGenerator {
             String identifierName = (String) identifiers.get(index).getValue();
             this.templateEngine.insert(llvmVarName(identifierName) + " = alloca i32");
         }
+        this.templateEngine.insert("%tmp = alloca i32");
         this.templateEngine.newLine();
     }
 
@@ -166,6 +167,8 @@ public class CodeGenerator {
             generateFromReturn(node.getChildren().get(0));
         } else if (instructionName.equals("Call")) {
             generateFromCall(node.getChildren().get(0));
+        } else if (instructionName.equals("Import")) {
+            generateFromImport(node.getChildren().get(0));
         }
     }
 
@@ -188,8 +191,8 @@ public class CodeGenerator {
         consumeOneToken(LexicalUnit.LPAREN);
         String tempVarName = generateFromExprArithP0(node.getChildren().get(2));
         consumeOneToken(LexicalUnit.RPAREN);
-        this.templateEngine.insert("%tmp = alloca i32");
         this.templateEngine.insert("store i32 " + tempVarName + ", i32* %tmp"); // TODO
+        String varName = llvmVarName(String.valueOf(this.nUnnamedVariables++)); // TODO: assignation
         this.templateEngine.insert("call i32 " + funcName + "(i32* " + "%tmp" + ")");
     }
 
@@ -231,6 +234,12 @@ public class CodeGenerator {
         this.nUnnamedVariables = unv;
         this.templateEngine.setTag(this.templateEngine.BODY);
         consumeOneToken(LexicalUnit.END);
+    }
+
+    private void generateFromImport(final Node node) {
+        consumeOneToken(LexicalUnit.IMPORT);
+        String moduleName = llvmVarName((String) consumeOneToken(LexicalUnit.MODULENAME).getValue());
+        System.out.println(moduleName);
     }
 
     /**

@@ -13,8 +13,10 @@
                     -> <Define>
                     -> <Return>
                     -> <Call>
+                    -> <Import>
 <Define>            -> function [FuncName] ( [VarName] ) do <Code> end
 <Return>            -> return <ExprArith-p0>
+<Import>            -> import [ModuleName]
 <Call>              -> [FuncName] ( <ExprArith-p0> )
 <Assign>            -> [VarName] := <ExprArith-p0> 
 <ExprArith-p0>      -> <ExprArith-p0> <Op-p0> <ExprArith-p1> 

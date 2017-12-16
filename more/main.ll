@@ -97,6 +97,11 @@ entry:
     %j = alloca i32
     %c = alloca i32
     %x = alloca i32
+    %tmp = alloca i32
+    
+    
+    
+    
     
     ; Read ( a ) 
     %1 = call i32 @readInt()
@@ -295,8 +300,15 @@ for.n4.cond.end:
     
     
     %58 = load i32, i32* %b
-    %tmp = alloca i32
     store i32 %58, i32* %tmp
+    call i32 @foo(i32* %tmp)
+    
+    
+    %60 = add i32 0, 45
+    %61 = add i32 0, 8
+    ; Arithmetic operation -
+    %62 = sub i32 %60, %61
+    store i32 %62, i32* %tmp
     call i32 @foo(i32* %tmp)
     
     

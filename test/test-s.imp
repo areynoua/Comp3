@@ -1,4 +1,7 @@
 begin
+  import _hpp;
+  import _gpp;
+
   read(a);
   b := 42;
   b := a;
@@ -38,5 +41,6 @@ begin
   end;
 
   b := (c + 1);
-  @foo(b)
+  @foo(b);
+  @foo((45 - 8))
 end
