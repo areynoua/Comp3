@@ -138,6 +138,7 @@ FuncName       = @{Identifier}
     "read"         { addSymbol(LexicalUnit.READ); }
     "rand"         { addSymbol(LexicalUnit.RAND); }
     "function"     { addSymbol(LexicalUnit.FUNCTION); }
+    "return"       { addSymbol(LexicalUnit.RETURN); }
     {FuncName}     { addSymbol(LexicalUnit.FUNCNAME); }
     {Identifier}   { addSymbol(LexicalUnit.VARNAME); }
     {Number}       { addSymbol(LexicalUnit.NUMBER); }

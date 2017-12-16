@@ -37,5 +37,6 @@ public enum LexicalUnit{
     RAND,
     FUNCTION,
     FUNCNAME,
+    RETURN,
     EOS,
 }

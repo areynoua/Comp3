@@ -11,9 +11,11 @@
                     -> <Read> 
                     -> <Rand> 
                     -> <Define> 
+                    -> <Return> 
                     -> <Call> 
 <Define>            -> function [FuncName] ( [VarName] ) do <Code> end 
-<Call>              -> [FuncName] ( [VarName] ) 
+<Return>            -> return <ExprArith> 
+<Call>              -> [FuncName] ( <ExprArith> ) 
 <Assign>            -> [VarName] := <ExprArith> 
 <ExprArith>         -> [VarName] 
                     -> [Number] 

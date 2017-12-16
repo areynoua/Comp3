@@ -29,8 +29,14 @@ begin
   print(c);
 
   function @foo(a) do
+    x := a+5;
+    print(x);
     for i from 0 to 5 do
       print(a)
-    done
-  end
+    done;
+    return a
+  end;
+
+  b := (c + 1);
+  @foo(b)
 end

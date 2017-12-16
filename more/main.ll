@@ -48,28 +48,39 @@ entry:
     %i = alloca i32
     %j = alloca i32
     %c = alloca i32
-    %0 = add i32 0, 0
-    store i32 %0, i32* %i
+    %x = alloca i32
+    ; Assignation of variable x
+    %0 = load i32, i32* %a
     %1 = add i32 0, 5
+    ; Arithmetic operation +
+    %2 = add i32 %0, %1
+    store i32 %2, i32* %x
+    ; Print ( x ) 
+    %3 = load i32, i32* %x
+    call void @println(i32 %3)
+    %4 = add i32 0, 0
+    store i32 %4, i32* %i
+    %5 = add i32 0, 5
     br label %for.n6.cond
     
 for.n6.cond.body:
     ; Print ( a ) 
-    %2 = load i32, i32* %a
-    call void @println(i32 %2)
+    %6 = load i32, i32* %a
+    call void @println(i32 %6)
     ; Increment counter %i
-    %3 = load i32, i32* %i
-    %4 = add i32 %3, 1
-    store i32 %4, i32* %i
+    %7 = load i32, i32* %i
+    %8 = add i32 %7, 1
+    store i32 %8, i32* %i
     br label %for.n6.cond
     
 for.n6.cond:
-    %5 = load i32, i32* %i
-    %6 = icmp ne i32 %5, %1
-    br i1 %6, label %for.n6.cond.body, label %for.n6.cond.end
+    %9 = load i32, i32* %i
+    %10 = icmp ne i32 %9, %5
+    br i1 %10, label %for.n6.cond.body, label %for.n6.cond.end
     
 for.n6.cond.end:
-    ret i32 0
+    %11 = load i32, i32* %a
+    ret i32 %11
     }
     
 
@@ -85,6 +96,7 @@ entry:
     %i = alloca i32
     %j = alloca i32
     %c = alloca i32
+    %x = alloca i32
     
     ; Read ( a ) 
     %1 = call i32 @readInt()
@@ -266,6 +278,26 @@ for.n4.cond.end:
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    ; Assignation of variable b
+    %55 = load i32, i32* %c
+    %56 = add i32 0, 1
+    ; Arithmetic operation +
+    %57 = add i32 %55, %56
+    store i32 %57, i32* %b
+    
+    
+    %58 = load i32, i32* %b
+    %tmp = alloca i32
+    store i32 %58, i32* %tmp
+    call i32 @foo(i32* %tmp)
     
     
 

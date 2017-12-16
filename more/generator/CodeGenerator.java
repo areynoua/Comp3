@@ -84,10 +84,6 @@ public class CodeGenerator {
         this.nConditions = 0;
         this.tokens = new ArrayList<Symbol>(tokens);
 
-        for (Symbol token : tokens) {
-            System.out.println(token);
-        }
-
         generateFromProgram(parseTree); // Generates llvm from the root of the parse tree
         // Write to the output file after writing the code and
         // asking the template engine to pretty print the result
@@ -166,6 +162,8 @@ public class CodeGenerator {
             generateFromRand(node.getChildren().get(0));
         } else if (instructionName.equals("Define")) {
             generateFromDefine(node.getChildren().get(0));
+        } else if (instructionName.equals("Return")) {
+            generateFromReturn(node.getChildren().get(0));
         } else if (instructionName.equals("Call")) {
             generateFromCall(node.getChildren().get(0));
         }
@@ -185,7 +183,20 @@ public class CodeGenerator {
     }
 
     private void generateFromCall(final Node node) {
-        // TODO
+        // [FuncName] ( <ExprArith-p0> )
+        String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
+        consumeOneToken(LexicalUnit.LPAREN);
+        String tempVarName = generateFromExprArithP0(node.getChildren().get(2));
+        consumeOneToken(LexicalUnit.RPAREN);
+        this.templateEngine.insert("%tmp = alloca i32");
+        this.templateEngine.insert("store i32 " + tempVarName + ", i32* %tmp"); // TODO
+        this.templateEngine.insert("call i32 " + funcName + "(i32* " + "%tmp" + ")");
+    }
+
+    private void generateFromReturn(final Node node) {
+        consumeOneToken(LexicalUnit.RETURN);
+        String tempVarName = generateFromExprArithP0(node.getChildren().get(1));
+        this.templateEngine.insert("ret i32 " + tempVarName);
     }
 
     private void generateFromDefine(final Node node) {
@@ -216,7 +227,6 @@ public class CodeGenerator {
 
         generateFromCode(node.getChildren().get(6));
         this.templateEngine.newLine();
-        this.templateEngine.insert("ret i32 0"); // TODO: ret void
         this.templateEngine.insert("}");
         this.nUnnamedVariables = unv;
         this.templateEngine.setTag(this.templateEngine.BODY);
