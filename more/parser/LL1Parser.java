@@ -30,6 +30,7 @@ public class LL1Parser {
     private Node root; // Root of parse tree
     private Integer numNodes;
     private boolean isSyntaxCorrect;
+    private List<Symbol> tokens; // debug purpose
 
     public LL1Parser(LL1Grammar grammar) {
         this.grammar = grammar;
@@ -42,6 +43,7 @@ public class LL1Parser {
             System.exit(1);
         }
         resetPDA();
+        this.tokens = tokens;
         List<GrammarSymbol> symbols = symbolsToGrammarSymbols(tokens);
         GrammarSymbol startVariable = grammar.getRules().get(0).getLeftVariable();
         numNodes = 0;
@@ -128,7 +130,8 @@ public class LL1Parser {
 
         StringJoiner sj = new StringJoiner("\n    ","LL1Parser:\n    ","\n");
         sj.add("cursor: " + this.cursor)
-          .add("stack:  " + stackSj.toString());
+          .add("stack:  " + stackSj.toString())
+          .add("token:  " + this.tokens.get(this.cursor));
 
         return sj.toString();
     }
