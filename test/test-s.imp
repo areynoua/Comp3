@@ -27,9 +27,6 @@ begin
     done
   done;
 
-  rand(c);
-  print(c);
-
   function @foo(a, k) do
     x := (a+k);
     print(x);
@@ -39,10 +36,13 @@ begin
     return a
   end;
 
+  c := 2 ;
   b := (c + 1);
-  @foo(b, c);
+  c := @foo(b, c);
+  print(c);
   b := @min((7 * 5), 8);
   print(b);
+  print(@min((7 * 5), 8));
   b := @max((7 * 5), 8);
   print(b)
 end

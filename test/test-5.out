@@ -1,6 +1,0 @@
-token: begin	lexical unit: BEGIN
-token: Attention	lexical unit: VARNAME
-token: end	lexical unit: END
-
-Identifiers
-Attention       3

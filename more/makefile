@@ -45,6 +45,7 @@ at: action_table.tex
 test-%: *.class */*.class
 	java Main grammars/imp_ll.grammar ../test/$@.imp -o tree
 	${VM-AS} main.ll -o=main.bc
-	${I} main.bc
+	${I} main.bc < ../test/$@.in > /tmp/out.out
+	diff -q /tmp/out.out ../test/$@.out
 
 .PHONY: jar all ru ll at

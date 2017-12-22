@@ -1,0 +1,6 @@
+begin
+	function @foo(a, b) do
+		print(a)
+	end;
+	@foo(a, b)
+end
