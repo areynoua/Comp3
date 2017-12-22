@@ -1,6 +1,6 @@
 <Program>           -> begin <Code> end 
-<Code>              -> epsilon 
-                    -> <InstList> 
+<Code>              -> <InstList> 
+                    -> epsilon 
 <InstList>          -> <Instruction> 
                     -> <Instruction> ; <InstList> 
 <Instruction>       -> <Assign> 

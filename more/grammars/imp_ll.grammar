@@ -1,6 +1,6 @@
 <Program>           -> begin <Code> end 
-<Code>              -> epsilon 
-                    -> <InstList> 
+<Code>              -> <InstList> 
+                    -> epsilon 
 <Instruction>       -> <Assign> 
                     -> <If> 
                     -> <While> 
@@ -51,11 +51,11 @@
 <InstList-Tail>     -> ; <InstList> 
                     -> epsilon 
 <ArgList>           -> <ExprArith-p0> <ArgList-Tail> 
-<ArgList-Tail>      -> epsilon 
-                    -> , <ArgList> 
+<ArgList-Tail>      -> , <ArgList> 
+                    -> epsilon 
 <ParamList>         -> [VarName] <ParamList-Tail> 
-<ParamList-Tail>    -> epsilon 
-                    -> , <ParamList> 
+<ParamList-Tail>    -> , <ParamList> 
+                    -> epsilon 
 <Assign>            -> [VarName] := <Assign-Tail> 
 <Assign-Tail>       -> <Call> 
                     -> <ExprArith-p0> 
