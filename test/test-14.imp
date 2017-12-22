@@ -1,5 +1,5 @@
 begin
-	a := 12 ;
+	a := 12
 	function @foo(a, b) do
 		print(a)
 	end;

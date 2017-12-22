@@ -23,3 +23,9 @@ more/trees/rules.js
 # Eclipse
 .project
 *.prefs
+/nbproject/private/
+
+# NetBeans
+build.xml
+manifest.mf
+nbproject/

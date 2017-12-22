@@ -86,7 +86,7 @@ public class CodeGenerator {
      */
     public void generate(final List<Symbol> tokens, final Node parseTree,
             final HashMap<Integer, Symbol>  identifiers, final String filepath)
-            throws FileNotFoundException, UnsupportedEncodingException {
+            throws FileNotFoundException, UnsupportedEncodingException, UndefinedFunctionException {
         this.templateEngine.init();
         this.importModule("_random");
         this.importModule("_stdio");
@@ -142,7 +142,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <Program>)
      */
-    private void generateFromProgram(final Node node) {
+    private void generateFromProgram(final Node node) throws UndefinedFunctionException {
         consumeOneToken(LexicalUnit.BEGIN);
         generateFromCode(node.getChildren().get(1));
         consumeOneToken(LexicalUnit.END);
@@ -153,7 +153,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <Code>)
      */
-    private void generateFromCode(final Node node) {
+    private void generateFromCode(final Node node) throws UndefinedFunctionException {
         // If of the form "<InstList>"
         if (node.getChildren().get(0).getSymbol().withoutChevrons().equals("InstList")) {
             generateFromInstList(node.getChildren().get(0));
@@ -165,7 +165,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <InstList>)
      */
-    private void generateFromInstList(final Node node) {
+    private void generateFromInstList(final Node node) throws UndefinedFunctionException {
         generateFromInstruction(node.getChildren().get(0));
         this.templateEngine.newLine();
         generateFromInstListTail(node.getChildren().get(1));
@@ -176,7 +176,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <Instruction>)
      */
-    private void generateFromInstruction(final Node node) {
+    private void generateFromInstruction(final Node node) throws UndefinedFunctionException {
         String instructionName = node.getChildren().get(0).getSymbol().withoutChevrons();
         if (instructionName.equals("Assign")) {
             generateFromAssign(node.getChildren().get(0));
@@ -208,7 +208,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <Assign>)
      */
-    private void generateFromAssign(final Node node) {
+    private void generateFromAssign(final Node node) throws UndefinedFunctionException {
         String varName = (String) consumeOneToken(LexicalUnit.VARNAME).getValue();
         consumeOneToken(LexicalUnit.ASSIGN);
         generateFromAssignTail(node.getChildren().get(2), varName);
@@ -220,7 +220,7 @@ public class CodeGenerator {
      * @param node Current node (must be <AssignTail>)
      * @param varName 
      */
-    private void generateFromAssignTail(final Node node, final String varName) {
+    private void generateFromAssignTail(final Node node, final String varName) throws UndefinedFunctionException {
         String symbolName = node.getChildren().get(0).getSymbol().withoutChevrons();
         this.templateEngine.oneLineComment("Assignation of variable " + varName);
         if (symbolName.equals("ExprArith-p0")) {
@@ -238,7 +238,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <Define>)
      */
-    private void generateFromDefine(final Node node) {
+    private void generateFromDefine(final Node node) throws UndefinedFunctionException {
         consumeOneToken(LexicalUnit.FUNCTION);
         String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
         consumeOneToken(LexicalUnit.LPAREN);
@@ -290,13 +290,12 @@ public class CodeGenerator {
      * @param node Current node (must be <Call>)
      * @return Name of the variable containing the fonction result
      */
-    private String generateFromCall(final Node node) {
+    private String generateFromCall(final Node node) throws UndefinedFunctionException {
         // [FuncName] ( <ExprArith-p0> )
         Symbol funcNameToken = this.tokens.get(0);
         String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
         if (!(this.definedFunctionNames.contains(funcName) || this.stdlibManager.isFunctionLoaded(funcName))) {
-            System.out.println("Undefined function");
-            System.out.println(funcNameToken); // TODO (pour Alexis <3)
+            throw new UndefinedFunctionException(funcNameToken);
         }
         consumeOneToken(LexicalUnit.LPAREN);
         List<String> args = generateFromArgList(node.getChildren().get(2));
@@ -452,7 +451,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <If>)
      */
-    private void generateFromIf(final Node node) {
+    private void generateFromIf(final Node node) throws UndefinedFunctionException {
         String condName = "if.n" + String.valueOf(++this.nConditions);
         String trueLabelName = condName + ".true";
         String falseLabelName;
@@ -482,7 +481,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <While>)
      */
-    private void generateFromWhile(final Node node) {
+    private void generateFromWhile(final Node node) throws UndefinedFunctionException {
         String condName = "while.n" + String.valueOf(++this.nConditions) + ".cond";
         String trueLabelName = condName + ".body";
         String falseLabelName = condName + ".end";
@@ -512,7 +511,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <For>)
      */
-    private void generateFromFor(final Node node) {
+    private void generateFromFor(final Node node) throws UndefinedFunctionException {
         String condName = "for.n" + String.valueOf(++this.nConditions) + ".cond";
         String trueLabelName = condName + ".body";
         String falseLabelName = condName + ".end";
@@ -593,7 +592,7 @@ public class CodeGenerator {
      * @param node Current node (must be <ForTail>)
      * @see generateFromForTail
      */
-    private void generateCodeOnlyFromForTail(final Node node) {
+    private void generateCodeOnlyFromForTail(final Node node) throws UndefinedFunctionException {
         if (node.getChildren().size() > 5) {
             // If of the form "by <ExprArith-p0> to <ExprArith-p0> do <Code> done"
             generateFromCode(node.getChildren().get(5));
@@ -755,7 +754,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <IfTail>)
      */
-    private void generateFromIfTail(final Node node) {
+    private void generateFromIfTail(final Node node) throws UndefinedFunctionException {
         if (node.getChildren().size() > 1) {
             // If of the form "else <Code> endif"
             String condName = "if.n" + String.valueOf(this.nConditions);
@@ -776,7 +775,7 @@ public class CodeGenerator {
      * 
      * @param node Current node (must be <InstListTail>)
      */
-    private void generateFromInstListTail(final Node node) {
+    private void generateFromInstListTail(final Node node) throws UndefinedFunctionException {
         if (node.getChildren().size() > 1) {
             // If of the form "; <InstList>"
             consumeOneToken(LexicalUnit.SEMICOLON);

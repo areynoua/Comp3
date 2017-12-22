@@ -40,6 +40,7 @@ public class LL1Parser {
 
     public boolean parse(List<Symbol> tokens) {
         if (!this.grammar.check()) {
+            System.out.println("Bad grammar!");
             System.exit(1);
         }
         resetPDA();

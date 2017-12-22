@@ -8,6 +8,7 @@ import lexer.Symbol;
 import parser.LL1Grammar;
 import parser.LL1Parser;
 import generator.CodeGenerator;
+import generator.UndefinedFunctionException;
 
 /**
  * Entry point of the compiler
@@ -126,9 +127,9 @@ public class Main {
                                 parser.saveLatexTreeToFile(outputFileName + ".tex");
                                 parser.saveJavascriptToFile("trees/rules.js");
                             }
-                            System.out.println("Parsing done");
-                            System.out.println("Rules used:");
-                            System.out.println(parser.rulesUsedToString());
+                            // System.out.println("Parsing done");
+                            // System.out.println("Rules used:");
+                            // System.out.println(parser.rulesUsedToString());
                         }
                         else {
                             System.out.println("Syntax error");
@@ -155,18 +156,26 @@ public class Main {
             catch (java.io.IOException e) {
                 System.out.println(e.getMessage());
                 System.out.println(e);
+                System.exit(1);
             }
             catch (BadTerminalException e) {
                 System.out.println("Unknown terminal:");
                 System.out.println(e);
+                System.exit(16);
             }
             catch (BadTerminalContextException e) {
                 System.out.println("Bad terminal context:");
                 System.out.println(e);
+                System.exit(17);
+            }
+            catch (UndefinedFunctionException e) {
+                System.out.println(e.getMessage());
+                System.exit(18);
             }
             catch (Exception e) {
                 System.out.println("Unexpected exception:");
                 e.printStackTrace();
+                System.exit(-1);
             }
         }
     }

@@ -43,9 +43,13 @@ ll: grammars/imp_ll.grammar
 at: action_table.tex
 
 test-%: *.class */*.class
-	java Main grammars/imp_ll.grammar ../test/$@.imp -o tree
-	${VM-AS} main.ll -o=main.bc
-	${I} main.bc < ../test/$@.in > /tmp/out.out
+	if java Main grammars/imp_ll.grammar ../test/$@.imp -o tree > /tmp/out.out ; then \
+		if ${VM-AS} main.ll -o=main.bc ; then \
+			if ${I} main.bc < ../test/$@.in >> /tmp/out.out ; then \
+				echo success >> /tmp/out.out ; \
+			fi ; \
+		fi ; \
+	fi
 	diff -q /tmp/out.out ../test/$@.out
 
-.PHONY: jar all ru ll at
+.PHONY: jar all ru ll at test-*
