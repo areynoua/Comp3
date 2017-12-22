@@ -52,4 +52,9 @@ test-%: *.class */*.class
 	fi
 	diff -q /tmp/out.out ../test/$@.out
 
+run-%:  *.class */*.class
+	java Main grammars/imp_ll.grammar ../test/$(subst run,test,$@).imp -o tree
+	${VM-AS} main.ll -o=main.bc
+	${I} main.bc < ../test/$(subst run,test,$@).in
+
 .PHONY: jar all ru ll at test-*

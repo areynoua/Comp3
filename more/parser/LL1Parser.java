@@ -38,7 +38,7 @@ public class LL1Parser {
         resetPDA();
     }
 
-    public boolean parse(List<Symbol> tokens) {
+    public boolean parse(List<Symbol> tokens) throws UnexpectedSymbolException, UnexpectedEndOfFileException {
         if (!this.grammar.check()) {
             System.out.println("Bad grammar!");
             System.exit(1);
@@ -65,7 +65,7 @@ public class LL1Parser {
                 return true;
             } else if (action == ActionTable.ERROR) {
                 error();
-                return false;
+                throw new UnexpectedSymbolException(tos, symbol);
             } else {
                 List<Node> nodes = produce(action);
                 for (Node node : nodes) {
@@ -74,7 +74,7 @@ public class LL1Parser {
                 rulesUsed.add(action);
             }
         }
-        return false;
+        throw new UnexpectedEndOfFileException();
     }
 
     private List<Node> produce(Integer ruleId) {

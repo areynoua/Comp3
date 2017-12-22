@@ -9,6 +9,8 @@ import parser.LL1Grammar;
 import parser.LL1Parser;
 import generator.CodeGenerator;
 import generator.UndefinedFunctionException;
+import parser.UnexpectedEndOfFileException;
+import parser.UnexpectedSymbolException;
 
 /**
  * Entry point of the compiler
@@ -171,6 +173,10 @@ public class Main {
             catch (UndefinedFunctionException e) {
                 System.out.println(e.getMessage());
                 System.exit(18);
+            }
+            catch (UnexpectedSymbolException | UnexpectedEndOfFileException e) {
+                System.out.println(e.getMessage());
+                System.exit(19);
             }
             catch (Exception e) {
                 System.out.println("Unexpected exception:");
