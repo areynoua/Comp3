@@ -42,6 +42,11 @@ ll: grammars/imp_ll.grammar
 
 at: action_table.tex
 
+grammar:
+	make ru
+	make ll
+	make at
+
 test-%: *.class */*.class
 	if java Main grammars/imp_ll.grammar ../test/$@.imp -o tree > /tmp/out.out ; then \
 		if ${VM-AS} main.ll -o=main.bc ; then \
@@ -57,4 +62,4 @@ run-%:  *.class */*.class
 	${VM-AS} main.ll -o=main.bc
 	${I} main.bc < ../test/$(subst run,test,$@).in
 
-.PHONY: jar all ru ll at test-*
+.PHONY: jar all ru ll at test-* grammar
