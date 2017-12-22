@@ -38,7 +38,7 @@ public class Node {
     /**
      * Set the given node as parent. This method is private and
      * automatically called by the node after calling addChild
-     * 
+     *
      * @param parent  Parent node
      * @see addChild
      */

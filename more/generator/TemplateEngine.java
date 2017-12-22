@@ -145,7 +145,7 @@ public class TemplateEngine {
         return String.join("", Collections.nCopies(level, "    "));
     }
 
-    /** 
+    /**
      * Finalize code formatting for given tag
      *
      * @param tag Tag that gives the location where finalize the code
@@ -164,6 +164,6 @@ public class TemplateEngine {
     }
 
     public String getCurrentTag() {
-        return this.currentTag;    
+        return this.currentTag;
     }
 }

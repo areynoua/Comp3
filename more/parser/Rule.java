@@ -45,7 +45,7 @@ public class Rule {
         this.rightSymbols = new ArrayList<>();
         for (String rightSymbol : rightSymbols) {
             if (rightSymbol.length() > 0) {
-                this.rightSymbols.add(new GrammarSymbol(rightSymbol));                
+                this.rightSymbols.add(new GrammarSymbol(rightSymbol));
             }
         }
         assert(this.rightSymbols.size() > 0); // Ensure that it is not empty
@@ -77,7 +77,7 @@ public class Rule {
     }
 
     /** Tells whether the rule if left-recursive all by itself */
-    public boolean isLeftRecursive() { 
+    public boolean isLeftRecursive() {
         // Suppose that there is no rule like "A → epsilon alpha" with alpha ≠ epsilon
         return this.getLeftVariable().equals(this.getRightSymbols().get(0));
     }
@@ -85,7 +85,7 @@ public class Rule {
     /**
      * Removes left-recursion after checking that the rule if left-recursive all by itself.
      *
-     * @param nonLeftRecursiveSuffix  New left-hand variable name to use in case 
+     * @param nonLeftRecursiveSuffix  New left-hand variable name to use in case
      *        where the rule is not left-recursive
      * @param leftRecursiveSuffix  New left-hand variable name to use in case
      *        where the rule is left-recursive
@@ -157,7 +157,7 @@ public class Rule {
         return result;
     }
 
-    /** 
+    /**
      * Pretty string representation of the rule.
      *
      * @param showLeftVariable  Whether to add left-hand variable or not.
@@ -167,7 +167,7 @@ public class Rule {
      */
     public String toPrettyString(boolean showLeftVariable, Integer padding) {
         String result = showLeftVariable ? leftVariable.toString() : "";
-        result += String.join("", Collections.nCopies(padding - result.length(), " ")) + "-> "; 
+        result += String.join("", Collections.nCopies(padding - result.length(), " ")) + "-> ";
         for (GrammarSymbol rightSymbol : rightSymbols) result += rightSymbol.toString() + " ";
         return result;
     }

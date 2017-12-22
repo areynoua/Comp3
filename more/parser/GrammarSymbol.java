@@ -9,7 +9,7 @@ import lexer.Symbol;
 * @author Alexis Reynouard
 */
 public class GrammarSymbol implements Comparable<GrammarSymbol> {
-    
+
     private final boolean isTerminalSymbol;
     private final String value;
 

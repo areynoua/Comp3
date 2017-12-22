@@ -195,7 +195,7 @@ public class LL1Grammar {
             if (intersection.size() > 0) rulesToRemove.add(rule);
         }
         for (Rule rule : rulesToRemove) {
-            rules.remove(rule);   
+            rules.remove(rule);
         }
     }
 
@@ -230,7 +230,7 @@ public class LL1Grammar {
             }
         }
         for (Rule rule : rulesToRemove) {
-            rules.remove(rule);   
+            rules.remove(rule);
         }
     }
 

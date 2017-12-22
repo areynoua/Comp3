@@ -51,7 +51,7 @@ public class Main {
                 case "--encoding":
                     encodingName = argv[i+1];
                     try {
-                        java.nio.charset.Charset.forName(encodingName); // Side-effect: is encodingName valid? 
+                        java.nio.charset.Charset.forName(encodingName); // Side-effect: is encodingName valid?
                     } catch (Exception e) {
                         System.out.println("Invalid encoding '" + encodingName + "'");
                         return false;

@@ -73,13 +73,13 @@ public class ActionTable {
             if (hasEpsilon) { // If left-hand part of the rule contains only epsilon
                 for (GrammarSymbol terminal : follow.get(rule.getLeftVariable())) {
                     M.put(Arrays.asList(variable, terminal), i);
-                }   
+                }
             }
             ++i;
         }
     }
 
-    /** 
+    /**
      * Computes the follow set of a sequence of symbols.
      *
      * @param  sequence   Sequence of symbols, which must necessarily come
@@ -102,11 +102,11 @@ public class ActionTable {
         return symbols;
     }
 
-    /** 
+    /**
      * Get element M[symbol, terminal] from the action table, where
      * symbol is the top of the stack and terminal is the next input
      * token to be read.
-     * 
+     *
      * @param symbol  Top of the stack
      * @param terminal  Next token to read from the inputs
      */
@@ -114,7 +114,7 @@ public class ActionTable {
         return M.get(Arrays.asList(symbol, terminal));
     }
 
-    /** 
+    /**
      * Helper function for getting the set of all terminals in the grammar
      *
      * @param includeEpsilon  Whether to add epsilon to the set of terminals or not
