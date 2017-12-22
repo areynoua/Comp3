@@ -1,0 +1,5 @@
+@readInt
+@printf
+@__isoc99_scanf
+@getchar
+@putchar

@@ -15,7 +15,7 @@ begin
   while a < 200 do
     a := a + 1
   done;
-  print(a);
+  print(a) ops;
 
   for i from 2 by 2 to 12 do
     print(i)
@@ -42,7 +42,8 @@ begin
   print(c);
   b := @min((7 * 5), 8);
   print(b);
-  print(@min((7 * 5), 8));
+  b := @min((7 * 5), 8);
+  print(b);
   b := @max((7 * 5), 8);
   print(b)
 end

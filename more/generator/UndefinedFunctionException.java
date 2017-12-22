@@ -1,21 +1,28 @@
 package generator;
+
+import lexer.Symbol;
+
 /**
  * Thrown when the imp program call an undefined function.
  */
 public class UndefinedFunctionException extends Exception {
+
+    private final Symbol token;
+
     public UndefinedFunctionException() {
         super();
+        this.token = null;
     }
-    public UndefinedFunctionException(String functionName) {
-        super(messageFromFunctionName(functionName));
+    public UndefinedFunctionException(Symbol token) {
+        super("Call to undefined function " + (String) token.getValue());
+        this.token = token;
     }
-    public UndefinedFunctionException(String functionName, Throwable cause) {
-        super(messageFromFunctionName(functionName), cause);
+    public UndefinedFunctionException(Symbol token, Throwable cause) {
+        super("Call to undefined function " + (String) token.getValue(), cause);
+        this.token = token;
     }
     public UndefinedFunctionException(Throwable cause) {
         super(cause);
-    }
-    private messageFromFunctionName(String functionName) {
-        return "Call to undefined function " + functionName;
+        this.token = null;
     }
 }
