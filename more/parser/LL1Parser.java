@@ -131,7 +131,7 @@ public class LL1Parser {
 
         String code = "";
         for (int i = 0, j = Math.max(0, this.cursor - 3); i < 7 && j < this.tokens.size(); ++i) {
-            code = code + this.tokens.get(i).getValue().toString() + " ";
+            code = code + this.tokens.get(j).getValue().toString() + " ";
             ++j;
         }
 
@@ -141,7 +141,7 @@ public class LL1Parser {
         sj.add("token number: " + this.cursor)
                 .add("stack: " + stackSj.toString())
                 .add(token.toString())
-                .add("position: " + String.valueOf(token.getLine()) + ":" + String.valueOf(token.getColumn()))
+                .add("line: " + String.valueOf(token.getLine()) + ", column: " + String.valueOf(token.getColumn()))
                 .add("code: " + code);
 
 
