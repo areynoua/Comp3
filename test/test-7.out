@@ -1,0 +1,9 @@
+Unexpected symbol:
+'[Number]' with TOS: '[VarName]'
+LL1Parser:
+    token number: 3
+    stack: [ '[VarName]', ')', '<InstList-Tail>', 'end', '$' ]
+    token: 2	lexical unit: NUMBER
+    line: 2, column: 7
+    code: begin read ( 2 a ) ; 
+

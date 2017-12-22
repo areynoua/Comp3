@@ -15,12 +15,14 @@ begin
   while a < 200 do
     a := a + 1
   done;
-  print(a) ops;
+  print(a);
 
+  (* prints 3 to 7 *)
   for i from 2 by 2 to 12 do
     print(i)
   done;
 
+  (* prints 8 to 27 *)
   for i from 27 by -3 to -3 do
     for j from 0 to 2 do
       print(i)
@@ -39,6 +41,7 @@ begin
   c := 2 ;
   b := (c + 1);
   c := @foo(b, c);
+  (* print 34 *)
   print(c);
   b := @min((7 * 5), 8);
   print(b);

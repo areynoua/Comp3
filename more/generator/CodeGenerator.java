@@ -227,7 +227,7 @@ public class CodeGenerator {
             String tempVarName = generateFromExprArithP0(node.getChildren().get(0));
             this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
         } else {
-            System.out.println(this.nUnnamedVariables);
+            //System.out.println(this.nUnnamedVariables);
             String tempVarName = generateFromCall(node.getChildren().get(0));
             this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
         }

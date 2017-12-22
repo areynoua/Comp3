@@ -4,7 +4,7 @@ do
 	echo test $f
 	if ! make ${f%%.imp};
 	then
-		diff /tmp/out.out ${file%%.imp}.out
+		diff -y /tmp/out.out ${file%%.imp}.out
 		echo
 		echo compare with
 		echo vimdiff /tmp/out.out ${file%%.imp}.out

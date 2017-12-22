@@ -4,6 +4,6 @@ LL1Parser:
     token number: 4
     stack: [ '<ExprArith-p1-j>', '<ExprArith-p0-j>', '<InstList-Tail>', 'end', '$' ]
     token: function	lexical unit: FUNCTION
-    position: 3:1
-    code: begin a := 12 function @foo ( 
+    line: 3, column: 1
+    code: a := 12 function @foo ( a 
 

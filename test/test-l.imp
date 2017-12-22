@@ -20,6 +20,7 @@ begin
 
   a := 5;
   print(a);
+  (* this is special because there is no scope *)
   b := @max(a, 8);
   print(b)
 end
