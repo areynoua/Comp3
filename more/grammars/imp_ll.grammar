@@ -51,11 +51,11 @@
 <InstList-Tail>     -> ; <InstList> 
                     -> epsilon 
 <ArgList>           -> <ExprArith-p0> <ArgList-Tail> 
-<ArgList-Tail>      -> , <ArgList> 
-                    -> epsilon 
+<ArgList-Tail>      -> epsilon 
+                    -> , <ArgList> 
 <ParamList>         -> [VarName] <ParamList-Tail> 
-<ParamList-Tail>    -> , <ParamList> 
-                    -> epsilon 
+<ParamList-Tail>    -> epsilon 
+                    -> , <ParamList> 
 <Assign>            -> [VarName] := <Assign-Tail> 
 <Assign-Tail>       -> <Call> 
                     -> <ExprArith-p0> 

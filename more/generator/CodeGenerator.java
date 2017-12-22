@@ -5,7 +5,9 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import lexer.LexicalUnit;
@@ -21,6 +23,7 @@ import parser.Node;
 public class CodeGenerator {
 
     private HashMap<Integer, Symbol> identifiers; // Symbol table received from the lexer
+    private Set<String> definedFunctionNames; // Set of user-defined function names
     private List<Symbol> tokens; // List of tokens received from the lexer
     private TemplateEngine templateEngine; // Used to write to the outptut llvm file
 
@@ -28,6 +31,8 @@ public class CodeGenerator {
     private Integer nConditions; // Number of llvm conditions currently generated
     private Integer nCalls; // Number of functions calls generated
     private boolean inFunc; // Indicates if the generator is inside a user-defined function or not
+
+    private STDLibManager stdlibManager;
 
     /**
      * Initializes the recursive descent code generator. 
@@ -37,6 +42,7 @@ public class CodeGenerator {
      */
     public CodeGenerator(final String templateFilepath) {
         this.templateEngine = new TemplateEngine(templateFilepath);
+        this.stdlibManager = new STDLibManager();
         this.tokens = null;
     }
 
@@ -82,9 +88,10 @@ public class CodeGenerator {
             final HashMap<Integer, Symbol>  identifiers, final String filepath)
             throws FileNotFoundException, UnsupportedEncodingException {
         this.templateEngine.init();
-        this.templateEngine.importModule("_random");
-        this.templateEngine.importModule("_stdio");
+        this.importModule("_random");
+        this.importModule("_stdio");
         this.identifiers = identifiers;
+        this.definedFunctionNames = new HashSet<String>();
         allocateVariables();
         this.nUnnamedVariables = 1; // Already one variable for the seed of the RNG
         this.nConditions = 0;
@@ -98,6 +105,22 @@ public class CodeGenerator {
         PrintWriter writer = new PrintWriter(filepath, "UTF-8");
         writer.println(this.templateEngine.finish());
         writer.close();
+    }
+
+    /**
+     * Imports module given its name, and copy its content at the beginning
+     * of the target llvm file.
+     *
+     * @param moduleName Name of the module to be included
+     */
+    public void importModule(String moduleName) {
+        String data = this.stdlibManager.includeModuleToLLVM(moduleName);
+        if (data != null) {
+            String tag = this.templateEngine.getCurrentTag();
+            this.templateEngine.setTag(TemplateEngine.FUNCTIONS);
+            this.templateEngine.insert(data);
+            this.templateEngine.setTag(tag);
+        }
     }
 
     /**
@@ -256,6 +279,9 @@ public class CodeGenerator {
         this.inFunc = false;
         this.templateEngine.setTag(this.templateEngine.BODY);
         consumeOneToken(LexicalUnit.END);
+
+        // Add the function name to the set of fonctions already defined by the user
+        this.definedFunctionNames.add(funcName);
     }
 
     /**
@@ -266,7 +292,12 @@ public class CodeGenerator {
      */
     private String generateFromCall(final Node node) {
         // [FuncName] ( <ExprArith-p0> )
+        Symbol funcNameToken = this.tokens.get(0);
         String funcName = (String) consumeOneToken(LexicalUnit.FUNCNAME).getValue();
+        if (!(this.definedFunctionNames.contains(funcName) || this.stdlibManager.isFunctionLoaded(funcName))) {
+            System.out.println("Undefined function");
+            System.out.println(funcNameToken); // TODO (pour Alexis <3)
+        }
         consumeOneToken(LexicalUnit.LPAREN);
         List<String> args = generateFromArgList(node.getChildren().get(2));
         consumeOneToken(LexicalUnit.RPAREN);
@@ -281,7 +312,6 @@ public class CodeGenerator {
         String tempVarName = llvmVarName(String.valueOf(this.nUnnamedVariables++));
         this.templateEngine.insert(tempVarName + " = call i32 " + funcName + "(" + sj.toString() +  ")");
         return tempVarName;
-
     }
 
     /**
@@ -365,7 +395,7 @@ public class CodeGenerator {
     private void generateFromImport(final Node node) {
         consumeOneToken(LexicalUnit.IMPORT);
         String moduleName = (String) consumeOneToken(LexicalUnit.MODULENAME).getValue();
-        this.templateEngine.importModule(moduleName);
+        this.importModule(moduleName);
     }
 
     /**
