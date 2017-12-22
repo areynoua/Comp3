@@ -1,0 +1,6 @@
+begin
+  function @foo(arg)
+  do
+    print(arg)
+  end
+end
