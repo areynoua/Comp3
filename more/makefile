@@ -21,6 +21,7 @@ Main.class: Main.java
 javadoc: lexer/*.java generator/*.java parser/*.java
 	javadoc -quiet -d ../doc/ $?
 	touch javadoc
+	echo 'maybe you should git add ../doc/ javadoc && git commit -m"Javadoc"'
 
 ../dist/impCompiler.jar: lexer/*.class parser/*.class generator/*.class Main.class
 	jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class generator/*.class Main.class
