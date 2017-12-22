@@ -22,7 +22,7 @@ javadoc: lexer/*.java generator/*.java parser/*.java
 	javadoc -quiet -d ../doc/ $?
 	touch javadoc
 
-../dist/impCompiler.jar: lexer/*.class parser/*.class generator/*.class Main.class 
+../dist/impCompiler.jar: lexer/*.class parser/*.class generator/*.class Main.class
 	jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class generator/*.class Main.class
 
 jar: ../dist/impCompiler.jar

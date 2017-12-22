@@ -1,1 +1,9 @@
-Unexpected symbol: function with TOS: <ExprArith-p1-j>
+Unexpected symbol:
+'function' with TOS: '<ExprArith-p1-j>'
+LL1Parser:
+    token number: 4
+    stack: [ '<ExprArith-p1-j>', '<ExprArith-p0-j>', '<InstList-Tail>', 'end', '$' ]
+    token: function	lexical unit: FUNCTION
+    position: 3:1
+    code: begin a := 12 function @foo ( 
+

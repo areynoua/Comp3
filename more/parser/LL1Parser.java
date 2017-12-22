@@ -123,16 +123,27 @@ public class LL1Parser {
 
     @Override
     public String toString() {
-        StringJoiner stackSj = new StringJoiner("', '", "[ '", "' ]"); 
+        StringJoiner stackSj = new StringJoiner("', '", "[ '", "' ]");
         Stack<Node> stack = (Stack<Node>) this.stack.clone();
         while (!stack.empty()) {
             stackSj.add(stack.pop().getSymbol().toString());
         }
 
+        String code = "";
+        for (int i = 0, j = Math.max(0, this.cursor - 3); i < 7 && j < this.tokens.size(); ++i) {
+            code = code + this.tokens.get(i).getValue().toString() + " ";
+            ++j;
+        }
+
+        Symbol token = this.tokens.get(this.cursor);
+
         StringJoiner sj = new StringJoiner("\n    ","LL1Parser:\n    ","\n");
-        sj.add("cursor: " + this.cursor)
-          .add("stack:  " + stackSj.toString())
-          .add("token:  " + this.tokens.get(this.cursor));
+        sj.add("token number: " + this.cursor)
+                .add("stack: " + stackSj.toString())
+                .add(token.toString())
+                .add("position: " + String.valueOf(token.getLine()) + ":" + String.valueOf(token.getColumn()))
+                .add("code: " + code);
+
 
         return sj.toString();
     }

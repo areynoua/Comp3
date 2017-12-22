@@ -162,19 +162,27 @@ public class Main {
             }
             catch (BadTerminalException e) {
                 System.out.println("Unknown terminal:");
-                System.out.println(e);
+                System.out.println(e.getMessage());
                 System.exit(16);
             }
             catch (BadTerminalContextException e) {
                 System.out.println("Bad terminal context:");
-                System.out.println(e);
+                System.out.println(e.getMessage());
                 System.exit(17);
             }
             catch (UndefinedFunctionException e) {
+                System.out.println("Call to undefined function:");
                 System.out.println(e.getMessage());
                 System.exit(18);
             }
-            catch (UnexpectedSymbolException | UnexpectedEndOfFileException e) {
+            catch (UnexpectedSymbolException e) {
+                System.out.println("Unexpected symbol:");
+                System.out.println(e.getMessage());
+                System.out.println(parser);
+                System.exit(19);
+            }
+            catch (UnexpectedEndOfFileException e) {
+                System.out.println("Unexpected End Of File:");
                 System.out.println(e.getMessage());
                 System.exit(19);
             }

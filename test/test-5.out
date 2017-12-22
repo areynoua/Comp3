@@ -1,0 +1,9 @@
+Unexpected symbol:
+'end' with TOS: ':='
+LL1Parser:
+    token number: 2
+    stack: [ ':=', '<Assign-Tail>', '<InstList-Tail>', 'end', '$' ]
+    token: end	lexical unit: END
+    position: 6:0
+    code: begin Attention end 
+

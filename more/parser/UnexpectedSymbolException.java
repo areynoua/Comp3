@@ -8,10 +8,10 @@ public class UnexpectedSymbolException extends Exception {
         super();
     }
     public UnexpectedSymbolException(GrammarSymbol tos, GrammarSymbol symbol) {
-        super("Unexpected symbol: " + symbol.toString() + " with TOS: " + tos.toString());
+        super("'" + symbol.toString() + "' with TOS: '" + tos.toString() + "'");
     }
     public UnexpectedSymbolException(GrammarSymbol tos, GrammarSymbol symbol, Throwable cause) {
-        super("Unexpected symbol: " + symbol.toString() + " with TOS: " + tos.toString(), cause);
+        super("'" + symbol.toString() + "' with TOS: '" + tos.toString() + "'", cause);
     }
     public UnexpectedSymbolException(Throwable cause) {
         super(cause);

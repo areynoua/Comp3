@@ -14,11 +14,11 @@ public class UndefinedFunctionException extends Exception {
         this.token = null;
     }
     public UndefinedFunctionException(Symbol token) {
-        super("Call to undefined function " + (String) token.getValue());
+        super("" + (String) token.getValue() + " is not a function name");
         this.token = token;
     }
     public UndefinedFunctionException(Symbol token, Throwable cause) {
-        super("Call to undefined function " + (String) token.getValue(), cause);
+        super("" + (String) token.getValue() + " is not a function name", cause);
         this.token = token;
     }
     public UndefinedFunctionException(Throwable cause) {
