@@ -236,7 +236,35 @@ One can note tree main changes:
 
 \subsubsection{Error handling}
 
- erreur de syntax, nom de module non existant, fonction non definie...
+The compiler may report some errors due to an input which does not correspond to the given grammar, or which may not
+produce some valid code (call to an undefined function).
+Sometimes the compiler may detect an error in the grammar (see the previous report).
+
+Errors in the source file are detected by one of the compiler component, according to the kind of error.
+
+\paragraph*{The Lexer} may report an error (\texttt{BadTerminalException}) when a terminal can not be associated to a
+lexical unit, or sometimes when a terminal is encountered in a bad context (\texttt{BadTerminalContextException}) (see
+the first report).
+
+\paragraph*{The parser} report errors either when the read token does not give any action in the action table
+according to the current top of stack (\texttt{UnexpectedSymbolException}),
+or when the end of file is encountered before the end of the program (\texttt{UnexpectedEndOfFileException}).
+
+\paragraph*{The code generator} report an error if one try to call an undefined function
+(\texttt{UndefinedFunctionException}).
+Note that there is no declaration required in \imp for (\inttt) variables.
+So all the variables are implicitly declared at the beginning of the program, but not assigned.
+It is the responsibility of the programmer to ensure that a value is assigned to the variable before use,
+otherwise the behaviour of the program may be unexpected.
+
+
+{\ttfamily
+generator/UndefinedFunctionException.java \\
+lexer/BadTerminalContextException.java \\
+lexer/BadTerminalException.java \\
+parser/UnexpectedEndOfFileException.java \\
+parser/UnexpectedSymbolException.java \\
+}
 
 \subsection{LLVM code generator}
 
