@@ -1,0 +1,106 @@
+\documentclass[12pt]{report}
+
+\usepackage[english]{babel}
+\usepackage{times}
+\usepackage[cm]{fullpage}
+\usepackage[bottom]{footmisc}
+\usepackage{chngcntr}
+\usepackage{etoolbox}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{calrsfs}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{titlesec}
+\usepackage{amssymb} 
+\usepackage{makecell}
+\usepackage{color}
+\usepackage{enumerate}
+
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+}
+
+\newcommand\todo[1]{\textcolor{red}{TODO: #1}}
+
+\titleformat{\chapter}{\normalfont\huge}{\thechapter.}{20pt}{\huge}
+
+
+\title{Introduction to language theory and compiling \\ Project - Part 3}
+\author{Antoine Passemiers \\ Alexis Reynouard}
+\date{December 12, 2017}
+
+\pagestyle{plain}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em plus0.5em minus0.3em}
+
+\begin{document}
+\pagenumbering{Roman}
+\maketitle
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+\setcounter{chapter}{0}
+\tableofcontents
+\pagebreak
+\clearpage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\chapter{Assumptions}
+
+\begin{itemize}
+\item Pas de gestion du scope. Tout est variable global, meme pour les appels de fonction.
+\item Les variables Imp sont nommés en llvm, toutes les variables temporaires sont non-nommees
+\item Tout est int32 (meme les fonctions ne renvoyant rien renvoient i32 0)
+\end{itemize}
+
+\chapter{Augmenting Imp's syntax and grammar}
+
+\section{Regular expressions}
+
+On s'est simplifié la vie pour funcName, moduleName.
+Mots clés faciles du genre import.
+
+\section{Grammar rules}
+
+arglist, paramlist... assign -> call
+
+\chapter{Implementation}
+
+\section{Improvements in both lexer and parser}
+
+\subsection{Error handling}
+
+ erreur de syntax, nom de module non existant, fonction non definie...
+
+\section{LLVM code generator}
+
+recursive descent code generator ?
+
+On a hard code une methode par variable de la grammaire.
+Quand c'est necessaire, une methode renvoie le nom d'une variable temporaire (non nommee)
+qui stocke le resultat de l'expression.
+
+Exemple: a := (7 + 9)
+
+7 est stockée dans une variable non nommee, puis de meme pour 9, puis 7 + 9 encore dans une autre, puis cette derniere est stockee
+dans la variable \%a avec un store.
+
+\chapter{Bonus features}
+
+\begin{itemize}
+\item Fonctions (definition et appel, arite au choix)
+\item Mot cles rand, import, function
+\item Gestion de librairie standard
+\item Gestion d'exceptions
+\item Optimization (faudrait qu'on checke les flags de llvm pour qu'il optimise les trucs immondes qu'on genere)
+\item Si tu trouves des trucs facile a ajouter, ne te prives pas
+\end{itemize}
+
+\end{document}
