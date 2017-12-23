@@ -4,6 +4,7 @@
 *.class
 *.log
 *.aux
+*.toc
 *.jar
 *.synctex.gz
 /*.pdf

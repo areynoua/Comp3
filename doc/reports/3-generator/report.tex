@@ -1,41 +1,64 @@
-\documentclass[12pt]{report}
+\documentclass[11pt]{article}
 
 \usepackage[english]{babel}
 \usepackage{times}
 \usepackage[cm]{fullpage}
-\usepackage[bottom]{footmisc}
-\usepackage{chngcntr}
-\usepackage{etoolbox}
 \usepackage{amsmath}
 \usepackage{mathtools}
+\usepackage{amssymb}
 \usepackage{geometry}
-\usepackage{calrsfs}
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{float}
-\usepackage{titlesec}
-\usepackage{amssymb} 
 \usepackage{makecell}
+\usepackage{xspace}
 \usepackage{color}
-\usepackage{enumerate}
+\usepackage{etoolbox}
+\usepackage[]{longtable}
 
-\geometry{
- a4paper,
- total={170mm,257mm},
- left=20mm,
- top=20mm,
-}
+\addto{\captionsenglish}{\renewcommand{\abstractname}{\vspace{-2\baselineskip}}}
+
+%%%%%% FONTS %%%%%%
+\usepackage{fontspec}
+\usepackage{unicode-math}
+
+\setmainfont{STIXGeneral}[
+  Extension = .otf ,
+  Path = stix/ ,
+  UprightFont = *-Regular ,
+  BoldFont = *-Bold ,
+  ItalicFont = *-Italic ,
+  BoldItalicFont = *-BoldItalic ,
+]
+\setsansfont{calibri}[
+  Extension = .ttf ,
+  Path = calibri/ ,
+  BoldFont = *b ,
+  ItalicFont = *i ,
+  BoldItalicFont = *z ,
+]
+\setmonofont{DroidSansMono}[
+  Extension = .ttf ,
+  Path = droid/ ,
+  Scale=MatchLowercase ,
+]
+\setmathfont{STIX Math}
+
+%%%%%% COMMANDS %%%%%%
 
 \newcommand\todo[1]{\textcolor{red}{TODO: #1}}
 
-\titleformat{\chapter}{\normalfont\huge}{\thechapter.}{20pt}{\huge}
+\newcommand{\varstyle}[1]{\notblank{#1}{\textsf{$<$#1$>$}}{}}
+\newcommand{\rul}[2]{\varstyle{#1} $\rightarrow$ #2}
 
+\newcommand\imp{\textsc{Imp}\xspace}
+\newcommand\inttt{\texttt{int32}\xspace}
 
-\title{Introduction to language theory and compiling \\ Project - Part 3}
-\author{Antoine Passemiers \\ Alexis Reynouard}
-\date{December 12, 2017}
+\title{Introduction to language theory and compiling \\ Project -- Part 3}
+\author{Antoine Passemiers -- Alexis Reynouard}
 
 \pagestyle{plain}
+\setcounter{tocdepth}{2}
 
 \setlength{\parindent}{0em}
 \setlength{\parskip}{1em plus0.5em minus0.3em}
@@ -43,43 +66,179 @@
 \begin{document}
 \pagenumbering{Roman}
 \maketitle
-\setcounter{tocdepth}{3}
-\setcounter{secnumdepth}{3}
-\setcounter{chapter}{0}
+\thispagestyle{empty}
+
+\vfill
+\begin{abstract}
+In this work, we implemented an actual compiler for the \imp language.
+
+Given an unambiguous LL(1) grammar (see previous report on how to produce it and how the program may help)
+and a source file, the compiler produces an LLVM-assambly language (LLVM IR) .ll file which may be compiled to LLVM
+bitcode with the LLVM assembler \textsf{llvm-as(1)}.
+So we extended the previously given \imp grammar to handle some new features
+and made improvements to the lexer and parser.
+
+We will begin with some choices we did to implement the compiler.
+Second we will introduces the new additional features of the language.
+Finally, we will present the new enriched \imp grammar,
+then the actual code generator and the additions to the implementation.
+\end{abstract}
+
+\vfill
 \tableofcontents
-\pagebreak
+
+\vfill
 \clearpage
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
-\chapter{Assumptions}
+\section{Assumptions, limitations and implementation choices}
+
+First it worth noting that \imp does not know about scopes.
+All the variables are global. \todo{and for functions arguments?}
+
+The \imp variables are translated into named LLVM IR variables.
+The temporary variables needed are implemented as unnamed LLVM IR variables.
+
+The \imp language only support the \inttt type.
+Any expressions which have a value have a \inttt value.
+Notably, all functions which does not explicitly return a value return 0.
+
+\section{Bonus features}
 
 \begin{itemize}
-\item Pas de gestion du scope. Tout est variable global, meme pour les appels de fonction.
-\item Les variables Imp sont nommés en llvm, toutes les variables temporaires sont non-nommees
-\item Tout est int32 (meme les fonctions ne renvoyant rien renvoient i32 0)
+\item Fonctions (definition et appel, arite au choix)
+\item Mot cles rand, import, function
+\item Gestion de librairie standard
+\item Gestion d'exceptions
+\item Optimization (faudrait qu'on checke les flags de llvm pour qu'il optimise les trucs immondes qu'on genere)
+\item Si tu trouves des trucs facile a ajouter, ne te prives pas
 \end{itemize}
 
-\chapter{Augmenting Imp's syntax and grammar}
+\section{Augmenting \imp's syntax and grammar}
 
-\section{Regular expressions}
+\subsection{Regular expressions}
 
-On s'est simplifié la vie pour funcName, moduleName.
-Mots clés faciles du genre import.
+The lexer was extended to read the new keywords:
+\texttt{rand}, \texttt{function}, \texttt{return}, \texttt{import}, \texttt{,} (comma),
+as well as two new ``kinds of identifier'': \textsf{FuncName} and \textsf{ModuleName}
+which are respectively identifiers for functions (begins with a ``@'')
+and identifiers for modules (begins with a ``\_'').
 
-\section{Grammar rules}
+\begin{center}{\sffamily
+\begin{tabular}{l @{ = } l}
+  Identifier     & \{Alpha\}\{AlphaNumeric\}* \\
+  FuncName       & @\{Identifier\} \\
+  ModuleName     & \_\{Identifier\} \\
+\end{tabular}
+}\end{center}
 
-arglist, paramlist... assign -> call
+\subsection{Grammar rules}
 
-\chapter{Implementation}
+Here is the new grammar for the \imp language.
+The main additions and changes are marked with an asterisk (\textsf{*}).
 
-\section{Improvements in both lexer and parser}
+One can note tree main changes:
+\begin{itemize}
+  \item \varstyle{ParamList} was introduced to define functions (with \varstyle{Define}),
+  \item \varstyle{ArgList} was introduced to call functions (with \varstyle{Call}),
+  \item \varstyle{Assign} was modified to allow to assign a variable with the result of a function call.
+\end{itemize}
 
-\subsection{Error handling}
+
+\newcounter{Rule}
+\newsavebox{\varbox}
+\begin{longtable}{
+    >{}r<{\sffamily[\stepcounter{Rule}\theRule]}
+    l
+    @{ $\rightarrow$ } >{\ttfamily}l<{\ttfamily}
+  }
+  & \varstyle{Program} & begin \varstyle{Code} end \\
+  & \varstyle{Code} & \varstyle{InstList} \\
+  &  & epsilon \\
+  & \varstyle{Instruction} & \varstyle{Assign} \\
+  &  & \varstyle{If} \\
+  &  & \varstyle{While} \\
+  &  & \varstyle{For} \\
+  &  & \varstyle{Print} \\
+  &  & \varstyle{Read} \\
+* &  & \varstyle{Rand} \\
+* &  & \varstyle{Define} \\
+* &  & \varstyle{Return} \\
+* &  & \varstyle{Call} \\
+* &  & \varstyle{Import} \\
+* & \varstyle{Define} & function [FuncName] ( \varstyle{ParamList} ) do \varstyle{Code} end \\
+* & \varstyle{Return} & return \varstyle{ExprArith-p0} \\
+* & \varstyle{Import} & import [ModuleName] \\
+* & \varstyle{Call} & [FuncName] ( \varstyle{ArgList} ) \\
+* & \varstyle{ArgList} & epsilon \\
+* & \varstyle{ArgList} & \varstyle{ExprArith-p0} \varstyle{ArgList-Tail} \\
+* & \varstyle{ArgList-Tail} & epsilon \\
+* &  & , \varstyle{ArgList} \\
+* & \varstyle{ParamList} & epsilon \\
+* & \varstyle{ParamList} & [VarName] \varstyle{ParamList-Tail} \\
+* & \varstyle{ParamList-Tail} & epsilon \\
+* &  & , \varstyle{ParamList} \\
+* & \varstyle{Assign} & [VarName] := \varstyle{Assign-Tail} \\
+* & \varstyle{Assign-Tail} & \varstyle{Call} \\
+* &  & \varstyle{ExprArith-p0} \\
+  & \varstyle{Atom} & [VarName] \\
+  &  & [Number] \\
+  &  & ( \varstyle{ExprArith-p0} ) \\
+  &  & - \varstyle{Atom} \\
+  & \varstyle{Op-p0} & + \\
+  &  & - \\
+  & \varstyle{Op-p1} & * \\
+  &  & / \\
+  & \varstyle{Cond-p0-j} & or \varstyle{Cond-p1} \\
+  & \varstyle{Cond-p0-i} & \varstyle{Cond-p1} \\
+  & \varstyle{Cond-p1-j} & and \varstyle{Cond-p2} \\
+  & \varstyle{Cond-p1-i} & \varstyle{Cond-p2} \\
+  & \varstyle{Cond-p2} & not \varstyle{SimpleCond} \\
+  &  & \varstyle{SimpleCond} \\
+  & \varstyle{SimpleCond} & \varstyle{ExprArith-p0} \varstyle{Comp} \varstyle{ExprArith-p0} \\
+  & \varstyle{Comp} & = \\
+  &  & >= \\
+  &  & > \\
+  &  & <= \\
+  &  & < \\
+  &  & <> \\
+  & \varstyle{While} & while \varstyle{Cond-p0} do \varstyle{Code} done \\
+  & \varstyle{Print} & print ( [VarName] ) \\
+  & \varstyle{Read} & read ( [VarName] ) \\
+* & \varstyle{Rand} & rand ( [VarName] ) \\
+  & \varstyle{InstList} & \varstyle{Instruction} \varstyle{InstList-Tail} \\
+  & \varstyle{InstList-Tail} & ; \varstyle{InstList} \\
+  &  & epsilon \\
+  & \varstyle{If} & if \varstyle{Cond-p0} then \varstyle{Code} \varstyle{If-Tail} \\
+  & \varstyle{If-Tail} & endif \\
+  &  & else \varstyle{Code} endif \\
+  & \varstyle{For} & for [VarName] from \varstyle{ExprArith-p0} \varstyle{For-Tail} \\
+  & \varstyle{For-Tail} & to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
+  &  & by \varstyle{ExprArith-p0} to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
+  & \varstyle{ExprArith-p0-j} & \varstyle{Op-p0} \varstyle{ExprArith-p1} \\
+  & \varstyle{ExprArith-p0-i} & \varstyle{ExprArith-p1} \\
+  & \varstyle{ExprArith-p1-j} & \varstyle{Op-p1} \varstyle{Atom} \\
+  & \varstyle{ExprArith-p1-i} & \varstyle{Atom} \\
+  & \varstyle{ExprArith-p0} & \varstyle{ExprArith-p0-i} \varstyle{ExprArith-p0-j} \\
+  & \varstyle{ExprArith-p0-j} & epsilon \\
+  & \varstyle{ExprArith-p1} & \varstyle{ExprArith-p1-i} \varstyle{ExprArith-p1-j} \\
+  & \varstyle{ExprArith-p1-j} & epsilon \\
+  & \varstyle{Cond-p0} & \varstyle{Cond-p0-i} \varstyle{Cond-p0-j} \\
+  & \varstyle{Cond-p0-j} & epsilon \\
+  & \varstyle{Cond-p1} & \varstyle{Cond-p1-i} \varstyle{Cond-p1-j} \\
+  & \varstyle{Cond-p1-j} & epsilon \\
+\end{longtable}
+
+\section{Implementation}
+
+\subsection{Improvements in both lexer and parser}
+
+\subsubsection{Error handling}
 
  erreur de syntax, nom de module non existant, fonction non definie...
 
-\section{LLVM code generator}
+\subsection{LLVM code generator}
 
 recursive descent code generator ?
 
@@ -92,15 +251,6 @@ Exemple: a := (7 + 9)
 7 est stockée dans une variable non nommee, puis de meme pour 9, puis 7 + 9 encore dans une autre, puis cette derniere est stockee
 dans la variable \%a avec un store.
 
-\chapter{Bonus features}
-
-\begin{itemize}
-\item Fonctions (definition et appel, arite au choix)
-\item Mot cles rand, import, function
-\item Gestion de librairie standard
-\item Gestion d'exceptions
-\item Optimization (faudrait qu'on checke les flags de llvm pour qu'il optimise les trucs immondes qu'on genere)
-\item Si tu trouves des trucs facile a ajouter, ne te prives pas
-\end{itemize}
-
 \end{document}
+
+% vim: set spell spelllang=en :
