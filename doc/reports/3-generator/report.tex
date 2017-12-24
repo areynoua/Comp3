@@ -73,29 +73,30 @@
 In this work, we implemented an actual compiler for the \imp language.
 
 Given an unambiguous LL(1) grammar (see previous report on how to produce it and how the program may help)
-and a source file, the compiler produces an LLVM-assambly language (LLVM IR) .ll file which may be compiled to LLVM
-bitcode with the LLVM assembler \textsf{llvm-as(1)}.
+and a source file, the compiler produces an LLVM-assambly language (LLVM IR) \texttt{.ll} file which may be compiled to
+LLVM bitcode with the LLVM assembler \textsf{llvm-as(1)}.
 So we extended the previously given \imp grammar to handle some new features
 and made improvements to the lexer and parser.
 
 We will begin with some choices we did to implement the compiler.
 Second we will introduces the new additional features of the language.
 Finally, we will present the new enriched \imp grammar,
-then the actual code generator and the additions to the implementation.
+then the actual code generator and the additions to the implementation of the lexer and parser.
 \end{abstract}
 
+\vfill
+\clearpage
 \vfill
 \tableofcontents
 
 \vfill
-\clearpage
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
 \section{Assumptions, limitations and implementation choices}
 
-First it worth noting that \imp does not know about scopes.
-All the variables are global. \todo{and for functions arguments?}
+First it worth noting that there exists two scopes in \imp.
+The global scope outside any function and the local scope inside the functions.
 
 The \imp variables are translated into named LLVM IR variables.
 The temporary variables needed are implemented as unnamed LLVM IR variables.
@@ -104,7 +105,13 @@ The \imp language only support the \inttt type.
 Any expressions which have a value have a \inttt value.
 Notably, all functions which does not explicitly return a value return 0.
 
-\section{Bonus features}
+\section[The enriched \imp language]{The enriched \imp language (bonus features)}
+
+\subsection{Functions}
+
+\imp functions are a way to group instructions together to later executions.
+They are executed
+
 
 \begin{itemize}
 \item Fonctions (definition et appel, arite au choix)
@@ -234,6 +241,9 @@ One can note tree main changes:
 
 \subsection{Improvements in both lexer and parser}
 
+To read the new keywords, the lexer was enriched with the corresponding lexical units: \texttt{RAND}, \texttt{FUNCTION},
+\texttt{FUNCNAME}, \texttt{RETURN}, \texttt{IMPORT}, \texttt{MODULENAME} and \texttt{COMMA}.
+
 \subsubsection{Error handling}
 
 The compiler may report some errors due to an input which does not correspond to the given grammar, or which may not
@@ -249,6 +259,7 @@ the first report).
 \paragraph*{The parser} report errors either when the read token does not give any action in the action table
 according to the current top of stack (\texttt{UnexpectedSymbolException}),
 or when the end of file is encountered before the end of the program (\texttt{UnexpectedEndOfFileException}).
+% Note that the display of these errors was improved to be more easily fixable.
 
 \paragraph*{The code generator} report an error if one try to call an undefined function
 (\texttt{UndefinedFunctionException}).
@@ -257,14 +268,19 @@ So all the variables are implicitly declared at the beginning of the program, bu
 It is the responsibility of the programmer to ensure that a value is assigned to the variable before use,
 otherwise the behaviour of the program may be unexpected.
 
+\paragraph*{\todo{returned error codes}}
 
-{\ttfamily
-generator/UndefinedFunctionException.java \\
-lexer/BadTerminalContextException.java \\
-lexer/BadTerminalException.java \\
-parser/UnexpectedEndOfFileException.java \\
-parser/UnexpectedSymbolException.java \\
-}
+\paragraph*{\todo{example}}
+\begin{verbatim}
+Unexpected symbol:
+'[VarName]' with TOS: '[FuncName]'
+LL1Parser:
+    token number: 2
+    stack: [ '[FuncName]', '(', '<ParamList>', ')', 'do', '<Code>', 'end', '<InstList-Tail>', 'end', '$' ]
+    token: foo  lexical unit: VARNAME
+    line: 2, column: 9
+    code: begin function foo ( ) do print
+\end{verbatim}
 
 \subsection{LLVM code generator}
 
