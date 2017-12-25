@@ -1,24 +1,31 @@
   & \varstyle{Program} & begin \varstyle{Code} end \\
-  & \varstyle{Code} & epsilon \\
-  &  & \varstyle{InstList} \\
+  & \varstyle{Code} & \varstyle{InstList} \\
   & \varstyle{InstList} & \varstyle{Instruction} \\
   &  & \varstyle{Instruction} ; \varstyle{InstList} \\
-  & \varstyle{Instruction} & \varstyle{Assign} \\
+  &  & epsilon \\
+  & \varstyle{FuncInstList} & \varstyle{FuncInstruction} \\
+  &  & \varstyle{FuncInstruction} ; \varstyle{FuncInstList} \\
+  &  & epsilon \\
+  & \varstyle{Instruction} & \varstyle{Define} \\
+  &  & \varstyle{FuncInstruction} \\
+  & \varstyle{FuncInstruction} & \varstyle{Assign} \\
   &  & \varstyle{If} \\
   &  & \varstyle{While} \\
   &  & \varstyle{For} \\
   &  & \varstyle{Print} \\
   &  & \varstyle{Read} \\
   &  & \varstyle{Rand} \\
-  &  & \varstyle{Define} \\
   &  & \varstyle{Return} \\
   &  & \varstyle{Call} \\
   &  & \varstyle{Import} \\
-  & \varstyle{Define} & function [FuncName] ( \varstyle{ArgList} ) do \varstyle{Code} end \\
+  & \varstyle{Define} & function [FuncName] ( \varstyle{ParamList} ) do \varstyle{FuncInstList} end \\
   & \varstyle{Return} & return \varstyle{ExprArith} \\
   & \varstyle{Call} & [FuncName] ( \varstyle{ArgList} ) \\
   & \varstyle{ArgList} & \varstyle{ExprArith} , \varstyle{ArgList} \\
   &  & \varstyle{ExprArith} \\
+  &  & epsilon \\
+  & \varstyle{ParamList} & [VarName] , \varstyle{ParamList} \\
+  &  & [VarName] \\
   &  & epsilon \\
   & \varstyle{Import} & import [ModuleName] \\
   & \varstyle{Assign} & [VarName] := \varstyle{ExprArith} \\
@@ -32,8 +39,8 @@
   &  & - \\
   &  & * \\
   &  & / \\
-  & \varstyle{If} & if \varstyle{Cond} then \varstyle{Code} endif \\
-  &  & if \varstyle{Cond} then \varstyle{Code} else \varstyle{Code} endif \\
+  & \varstyle{If} & if \varstyle{Cond} then \varstyle{FuncInstList} endif \\
+  &  & if \varstyle{Cond} then \varstyle{FuncInstList} else \varstyle{FuncInstList} endif \\
   & \varstyle{Cond} & \varstyle{Cond} \varstyle{BinOp} \varstyle{Cond} \\
   &  & not \varstyle{SimpleCond} \\
   &  & \varstyle{SimpleCond} \\
@@ -46,9 +53,9 @@
   &  & <= \\
   &  & < \\
   &  & <> \\
-  & \varstyle{While} & while \varstyle{Cond} do \varstyle{Code} done \\
-  & \varstyle{For} & for [VarName] from \varstyle{ExprArith} by \varstyle{ExprArith} to \varstyle{ExprArith} do \varstyle{Code} done \\
-  &  & for [VarName] from \varstyle{ExprArith} to \varstyle{ExprArith} do \varstyle{Code} done \\
+  & \varstyle{While} & while \varstyle{Cond} do \varstyle{FuncInstList} done \\
+  & \varstyle{For} & for [VarName] from \varstyle{ExprArith} by \varstyle{ExprArith} to \varstyle{ExprArith} do \varstyle{FuncInstList} done \\
+  &  & for [VarName] from \varstyle{ExprArith} to \varstyle{ExprArith} do \varstyle{FuncInstList} done \\
   & \varstyle{Print} & print ( [VarName] ) \\
   & \varstyle{Read} & read ( [VarName] ) \\
   & \varstyle{Rand} & rand ( [VarName] ) \\

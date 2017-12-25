@@ -1,0 +1,4 @@
+begin
+function @foo(a,b) do print(a);print(b);print(c) end;
+@foo(3)
+end

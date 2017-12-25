@@ -1,0 +1,15 @@
+begin
+  function @fib(i) do
+    if i <= 1 then
+      return i
+    else
+      j := @fib(i-1);
+	  i := @fib(i-2);
+	  j := i + j;
+      return j
+    endif
+  end;
+  read(a);
+  (* b := @fib(a); *)
+  print(b)
+end

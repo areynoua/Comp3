@@ -1,18 +1,20 @@
   & \varstyle{Program} & begin \varstyle{Code} end \\
   & \varstyle{Code} & \varstyle{InstList} \\
-  &  & epsilon \\
-  & \varstyle{Instruction} & \varstyle{Assign} \\
+  & \varstyle{InstList} & epsilon \\
+  & \varstyle{FuncInstList} & epsilon \\
+  & \varstyle{Instruction} & \varstyle{Define} \\
+  &  & \varstyle{FuncInstruction} \\
+  & \varstyle{FuncInstruction} & \varstyle{Assign} \\
   &  & \varstyle{If} \\
   &  & \varstyle{While} \\
   &  & \varstyle{For} \\
   &  & \varstyle{Print} \\
   &  & \varstyle{Read} \\
   &  & \varstyle{Rand} \\
-  &  & \varstyle{Define} \\
   &  & \varstyle{Return} \\
   &  & \varstyle{Call} \\
   &  & \varstyle{Import} \\
-  & \varstyle{Define} & function [FuncName] ( \varstyle{ParamList} ) do \varstyle{Code} end \\
+  & \varstyle{Define} & function [FuncName] ( \varstyle{ParamList} ) do \varstyle{FuncInstList} end \\
   & \varstyle{Return} & return \varstyle{ExprArith-p0} \\
   & \varstyle{Import} & import [ModuleName] \\
   & \varstyle{Call} & [FuncName] ( \varstyle{ArgList} ) \\
@@ -43,12 +45,15 @@
   &  & <= \\
   &  & < \\
   &  & <> \\
-  & \varstyle{While} & while \varstyle{Cond-p0} do \varstyle{Code} done \\
+  & \varstyle{While} & while \varstyle{Cond-p0} do \varstyle{FuncInstList} done \\
   & \varstyle{Print} & print ( [VarName] ) \\
   & \varstyle{Read} & read ( [VarName] ) \\
   & \varstyle{Rand} & rand ( [VarName] ) \\
   & \varstyle{InstList} & \varstyle{Instruction} \varstyle{InstList-Tail} \\
   & \varstyle{InstList-Tail} & ; \varstyle{InstList} \\
+  &  & epsilon \\
+  & \varstyle{FuncInstList} & \varstyle{FuncInstruction} \varstyle{FuncInstList-Tail} \\
+  & \varstyle{FuncInstList-Tail} & ; \varstyle{FuncInstList} \\
   &  & epsilon \\
   & \varstyle{ArgList} & \varstyle{ExprArith-p0} \varstyle{ArgList-Tail} \\
   & \varstyle{ArgList-Tail} & epsilon \\
@@ -59,12 +64,12 @@
   & \varstyle{Assign} & [VarName] := \varstyle{Assign-Tail} \\
   & \varstyle{Assign-Tail} & \varstyle{Call} \\
   &  & \varstyle{ExprArith-p0} \\
-  & \varstyle{If} & if \varstyle{Cond-p0} then \varstyle{Code} \varstyle{If-Tail} \\
+  & \varstyle{If} & if \varstyle{Cond-p0} then \varstyle{FuncInstList} \varstyle{If-Tail} \\
   & \varstyle{If-Tail} & endif \\
-  &  & else \varstyle{Code} endif \\
+  &  & else \varstyle{FuncInstList} endif \\
   & \varstyle{For} & for [VarName] from \varstyle{ExprArith-p0} \varstyle{For-Tail} \\
-  & \varstyle{For-Tail} & to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
-  &  & by \varstyle{ExprArith-p0} to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
+  & \varstyle{For-Tail} & to \varstyle{ExprArith-p0} do \varstyle{FuncInstList} done \\
+  &  & by \varstyle{ExprArith-p0} to \varstyle{ExprArith-p0} do \varstyle{FuncInstList} done \\
   & \varstyle{ExprArith-p0} & \varstyle{ExprArith-p0-i} \varstyle{ExprArith-p0-j} \\
   & \varstyle{ExprArith-p0-j} & epsilon \\
   & \varstyle{ExprArith-p1} & \varstyle{ExprArith-p1-i} \varstyle{ExprArith-p1-j} \\

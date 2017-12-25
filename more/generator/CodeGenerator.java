@@ -67,6 +67,7 @@ public class CodeGenerator {
         Symbol token = this.tokens.get(0);
         if (type != token.getType()) {
             System.out.println(token);
+            System.out.println("TODO: Error");
             // TODO: raise exception
         }
         this.tokens.remove(0);
@@ -154,10 +155,7 @@ public class CodeGenerator {
      * @param node Current node (must be <Code>)
      */
     private void generateFromCode(final Node node) throws UndefinedFunctionException {
-        // If of the form "<InstList>"
-        if (node.getChildren().get(0).getSymbol().withoutChevrons().equals("InstList")) {
-            generateFromInstList(node.getChildren().get(0));
-        }
+        generateFromInstList(node.getChildren().get(0));
     }
 
     /**
@@ -166,9 +164,23 @@ public class CodeGenerator {
      * @param node Current node (must be <InstList>)
      */
     private void generateFromInstList(final Node node) throws UndefinedFunctionException {
-        generateFromInstruction(node.getChildren().get(0));
-        this.templateEngine.newLine();
-        generateFromInstListTail(node.getChildren().get(1));
+        // <Instruction> <InstList-Tail>
+        if (node.getChildren().get(0).getSymbol().withoutChevrons().equals("Instruction")) {
+            generateFromInstruction(node.getChildren().get(0));
+            this.templateEngine.newLine();
+            generateFromInstListTail(node.getChildren().get(1));
+        }
+        // else { epsilon }
+    }
+
+    private void generateFromFuncInstList(final Node node) throws UndefinedFunctionException {
+        // <FuncInstruction> <FuncInstList-Tail>
+        if (node.getChildren().get(0).getSymbol().withoutChevrons().equals("FuncInstruction")) {
+            generateFromFuncInstruction(node.getChildren().get(0));
+            this.templateEngine.newLine();
+            generateFromFuncInstListTail(node.getChildren().get(1));
+        }
+        // else { epsilon }
     }
 
     /**
@@ -177,6 +189,22 @@ public class CodeGenerator {
      * @param node Current node (must be <Instruction>)
      */
     private void generateFromInstruction(final Node node) throws UndefinedFunctionException {
+        String instructionName = node.getChildren().get(0).getSymbol().withoutChevrons();
+        if (instructionName.equals("Define")) {
+            generateFromDefine(node.getChildren().get(0));
+        } else if (instructionName.equals("Import")) {
+            generateFromImport(node.getChildren().get(0));
+        } else if (instructionName.equals("FuncInstruction")) {
+            generateFromFuncInstruction(node.getChildren().get(0));
+        }
+    }
+
+    /**
+     * Generates llvm code from a <FuncInstruction> node of the parse tree.
+     *
+     * @param node Current node (must be <FuncInstruction>)
+     */
+    private void generateFromFuncInstruction(final Node node) throws UndefinedFunctionException {
         String instructionName = node.getChildren().get(0).getSymbol().withoutChevrons();
         if (instructionName.equals("Assign")) {
             generateFromAssign(node.getChildren().get(0));
@@ -192,14 +220,10 @@ public class CodeGenerator {
             generateFromRead(node.getChildren().get(0));
         } else if (instructionName.equals("Rand")) {
             generateFromRand(node.getChildren().get(0));
-        } else if (instructionName.equals("Define")) {
-            generateFromDefine(node.getChildren().get(0));
         } else if (instructionName.equals("Return")) {
             generateFromReturn(node.getChildren().get(0));
         } else if (instructionName.equals("Call")) {
             generateFromCall(node.getChildren().get(0));
-        } else if (instructionName.equals("Import")) {
-            generateFromImport(node.getChildren().get(0));
         }
     }
 
@@ -271,7 +295,7 @@ public class CodeGenerator {
         this.templateEngine.newLine();
 
         // Write the body of the function
-        generateFromCode(node.getChildren().get(6));
+        generateFromFuncInstList(node.getChildren().get(6));
         this.templateEngine.insert("ret i32 0");
         this.templateEngine.newLine();
         this.templateEngine.insert("}");
@@ -470,7 +494,7 @@ public class CodeGenerator {
 
         consumeOneToken(LexicalUnit.THEN);
         this.templateEngine.addLabel(trueLabelName);
-        generateFromCode(node.getChildren().get(3));
+        generateFromFuncInstList(node.getChildren().get(3));
         this.templateEngine.insert("br label %" + condName);
         generateFromIfTail(node.getChildren().get(4));
         this.templateEngine.addLabel(condName);
@@ -497,7 +521,7 @@ public class CodeGenerator {
 
         // Loop body
         this.templateEngine.addLabel(trueLabelName);
-        generateFromCode(node.getChildren().get(3));
+        generateFromFuncInstList(node.getChildren().get(3));
         this.templateEngine.insert("br label %" + condName);
         consumeOneToken(LexicalUnit.DONE);
         this.templateEngine.addLabel(falseLabelName);
@@ -552,7 +576,7 @@ public class CodeGenerator {
 
     /**
      * Generates llvm code from a <ForTail> node of the parse tree.
-     * Stops just before to produce code from the next <Code> child node.
+     * Stops just before to produce code from the next <FuncInstList> child node.
      * This is to produce only the code related to the computation of
      * arithmetic expressions. More specifically, this only computes
      * the "end" and "step" integer values required for the for loop to work.
@@ -562,11 +586,12 @@ public class CodeGenerator {
      * @return String array of size two, where the first element is the name of the variable
      *         containing the "end" value and the second element is the name of the variable
      *         containing the "step" value.
+     * @see generateCodeOnlyFromForTail
      */
     private String[] generateFromForTail(final Node node, final String counterVarName) {
         String[] varnames;
         if (node.getChildren().size() > 5) {
-            // If of the form "by <ExprArith-p0> to <ExprArith-p0> do <Code> done"
+            // If of the form "by <> to <> do <> done"
             consumeOneToken(LexicalUnit.BY);
             String stepVarName = generateFromExprArithP0(node.getChildren().get(1));
             consumeOneToken(LexicalUnit.TO);
@@ -574,7 +599,7 @@ public class CodeGenerator {
             consumeOneToken(LexicalUnit.DO);
             varnames = new String[] { limitVarName, stepVarName };
         } else {
-            // If the form "to <ExprArith-p0> do <Code> done"
+            // If the form "to <> do <> done"
             consumeOneToken(LexicalUnit.TO);
             String limitVarName = generateFromExprArithP0(node.getChildren().get(1));
             consumeOneToken(LexicalUnit.DO);
@@ -585,7 +610,7 @@ public class CodeGenerator {
 
     /**
      * Generates llvm code from a <ForTail> node of the parse tree,
-     * by starting from the next <Code> child node. This is to avoid
+     * by starting from the next <FuncInstList> child node. This is to avoid
      * generating the code for "end" and "step" values twice.
      * See generateFromForTail for more details.
      *
@@ -595,11 +620,11 @@ public class CodeGenerator {
     private void generateCodeOnlyFromForTail(final Node node) throws UndefinedFunctionException {
         if (node.getChildren().size() > 5) {
             // If of the form "by <ExprArith-p0> to <ExprArith-p0> do <Code> done"
-            generateFromCode(node.getChildren().get(5));
+            generateFromFuncInstList(node.getChildren().get(5));
             consumeOneToken(LexicalUnit.DONE);
         } else {
             // If the form "to <ExprArith-p0> do <Code> done"
-            generateFromCode(node.getChildren().get(3));
+            generateFromFuncInstList(node.getChildren().get(3));
             consumeOneToken(LexicalUnit.DONE);
         }
     }
@@ -761,7 +786,7 @@ public class CodeGenerator {
             String falseLabelName = condName + ".false";
             consumeOneToken(LexicalUnit.ELSE);
             this.templateEngine.addLabel(falseLabelName);
-            generateFromCode(node.getChildren().get(1));
+            generateFromFuncInstList(node.getChildren().get(1));
             consumeOneToken(LexicalUnit.ENDIF);
             this.templateEngine.insert("br label %" + condName);
         } else {
@@ -781,6 +806,20 @@ public class CodeGenerator {
             consumeOneToken(LexicalUnit.SEMICOLON);
             this.templateEngine.newLine();
             generateFromInstList(node.getChildren().get(1));
+        }
+    }
+
+    /**
+     * Generates llvm code from a <FuncInstListTail> node of the parse tree.
+     *
+     * @param node Current node (must be <FuncInstListTail>)
+     */
+    private void generateFromFuncInstListTail(final Node node) throws UndefinedFunctionException {
+        if (node.getChildren().size() > 1) {
+            // ; <FuncInstList>
+            consumeOneToken(LexicalUnit.SEMICOLON);
+            this.templateEngine.newLine();
+            generateFromFuncInstList(node.getChildren().get(1));
         }
     }
 

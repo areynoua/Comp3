@@ -1,0 +1,9 @@
+Unexpected symbol:
+'function' with TOS: '<FuncInstList>'
+LL1Parser:
+    token number: 35
+    stack: [ '<FuncInstList>', 'end', '<InstList-Tail>', 'end', '$' ]
+    token: function	lexical unit: FUNCTION
+    line: 5, column: 1
+    code: + 1 ; function @bar ( b 
+

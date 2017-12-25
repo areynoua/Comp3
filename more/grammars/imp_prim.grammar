@@ -1,20 +1,24 @@
 <Program>           -> begin <Code> end 
 <Code>              -> <InstList> 
-                    -> epsilon 
 <InstList>          -> <Instruction> 
                     -> <Instruction> ; <InstList> 
-<Instruction>       -> <Assign> 
+                    -> epsilon 
+<FuncInstList>      -> <FuncInstruction> 
+                    -> <FuncInstruction> ; <FuncInstList> 
+                    -> epsilon 
+<Instruction>       -> <Define> 
+                    -> <FuncInstruction> 
+<FuncInstruction>   -> <Assign> 
                     -> <If> 
                     -> <While> 
                     -> <For> 
                     -> <Print>
                     -> <Read>
                     -> <Rand> 
-                    -> <Define>
                     -> <Return>
                     -> <Call>
                     -> <Import>
-<Define>            -> function [FuncName] ( <ParamList> ) do <Code> end
+<Define>            -> function [FuncName] ( <ParamList> ) do <FuncInstList> end
 <Return>            -> return <ExprArith-p0>
 <Import>            -> import [ModuleName]
 <Call>              -> [FuncName] ( <ArgList> )
@@ -51,11 +55,11 @@
                     -> <= 
                     -> < 
                     -> <> 
-<While>             -> while <Cond-p0> do <Code> done 
-<If>                -> if <Cond-p0> then <Code> else <Code> endif 
-                    -> if <Cond-p0> then <Code> endif 
-<For>               -> for [VarName] from <ExprArith-p0> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
-                    -> for [VarName] from <ExprArith-p0> to <ExprArith-p0> do <Code> done 
+<While>             -> while <Cond-p0> do <FuncInstList> done 
+<If>                -> if <Cond-p0> then <FuncInstList> else <FuncInstList> endif 
+                    -> if <Cond-p0> then <FuncInstList> endif 
+<For>               -> for [VarName] from <ExprArith-p0> by <ExprArith-p0> to <ExprArith-p0> do <FuncInstList> done 
+                    -> for [VarName] from <ExprArith-p0> to <ExprArith-p0> do <FuncInstList> done 
 <Print>             -> print ( [VarName] )
 <Read>              -> read ( [VarName] )
 <Rand>              -> rand ( [VarName] )

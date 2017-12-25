@@ -1,24 +1,31 @@
 <Program>           -> begin <Code> end 
-<Code>              -> epsilon 
-                    -> <InstList> 
+<Code>              -> <InstList> 
 <InstList>          -> <Instruction> 
                     -> <Instruction> ; <InstList> 
-<Instruction>       -> <Assign> 
+                    -> epsilon 
+<FuncInstList>      -> <FuncInstruction> 
+                    -> <FuncInstruction> ; <FuncInstList> 
+                    -> epsilon 
+<Instruction>       -> <Define> 
+                    -> <FuncInstruction> 
+<FuncInstruction>   -> <Assign> 
                     -> <If> 
                     -> <While> 
                     -> <For> 
                     -> <Print> 
                     -> <Read> 
                     -> <Rand> 
-                    -> <Define> 
                     -> <Return> 
                     -> <Call> 
                     -> <Import> 
-<Define>            -> function [FuncName] ( <ArgList> ) do <Code> end 
+<Define>            -> function [FuncName] ( <ParamList> ) do <FuncInstList> end 
 <Return>            -> return <ExprArith> 
 <Call>              -> [FuncName] ( <ArgList> ) 
 <ArgList>           -> <ExprArith> , <ArgList> 
                     -> <ExprArith> 
+                    -> epsilon 
+<ParamList>         -> [VarName] , <ParamList> 
+                    -> [VarName] 
                     -> epsilon 
 <Import>            -> import [ModuleName] 
 <Assign>            -> [VarName] := <ExprArith> 
@@ -32,8 +39,8 @@
                     -> - 
                     -> * 
                     -> / 
-<If>                -> if <Cond> then <Code> endif 
-                    -> if <Cond> then <Code> else <Code> endif 
+<If>                -> if <Cond> then <FuncInstList> endif 
+                    -> if <Cond> then <FuncInstList> else <FuncInstList> endif 
 <Cond>              -> <Cond> <BinOp> <Cond> 
                     -> not <SimpleCond> 
                     -> <SimpleCond> 
@@ -46,9 +53,9 @@
                     -> <= 
                     -> < 
                     -> <> 
-<While>             -> while <Cond> do <Code> done 
-<For>               -> for [VarName] from <ExprArith> by <ExprArith> to <ExprArith> do <Code> done 
-                    -> for [VarName] from <ExprArith> to <ExprArith> do <Code> done 
+<While>             -> while <Cond> do <FuncInstList> done 
+<For>               -> for [VarName] from <ExprArith> by <ExprArith> to <ExprArith> do <FuncInstList> done 
+                    -> for [VarName] from <ExprArith> to <ExprArith> do <FuncInstList> done 
 <Print>             -> print ( [VarName] ) 
 <Read>              -> read ( [VarName] ) 
 <Rand>              -> rand ( [VarName] ) 

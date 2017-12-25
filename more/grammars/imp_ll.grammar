@@ -1,18 +1,20 @@
 <Program>           -> begin <Code> end 
 <Code>              -> <InstList> 
-                    -> epsilon 
-<Instruction>       -> <Assign> 
+<InstList>          -> epsilon 
+<FuncInstList>      -> epsilon 
+<Instruction>       -> <Define> 
+                    -> <FuncInstruction> 
+                    -> <Import> 
+<FuncInstruction>   -> <Assign> 
                     -> <If> 
                     -> <While> 
                     -> <For> 
                     -> <Print> 
                     -> <Read> 
                     -> <Rand> 
-                    -> <Define> 
                     -> <Return> 
                     -> <Call> 
-                    -> <Import> 
-<Define>            -> function [FuncName] ( <ParamList> ) do <Code> end 
+<Define>            -> function [FuncName] ( <ParamList> ) do <FuncInstList> end 
 <Return>            -> return <ExprArith-p0> 
 <Import>            -> import [ModuleName] 
 <Call>              -> [FuncName] ( <ArgList> ) 
@@ -43,12 +45,15 @@
                     -> <= 
                     -> < 
                     -> <> 
-<While>             -> while <Cond-p0> do <Code> done 
+<While>             -> while <Cond-p0> do <FuncInstList> done 
 <Print>             -> print ( [VarName] ) 
 <Read>              -> read ( [VarName] ) 
 <Rand>              -> rand ( [VarName] ) 
 <InstList>          -> <Instruction> <InstList-Tail> 
 <InstList-Tail>     -> ; <InstList> 
+                    -> epsilon 
+<FuncInstList>      -> <FuncInstruction> <FuncInstList-Tail> 
+<FuncInstList-Tail> -> ; <FuncInstList> 
                     -> epsilon 
 <ArgList>           -> <ExprArith-p0> <ArgList-Tail> 
 <ArgList-Tail>      -> epsilon 
@@ -59,12 +64,12 @@
 <Assign>            -> [VarName] := <Assign-Tail> 
 <Assign-Tail>       -> <Call> 
                     -> <ExprArith-p0> 
-<If>                -> if <Cond-p0> then <Code> <If-Tail> 
+<If>                -> if <Cond-p0> then <FuncInstList> <If-Tail> 
 <If-Tail>           -> endif 
-                    -> else <Code> endif 
+                    -> else <FuncInstList> endif 
 <For>               -> for [VarName] from <ExprArith-p0> <For-Tail> 
-<For-Tail>          -> to <ExprArith-p0> do <Code> done 
-                    -> by <ExprArith-p0> to <ExprArith-p0> do <Code> done 
+<For-Tail>          -> to <ExprArith-p0> do <FuncInstList> done 
+                    -> by <ExprArith-p0> to <ExprArith-p0> do <FuncInstList> done 
 <ExprArith-p0>      -> <ExprArith-p0-i> <ExprArith-p0-j> 
 <ExprArith-p0-j>    -> epsilon 
 <ExprArith-p1>      -> <ExprArith-p1-i> <ExprArith-p1-j> 
