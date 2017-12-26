@@ -14,7 +14,7 @@
 <While> & while  & else end endif ; done \\ \hline
 <Assign> & [VarName]  & else end endif ; done \\ \hline
 <Define> & function  & end ; \\ \hline
-<Import> & import  & else end endif ; done \\ \hline
+<Import> & import  & end ; \\ \hline
 <Return> & return  & else end endif ; done \\ \hline
 <ArgList> & epsilon [VarName] ( - [Number]  & ) \\ \hline
 <Cond-p0> & [VarName] not ( - [Number]  & do then \\ \hline
@@ -35,14 +35,14 @@
 <ArgList-Tail> & epsilon ,  & ) \\ \hline
 <ExprArith-p0> & [VarName] ( - [Number]  & <= <> or ) do then , done else and by end endif ; to < = > >= \\ \hline
 <ExprArith-p1> & [VarName] ( - [Number]  & <= <> or ) + do then , - done else and by end endif ; to < = > >= \\ \hline
-<FuncInstList> & epsilon rand [VarName] [FuncName] print read import for while if return  & else end endif done \\ \hline
+<FuncInstList> & epsilon rand [VarName] [FuncName] print read for while if return  & else end endif done \\ \hline
 <InstList-Tail> & epsilon ;  & end \\ \hline
 <ExprArith-p0-i> & [VarName] ( - [Number]  & <= <> or ) + do then , - done else and by end endif ; to < = > >= \\ \hline
 <ExprArith-p0-j> & epsilon + -  & <= <> or ) do then , done else and by end endif ; to < = > >= \\ \hline
 <ExprArith-p1-i> & [VarName] ( - [Number]  & <= <> or ) * + do then , - done / else and by end endif ; to < = > >= \\ \hline
 <ExprArith-p1-j> & epsilon * /  & <= <> or ) + do then , - done else and by end endif ; to < = > >= \\ \hline
 <ParamList-Tail> & epsilon ,  & ) \\ \hline
-<FuncInstruction> & rand [VarName] [FuncName] print read import for while if return  & else end endif ; done \\ \hline
+<FuncInstruction> & rand [VarName] [FuncName] print read for while if return  & else end endif ; done \\ \hline
 <FuncInstList-Tail> & epsilon ;  & else end endif done 
 \end{longtable}
 

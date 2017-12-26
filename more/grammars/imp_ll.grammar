@@ -3,8 +3,8 @@
 <InstList>          -> epsilon 
 <FuncInstList>      -> epsilon 
 <Instruction>       -> <Define> 
-                    -> <FuncInstruction> 
                     -> <Import> 
+                    -> <FuncInstruction> 
 <FuncInstruction>   -> <Assign> 
                     -> <If> 
                     -> <While> 

@@ -47,6 +47,15 @@ public class CodeGenerator {
     }
 
     /**
+     * Temporary method because the generator is not modular (while the lexer
+     * and the parser are) and work only on the imp grammar.
+     */
+    private void notImpGrammar() {
+            System.err.println("It's seems that we are not working with the Imp grammar. For now the code generator work only with it.");
+            System.exit(-1);
+    }
+
+    /**
      * Removes the current token from the input buffer and returns it.
      *
      * @return Token located on the head of the input buffer
@@ -66,9 +75,8 @@ public class CodeGenerator {
     private Symbol consumeOneToken(LexicalUnit type) {
         Symbol token = this.tokens.get(0);
         if (type != token.getType()) {
-            System.out.println(token);
-            System.out.println("TODO: Error");
-            // TODO: raise exception
+            System.err.println(token);
+            notImpGrammar();
         }
         this.tokens.remove(0);
         return token;
@@ -196,6 +204,8 @@ public class CodeGenerator {
             generateFromImport(node.getChildren().get(0));
         } else if (instructionName.equals("FuncInstruction")) {
             generateFromFuncInstruction(node.getChildren().get(0));
+        } else {
+            notImpGrammar();
         }
     }
 
@@ -224,6 +234,8 @@ public class CodeGenerator {
             generateFromReturn(node.getChildren().get(0));
         } else if (instructionName.equals("Call")) {
             generateFromCall(node.getChildren().get(0));
+        } else {
+            notImpGrammar();
         }
     }
 
@@ -250,10 +262,12 @@ public class CodeGenerator {
         if (symbolName.equals("ExprArith-p0")) {
             String tempVarName = generateFromExprArithP0(node.getChildren().get(0));
             this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
-        } else {
-            //System.out.println(this.nUnnamedVariables);
+        }
+        else if (symbolName.equals("Call")) {
             String tempVarName = generateFromCall(node.getChildren().get(0));
             this.templateEngine.insert("store i32 " + tempVarName + ", i32* " + llvmVarName(varName));
+        } else {
+            notImpGrammar();
         }
     }
 
@@ -757,7 +771,7 @@ public class CodeGenerator {
         } else if (opName.equals("<>")) {
             instruction = tempVarName + " = icmp ne i32 " + leftVarName + ", " + rightVarName;
         } else {
-            // TODO: raise exception
+            notImpGrammar();
         }
         this.templateEngine.oneLineComment("Logical operation " + opName);
         this.templateEngine.insert(instruction);
@@ -863,7 +877,7 @@ public class CodeGenerator {
             } else if (opName.equals("-")) { // Imp subtraction
                 instruction = tempVarName + " = sub i32 " + leftVarName + ", " + rightVarName;
             } else {
-                // TODO: raise exception
+                notImpGrammar();
             }
             this.templateEngine.oneLineComment("Arithmetic operation " + opName);
             this.templateEngine.insert(instruction);
@@ -925,7 +939,7 @@ public class CodeGenerator {
             } else if (opName.equals("/")) {
                 instruction = tempVarName + " = sdiv i32 " + leftVarName + ", " + rightVarName;
             } else {
-                // TODO: raise exception
+                notImpGrammar();
             }
             this.templateEngine.oneLineComment("Arithmetic operation " + opName);
             this.templateEngine.insert(instruction);
@@ -983,6 +997,7 @@ public class CodeGenerator {
             this.templateEngine.insert(instruction);
         } else {
             tempVarName = null; // TODO: raise exception
+            notImpGrammar();
         }
         return tempVarName;
     }

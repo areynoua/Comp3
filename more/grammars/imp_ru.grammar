@@ -7,6 +7,7 @@
                     -> <FuncInstruction> ; <FuncInstList> 
                     -> epsilon 
 <Instruction>       -> <Define> 
+                    -> <Import> 
                     -> <FuncInstruction> 
 <FuncInstruction>   -> <Assign> 
                     -> <If> 
@@ -17,7 +18,6 @@
                     -> <Rand> 
                     -> <Return> 
                     -> <Call> 
-                    -> <Import> 
 <Define>            -> function [FuncName] ( <ParamList> ) do <FuncInstList> end 
 <Return>            -> return <ExprArith> 
 <Call>              -> [FuncName] ( <ArgList> ) 
