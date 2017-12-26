@@ -31,15 +31,21 @@ jar: ../dist/impCompiler.jar
 grammars/imp_ru.grammar: Main.class parser/*.class grammars/imp.grammar
 	java Main --ru grammars/imp.grammar -o grammars/imp_ru.grammar
 
+grammars/imp_ru.grammar.tex: Main.class parser/*.class grammars/imp.grammar
+	java Main --ru grammars/imp.grammar -o grammars/imp_ru.grammar
+
 grammars/imp_ll.grammar: Main.class parser/*.class grammars/imp_prim.grammar
+	java Main --ll grammars/imp_prim.grammar -o grammars/imp_ll.grammar
+
+grammars/imp_ll.grammar.tex: Main.class parser/*.class grammars/imp_prim.grammar
 	java Main --ll grammars/imp_prim.grammar -o grammars/imp_ll.grammar
 
 action_table.tex: Main.class parser/*.class grammars/imp_ll.grammar
 	java Main --at grammars/imp_ll.grammar -o action_table.tex
 
-ru: grammars/imp_ru.grammar
+ru: grammars/imp_ru.grammar grammars/imp_ru.grammar.tex
 
-ll: grammars/imp_ll.grammar
+ll: grammars/imp_ll.grammar grammars/imp_ll.grammar.tex
 
 at: action_table.tex
 
