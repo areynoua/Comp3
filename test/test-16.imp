@@ -1,0 +1,6 @@
+begin
+@foo(3);
+function @foo(i) do
+ print(i)
+end
+end

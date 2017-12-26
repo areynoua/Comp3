@@ -1,0 +1,9 @@
+begin
+c := 3;
+function @foo() do
+c := 4
+end;
+print(c);
+@foo();
+print(c);
+end
