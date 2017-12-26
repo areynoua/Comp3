@@ -15,6 +15,9 @@
 \usepackage{color}
 \usepackage{etoolbox}
 \usepackage[]{longtable}
+\usepackage{alltt}
+\usepackage{multirow}
+\usepackage[bottom]{footmisc}
 
 \addto{\captionsenglish}{\renewcommand{\abstractname}{\vspace{-2\baselineskip}}}
 
@@ -68,13 +71,13 @@
 \maketitle
 \thispagestyle{empty}
 
-\vfill
+\vfil
 \begin{abstract}
 In this work, we implemented an actual compiler for the \imp language.
 
-Given an unambiguous LL(1) grammar (see previous report on how to produce it and how the program may help)
-and a source file, the compiler produces an LLVM-assambly language (LLVM IR) \texttt{.ll} file which may be compiled to
-LLVM bitcode with the LLVM assembler \textsf{llvm-as(1)}.
+Given the unambiguous LL(1) grammar (see previous report on how to produce it and how the program may help) for the imp
+language and a source file, the compiler produces an LLVM-assambly language (LLVM IR) \texttt{.ll} file which may be
+compiled to LLVM bitcode with the LLVM assembler \textsf{llvm-as(1)}.
 So we extended the previously given \imp grammar to handle some new features
 and made improvements to the lexer and parser.
 
@@ -84,12 +87,16 @@ Finally, we will present the new enriched \imp grammar,
 then the actual code generator and the additions to the implementation of the lexer and parser.
 \end{abstract}
 
-\vfill
 \clearpage
 \vfill
+\hrule
+\vspace{\baselineskip}
 \tableofcontents
-
+\vspace{3\baselineskip}
+\hrule
 \vfill
+\clearpage
+
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
@@ -103,24 +110,62 @@ The temporary variables needed are implemented as unnamed LLVM IR variables.
 
 The \imp language only support the \inttt type.
 Any expressions which have a value have a \inttt value.
-Notably, all functions which does not explicitly return a value return 0.
+Notably, any functions which does not explicitly return a value returns 0.
+
+The usage may seems strange because we have to give to the compiler the grammar of the \imp language.
+This is because we implemented modular lexer and parser, but the code generation was hard-coded due to a lack of time.
+If the code generator detect an inconsistency due to the usage of another grammar, an error message will be displayed
+and the program exit with the error code -1.
 
 \section[The enriched \imp language]{The enriched \imp language (bonus features)}
 
+Here we present briefly the additions made to the \imp language. For a more precise description the reader can go to the
+next section.
+
+\subsection{Randomness}
+
+The ability to use pseudo random numbers was added to the language through the \texttt{rand} keyword.
+The expression \texttt{rand(a)} assigns a pseudo random value between \todo{min} and \todo{max} to the variable \texttt{a}.
+
 \subsection{Functions}
 
-\imp functions are a way to group instructions together to later executions.
-They are executed
+Informally, an \imp function is an executable statement, composed of any instruction list without \texttt{define} and
+\texttt{import}, and whose the value is an \inttt.
 
+A function must be defined before any usage.
+The way to define a function is described by the variable \varstyle{Define} of the language.
+A usage of, or ``call to'', the function is defined by the \varstyle{Call} variable.
+The arguments are passed to the function by copy and the inner variable are defined in a local scope.
 
-\begin{itemize}
-\item Fonctions (definition et appel, arite au choix)
-\item Mot cles rand, import, function
-\item Gestion de librairie standard
-\item Gestion d'exceptions
-\item Optimization (faudrait qu'on checke les flags de llvm pour qu'il optimise les trucs immondes qu'on genere)
-\item Si tu trouves des trucs facile a ajouter, ne te prives pas
-\end{itemize}
+To take an example, the following program print 12:\\
+\texttt{
+  \input{../../../test/test-18.imp}
+}
+
+Because a function has to be defined before its first call, recursive calls are not supported.
+
+Unfortunately for now the compiler is not able to detect that a function call respect the function signature, this can
+lead to an error when running the llvm assembler \textsf{llvm-as}, like
+\begin{verbatim}
+llvm-as: main.ll:85:19: error: '@foo' defined with type 'i32 (i32*, i32*)*'
+    %2 = call i32 @foo(i32* %c0c0)
+\end{verbatim}
+Here for example, the function was defined with two parameters but called with only one argument.
+
+\subsection{Import}
+
+One can create a file to contains code for later use in other files.
+Once created any file may be imported in another thanks to the \texttt{import} keyword.
+\todo{}
+
+A file designed to be \texttt{import}ed into other files is called a module.
+
+\subsection{The standard library}
+
+The standard library provide three modules. Two of them, \texttt{\todo{}} and \texttt{\todo{}} are imported by default.
+They provide some functions whose the name is self-explanatory: \texttt{\todo{}}
+
+The last one may be included with \texttt{\todo{}} and provide the \texttt{\todo{}} and \texttt{\todo{}} functions.
 
 \section{Augmenting \imp's syntax and grammar}
 
@@ -143,10 +188,13 @@ and identifiers for modules (begins with a ``\_'').
 \subsection{Grammar rules}
 
 Here is the new grammar for the \imp language.
-The main additions and changes are marked with an asterisk (\textsf{*}).
+\todo{The main additions and changes are marked with an asterisk (\textsf{*}).}
 
-One can note tree main changes:
+One can note four main changes:
 \begin{itemize}
+  \item \varstyle{Instruction} is divided into \varstyle{Instruction} and \varstyle{FuncInstruction} (and some other
+    variables were updated to reflect this change). \varstyle{FuncInstruction} is defined as an \varstyle{Instruction}
+    without \varstyle{Define} and \varstyle{Import}.
   \item \varstyle{ParamList} was introduced to define functions (with \varstyle{Define}),
   \item \varstyle{ArgList} was introduced to call functions (with \varstyle{Call}),
   \item \varstyle{Assign} was modified to allow to assign a variable with the result of a function call.
@@ -160,81 +208,7 @@ One can note tree main changes:
     l
     @{ $\rightarrow$ } >{\ttfamily}l<{\ttfamily}
   }
-  & \varstyle{Program} & begin \varstyle{Code} end \\
-  & \varstyle{Code} & \varstyle{InstList} \\
-  &  & epsilon \\
-  & \varstyle{Instruction} & \varstyle{Assign} \\
-  &  & \varstyle{If} \\
-  &  & \varstyle{While} \\
-  &  & \varstyle{For} \\
-  &  & \varstyle{Print} \\
-  &  & \varstyle{Read} \\
-* &  & \varstyle{Rand} \\
-* &  & \varstyle{Define} \\
-* &  & \varstyle{Return} \\
-* &  & \varstyle{Call} \\
-* &  & \varstyle{Import} \\
-* & \varstyle{Define} & function [FuncName] ( \varstyle{ParamList} ) do \varstyle{Code} end \\
-* & \varstyle{Return} & return \varstyle{ExprArith-p0} \\
-* & \varstyle{Import} & import [ModuleName] \\
-* & \varstyle{Call} & [FuncName] ( \varstyle{ArgList} ) \\
-* & \varstyle{ArgList} & epsilon \\
-* & \varstyle{ArgList} & \varstyle{ExprArith-p0} \varstyle{ArgList-Tail} \\
-* & \varstyle{ArgList-Tail} & epsilon \\
-* &  & , \varstyle{ArgList} \\
-* & \varstyle{ParamList} & epsilon \\
-* & \varstyle{ParamList} & [VarName] \varstyle{ParamList-Tail} \\
-* & \varstyle{ParamList-Tail} & epsilon \\
-* &  & , \varstyle{ParamList} \\
-* & \varstyle{Assign} & [VarName] := \varstyle{Assign-Tail} \\
-* & \varstyle{Assign-Tail} & \varstyle{Call} \\
-* &  & \varstyle{ExprArith-p0} \\
-  & \varstyle{Atom} & [VarName] \\
-  &  & [Number] \\
-  &  & ( \varstyle{ExprArith-p0} ) \\
-  &  & - \varstyle{Atom} \\
-  & \varstyle{Op-p0} & + \\
-  &  & - \\
-  & \varstyle{Op-p1} & * \\
-  &  & / \\
-  & \varstyle{Cond-p0-j} & or \varstyle{Cond-p1} \\
-  & \varstyle{Cond-p0-i} & \varstyle{Cond-p1} \\
-  & \varstyle{Cond-p1-j} & and \varstyle{Cond-p2} \\
-  & \varstyle{Cond-p1-i} & \varstyle{Cond-p2} \\
-  & \varstyle{Cond-p2} & not \varstyle{SimpleCond} \\
-  &  & \varstyle{SimpleCond} \\
-  & \varstyle{SimpleCond} & \varstyle{ExprArith-p0} \varstyle{Comp} \varstyle{ExprArith-p0} \\
-  & \varstyle{Comp} & = \\
-  &  & >= \\
-  &  & > \\
-  &  & <= \\
-  &  & < \\
-  &  & <> \\
-  & \varstyle{While} & while \varstyle{Cond-p0} do \varstyle{Code} done \\
-  & \varstyle{Print} & print ( [VarName] ) \\
-  & \varstyle{Read} & read ( [VarName] ) \\
-* & \varstyle{Rand} & rand ( [VarName] ) \\
-  & \varstyle{InstList} & \varstyle{Instruction} \varstyle{InstList-Tail} \\
-  & \varstyle{InstList-Tail} & ; \varstyle{InstList} \\
-  &  & epsilon \\
-  & \varstyle{If} & if \varstyle{Cond-p0} then \varstyle{Code} \varstyle{If-Tail} \\
-  & \varstyle{If-Tail} & endif \\
-  &  & else \varstyle{Code} endif \\
-  & \varstyle{For} & for [VarName] from \varstyle{ExprArith-p0} \varstyle{For-Tail} \\
-  & \varstyle{For-Tail} & to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
-  &  & by \varstyle{ExprArith-p0} to \varstyle{ExprArith-p0} do \varstyle{Code} done \\
-  & \varstyle{ExprArith-p0-j} & \varstyle{Op-p0} \varstyle{ExprArith-p1} \\
-  & \varstyle{ExprArith-p0-i} & \varstyle{ExprArith-p1} \\
-  & \varstyle{ExprArith-p1-j} & \varstyle{Op-p1} \varstyle{Atom} \\
-  & \varstyle{ExprArith-p1-i} & \varstyle{Atom} \\
-  & \varstyle{ExprArith-p0} & \varstyle{ExprArith-p0-i} \varstyle{ExprArith-p0-j} \\
-  & \varstyle{ExprArith-p0-j} & epsilon \\
-  & \varstyle{ExprArith-p1} & \varstyle{ExprArith-p1-i} \varstyle{ExprArith-p1-j} \\
-  & \varstyle{ExprArith-p1-j} & epsilon \\
-  & \varstyle{Cond-p0} & \varstyle{Cond-p0-i} \varstyle{Cond-p0-j} \\
-  & \varstyle{Cond-p0-j} & epsilon \\
-  & \varstyle{Cond-p1} & \varstyle{Cond-p1-i} \varstyle{Cond-p1-j} \\
-  & \varstyle{Cond-p1-j} & epsilon \\
+  \input{../../../more/grammars/imp_ll.grammar.tex}
 \end{longtable}
 
 \section{Implementation}
@@ -244,7 +218,20 @@ One can note tree main changes:
 To read the new keywords, the lexer was enriched with the corresponding lexical units: \texttt{RAND}, \texttt{FUNCTION},
 \texttt{FUNCNAME}, \texttt{RETURN}, \texttt{IMPORT}, \texttt{MODULENAME} and \texttt{COMMA}.
 
-\subsubsection{Error handling}
+The parser receive the corresponding improvement as well as some modifications, especially to display errors in a more
+convenient way.
+
+The error management was improved as described in a following section.
+
+\subsection{LLVM code generator}
+
+For each variable of the grammar, a method to produce the corresponding llvm code is hard-coded.
+When needed, such a method return the number of an unnamed variable used to store the result of the code generated.
+For example, when working on \texttt{a := 7 + 9}, 7 and 9 are both stored in an unnamed llvm variable. Which one is
+defined and returned by the function which generate the corresponding code (\texttt{generateFromAtom}).
+Then, the result of the addition is stored in an unnamed variable too (\texttt{generateFromExprArithP0J}).
+
+\subsection{Error handling}
 
 The compiler may report some errors due to an input which does not correspond to the given grammar, or which may not
 produce some valid code (call to an undefined function).
@@ -268,32 +255,45 @@ So all the variables are implicitly declared at the beginning of the program, bu
 It is the responsibility of the programmer to ensure that a value is assigned to the variable before use,
 otherwise the behaviour of the program may be unexpected.
 
-\paragraph*{\todo{returned error codes}}
+\paragraph*{Returned error codes}
 
-\paragraph*{\todo{example}}
+On success, the compiler return 0 (or the success value of the platform).
+Otherwise, the return value depends on the error.
+These values are shown in the table below:
+
+\begin{center}
+  \begin{tabular}{| l | l | l |}
+    \hline
+    Error from & code & description \\ \hline
+    \multirow{2}{*}{OS} & 1 & IO error \\
+    & 2 & File not found \\ \hline
+    \multirow{2}{*}{Lexer} & 16 & Unkown terminal \\
+    & 17 & Bad terminal context \\ \hline
+    \multirow{2}{*}{Parser} & \multirow{2}{*}{19} & Unexpected symbol \\
+    & & Unexpected end of file \\ \hline
+    Code generator & 18 & Call to undefined function \\ \hline
+    & -1 & Unknown \\
+    & -1 & Not imp grammar\footnotemark[1]
+    \\ \hline
+  \end{tabular}
+  \footnotetext[1]{Temporary error because of the modular lexer and parser (work well with any ll(1)
+  grammar whose keywords and lexical units are the same as the current \imp language)
+  working with a currently not modular code generator (the \imp grammar is hard-coded).}
+\end{center}
+
+\paragraph*{Here is an example}
+of error reported by the parser when one try to define a function inside another function:
+
 \begin{verbatim}
 Unexpected symbol:
-'[VarName]' with TOS: '[FuncName]'
+'function' with TOS: '<FuncInstList>'
 LL1Parser:
-    token number: 2
-    stack: [ '[FuncName]', '(', '<ParamList>', ')', 'do', '<Code>', 'end', '<InstList-Tail>', 'end', '$' ]
-    token: foo  lexical unit: VARNAME
-    line: 2, column: 9
-    code: begin function foo ( ) do print
+    token number: 35
+    stack: [ '<FuncInstList>', 'end', '<InstList-Tail>', 'end', '$' ]
+    token: function     lexical unit: FUNCTION
+    line: 5, column: 1
+    code: + 1 ; function @bar ( b 
 \end{verbatim}
-
-\subsection{LLVM code generator}
-
-recursive descent code generator ?
-
-On a hard code une methode par variable de la grammaire.
-Quand c'est necessaire, une methode renvoie le nom d'une variable temporaire (non nommee)
-qui stocke le resultat de l'expression.
-
-Exemple: a := (7 + 9)
-
-7 est stockée dans une variable non nommee, puis de meme pour 9, puis 7 + 9 encore dans une autre, puis cette derniere est stockee
-dans la variable \%a avec un store.
 
 \end{document}
 
