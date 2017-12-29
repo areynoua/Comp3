@@ -1,0 +1,73 @@
+Program
+| + begin
+| + <Code>
+| | + <InstList>
+| | + <Instruction>
+| | | + <Define>
+| | | + function
+| | | + [FuncName]
+| | | + (
+| | | + <ParamList>
+| | | | + [VarName]
+| | | | + <ParamList-Tail>
+| | | | + ,
+| | | | + <ParamList>
+| | | | + [VarName]
+| | | | + <ParamList-Tail>
+| | | | + epsilon
+| | | + )
+| | | + do
+| | | + <FuncInstList>
+| | | | + <FuncInstruction>
+| | | | | + <Print>
+| | | | | + print
+| | | | | + (
+| | | | | + [VarName]
+| | | | | + )
+| | | | + <FuncInstList-Tail>
+| | | | + ;
+| | | | + <FuncInstList>
+| | | | + <FuncInstruction>
+| | | | | + <Print>
+| | | | | + print
+| | | | | + (
+| | | | | + [VarName]
+| | | | | + )
+| | | | + <FuncInstList-Tail>
+| | | | + ;
+| | | | + <FuncInstList>
+| | | | + <FuncInstruction>
+| | | | | + <Print>
+| | | | | + print
+| | | | | + (
+| | | | | + [VarName]
+| | | | | + )
+| | | | + <FuncInstList-Tail>
+| | | | + epsilon
+| | | + end
+| | + <InstList-Tail>
+| | + ;
+| | + <InstList>
+| | + <Instruction>
+| | | + <FuncInstruction>
+| | | + <Call>
+| | | + [FuncName]
+| | | + (
+| | | + <ArgList>
+| | | | + <ExprArith-p0>
+| | | | | + <ExprArith-p0-i>
+| | | | | | + <ExprArith-p1>
+| | | | | | + <ExprArith-p1-i>
+| | | | | | | + <Atom>
+| | | | | | | + [Number]
+| | | | | | + <ExprArith-p1-j>
+| | | | | | + epsilon
+| | | | | + <ExprArith-p0-j>
+| | | | | + epsilon
+| | | | + <ArgList-Tail>
+| | | | + epsilon
+| | | + )
+| | + <InstList-Tail>
+| | + epsilon
+| + end
+$

@@ -26,7 +26,7 @@ public class STDLibManager {
     * @param moduleName  Name of the module to be included
     */
     public void loadFunctions(String moduleName) {
-        String pathToHeader = "imp_stdlib/" + moduleName + ".sih";
+        String pathToHeader = "../more/imp_stdlib/" + moduleName + ".sih";
         File file = new File(pathToHeader);
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
@@ -55,7 +55,7 @@ public class STDLibManager {
         String code = null;
         if (!importedModules.contains(moduleName)) {
             this.loadFunctions(moduleName);
-            String pathToLibrary = "imp_stdlib/" + moduleName + ".ll";
+            String pathToLibrary = "../more/imp_stdlib/" + moduleName + ".ll";
             File file = new File(pathToLibrary);
             FileInputStream fis;
             byte[] data = null;

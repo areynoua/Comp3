@@ -127,7 +127,7 @@ public class Main {
                             if (outputFileName != null) {
                                 parser.saveTextTreeToFile(outputFileName + ".txt");
                                 parser.saveLatexTreeToFile(outputFileName + ".tex");
-                                parser.saveJavascriptToFile("trees/rules.js");
+                                parser.saveJavascriptToFile("../more/trees/rules.js");
                             }
                             // System.out.println("Parsing done");
                             // System.out.println("Rules used:");
@@ -137,7 +137,7 @@ public class Main {
                             System.out.println("Syntax error");
                             System.out.println(parser);
                         }
-                        codeGenerator = new CodeGenerator("templates/template.ll");
+                        codeGenerator = new CodeGenerator("../more/templates/template.ll");
                         codeGenerator.generate(symbols, parser.getParseTree(), identifiers, "main.ll");
                         break;
                     default :

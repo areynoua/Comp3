@@ -1,3 +1,5 @@
+cd ../src/
+
 for file in ../test/*.imp;
 do
 	f=${file##*/};
