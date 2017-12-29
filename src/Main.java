@@ -42,8 +42,8 @@ public class Main {
      * Parse command line arguments
      */
     public static boolean argParse(String argv[]) {
-        if (argv.length == 0 || argv.length % 2 == 1) {
-            System.out.println("Arguments :\n	(1) --ru <grammar file> -o <grammar output file>\n	(2) --ll <grammar file> -o <grammar output file>\n	(3) --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) <ll1 unambiguous grammar file> <code> [-o <LLVM IR code file> ][-t <parse tree output file>]");
+        if (argv == null) {
+            System.out.println("Arguments :\n	(1) --ru <grammar file> -o <grammar output file>\n	(2) --ll <grammar file> -o <grammar output file>\n	(3) --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) <code file> [-g <input: ll1 unambiguous grammar file>] [-o <output: LLVM IR code file>] [-t <output: parse tree output file>]");
             System.out.println("(1) remove useless\n(2) left factorization and removing of left recursion\n(3) print action table\n(4) Output the llvm intermediary code (or save it in the file denoted by -o) and optionnaly save the parse tree");
             return false;
         }
@@ -51,6 +51,7 @@ public class Main {
         for (int i = 0; i < argv.length; i+=2) {
             switch (argv[i]) {
                 case "--encoding":
+                    if (i+1 >= argv.length) return false;
                     encodingName = argv[i+1];
                     try {
                         java.nio.charset.Charset.forName(encodingName); // Side-effect: is encodingName valid?
@@ -60,31 +61,43 @@ public class Main {
                     }
                     break;
                 case "--ru":
+                    if (i+1 >= argv.length) return false;
                     if (action != null) return false;
                     action = REMOVE_USELESS;
                     inputGrammarFileName = argv[i+1];
                     break;
                 case "--ll":
+                    if (i+1 >= argv.length) return false;
                     if (action != null) return false;
                     action = LEFT_LEFT;
                     inputGrammarFileName = argv[i+1];
                     break;
                 case "--at":
+                    if (i+1 >= argv.length) return false;
                     if (action != null) return false;
                     action = ACTION_TABLE;
                     inputGrammarFileName = argv[i+1];
                     break;
                 case "-o":
+                    if (i+1 >= argv.length) return false;
                     outputFileName = argv[i+1];
                     break;
                 case "-t":
+                    if (i+1 >= argv.length) return false;
                     treeFileName = argv[i+1];
+                    break;
+                case "-g":
+                    if (i+1 >= argv.length) return false;
+                    inputGrammarFileName = argv[i+1];
                     break;
                 default :
                     if (action != null) return false;
                     action = PARSE;
-                    inputGrammarFileName = argv[i];
-                    inputCodeFileName = argv[i+1];
+                    if (inputGrammarFileName == null) {
+                        inputGrammarFileName = "../more/grammars/imp_ll.grammar";
+                    }
+                    inputCodeFileName = argv[i];
+                    --i;
             }
         }
         return action != null && (outputFileName != null || action == PARSE);
@@ -196,6 +209,9 @@ public class Main {
                 e.printStackTrace();
                 System.exit(-1);
             }
+        }
+        else {
+            argParse(null);
         }
     }
 }
