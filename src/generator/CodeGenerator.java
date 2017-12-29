@@ -111,9 +111,14 @@ public class CodeGenerator {
         generateFromProgram(parseTree); // Generates llvm from the root of the parse tree
         // Write to the output file after writing the code and
         // asking the template engine to pretty print the result
-        PrintWriter writer = new PrintWriter(filepath, "UTF-8");
-        writer.println(this.templateEngine.finish());
-        writer.close();
+        if (filepath != null) {
+            PrintWriter writer = new PrintWriter(filepath, "UTF-8");
+            writer.println(this.templateEngine.finish());
+            writer.close();
+        }
+        else {
+            System.out.println(this.templateEngine.finish());
+        }
     }
 
     /**
