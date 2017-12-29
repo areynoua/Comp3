@@ -18,6 +18,7 @@
 \usepackage{alltt}
 \usepackage{multirow}
 \usepackage[bottom]{footmisc}
+\usepackage{listings}
 
 \addto{\captionsenglish}{\renewcommand{\abstractname}{\vspace{-2\baselineskip}}}
 
@@ -404,6 +405,44 @@ LL1Parser:
     line: 5, column: 1
     code: + 1 ; function @bar ( b 
 \end{verbatim}
+
+\section{How to use Imp compiler}
+
+\begin{lstlisting}
+Arguments :
+	(1) --ru <grammar file> -o <grammar output file> 
+	(2) --ll <grammar file> -o <grammar output file>
+	(3) --at <ll1 unambiguous grammar file> -o <output file>
+	(4) <ll1 unambiguous grammar file> <code> [-o <output file>]
+(1) remove useless rules and symbols
+(2) left factorization and removing of left-recursion
+(3) print action table
+(4) save parse tree and output the rules used}
+\end{lstlisting}
+
+(1) You don't need to execute this command yourself. <grammar file> is the path to the initial grammar.
+Our parser has been designed to work with any grammar. For this project, we removed useless rules and symbols
+using the following arguments:
+\begin{lstlisting}
+--ru ../more/grammars/imp.grammar -o ../more/grammars/imp_ru.grammar
+\end{lstlisting}
+
+(2) You don't need to execute this command either. <grammar file> is the path to the unambigous grammar, which
+means that it must contains no useless symbol nor ambiguities.
+For this project, we transformed the grammar into a LL(1) grammar by using the following arguments:
+\begin{lstlisting}
+--ll ../more/grammars/imp_prim.grammar -o ../more/grammars/imp_ll.grammar
+\end{lstlisting}
+
+(3) You don't need to execute this command either. <grammar file> is the path to the unambigous LL(1) grammar.
+We used it to compile our first sets, follow sets, and action table to LaTex.
+\begin{lstlisting}
+--at ../more/grammars/imp_ll.grammar -o action_table.tex
+\end{lstlisting}
+
+(4) Run the parser to get the output expected as in the project statement.
+For example, to run the jar on one of out test files (you can obviously use yours), use the following arguments:
+../more/grammars/imp\_ll.grammar ../test/test-1.imp
 
 \end{document}
 
