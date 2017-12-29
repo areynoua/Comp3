@@ -55,9 +55,9 @@ grammar:
 	make ll
 	make at
 
-test-%: *.class */*.class
+test-%: *.class */*.class ../dist/part3.jar
 	@echo $@
-	@if java Main ../more/grammars/imp_ll.grammar ../test/$@.imp -o tree > /tmp/out.out ; then \
+	@if java -jar ../dist/part3.jar ../more/grammars/imp_ll.grammar ../test/$@.imp -o tree > /tmp/out.out ; then \
 		if ${VM-AS} main.ll -o=main.bc ; then \
 			if ${I} main.bc < ../test/$@.in >> /tmp/out.out ; then \
 				echo success >> /tmp/out.out ; \
