@@ -118,8 +118,8 @@ public class LL1Grammar {
 
     /** Return a set of all grammar symbols that exists in any rule
      *
-     * @param getT: include terminals
      * @param getV: include variables
+     * @param getT: include terminals
      */
     public Set<GrammarSymbol> getGrammarSymbols(boolean getV, boolean getT) {
         Set<GrammarSymbol> S = new HashSet<>();

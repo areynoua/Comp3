@@ -23,10 +23,10 @@ javadoc: lexer/*.java generator/*.java parser/*.java
 	touch javadoc
 	echo 'maybe you should git add ../doc/ javadoc && git commit -m"Javadoc"'
 
-../dist/impCompiler.jar: lexer/*.class parser/*.class generator/*.class Main.class
-	jar cfe ../dist/impCompiler.jar Main lexer/*.class parser/*.class generator/*.class Main.class
+../dist/part3.jar: lexer/*.class parser/*.class generator/*.class Main.class
+	jar cfe ../dist/part3.jar Main lexer/*.class parser/*.class generator/*.class Main.class
 
-jar: ../dist/impCompiler.jar
+jar: ../dist/part3.jar
 
 grammars/imp_ru.grammar: Main.class parser/*.class grammars/imp.grammar
 	java Main --ru grammars/imp.grammar -o grammars/imp_ru.grammar
