@@ -57,7 +57,7 @@ grammar:
 
 test-%: *.class */*.class ../dist/part3.jar
 	@echo $@
-	@if java -jar ../dist/part3.jar ../more/grammars/imp_ll.grammar ../test/$@.imp -o tree > /tmp/out.out ; then \
+	@if java -jar ../dist/part3.jar ../more/grammars/imp_ll.grammar ../test/$@.imp -t /tmp/tree > /tmp/out.out ; then \
 		if ${VM-AS} main.ll -o=main.bc ; then \
 			if ${I} main.bc < ../test/$@.in >> /tmp/out.out ; then \
 				echo success >> /tmp/out.out ; \
@@ -67,7 +67,7 @@ test-%: *.class */*.class ../dist/part3.jar
 	@diff -q /tmp/out.out ../test/$@.out
 
 run-%:  *.class */*.class
-	java Main ../more/grammars/imp_ll.grammar ../test/$(subst run,test,$@).imp -o tree
+	java Main ../more/grammars/imp_ll.grammar ../test/$(subst run,test,$@).imp -t /tmp/tree
 	${VM-AS} main.ll -o=main.bc
 	${I} main.bc < ../test/$(subst run,test,$@).in
 

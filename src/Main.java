@@ -33,6 +33,8 @@ public class Main {
     private static String inputGrammarFileName;
     /** Command line argument: output file */
     private static String outputFileName;
+    /** Command line argument: tree output file */
+    private static String treeFileName;
     /** Command line argument: choosen ACTION */
     private static Integer action;
 
@@ -41,8 +43,8 @@ public class Main {
      */
     public static boolean argParse(String argv[]) {
         if (argv.length == 0 || argv.length % 2 == 1) {
-            System.out.println("Arguments :\n	(1) --ru <grammar file> -o <grammar output file>\n	(2) --ll <grammar file> -o <grammar output file>\n	(3) --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) <ll1 unambiguous grammar file> <code> [-o <parse tree output file>]");
-            System.out.println("(1) remove useless\n(2) left factorization and removing of left recursion\n(3) print action table\n(4) save parse tree and output the rule used");
+            System.out.println("Arguments :\n	(1) --ru <grammar file> -o <grammar output file>\n	(2) --ll <grammar file> -o <grammar output file>\n	(3) --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) <ll1 unambiguous grammar file> <code> [-t <parse tree output file>]");
+            System.out.println("(1) remove useless\n(2) left factorization and removing of left recursion\n(3) print action table\n(4) Output the llvm intermediary code and optionnaly save the parse tree");
             return false;
         }
         encodingName = "UTF-8";
@@ -74,6 +76,9 @@ public class Main {
                     break;
                 case "-o":
                     outputFileName = argv[i+1];
+                    break;
+                case "-t":
+                    treeFileName = argv[i+1];
                     break;
                 default :
                     if (action != null) return false;
@@ -124,9 +129,9 @@ public class Main {
                         HashMap<Integer, Symbol> identifiers = scanner.getIdentifiers();
                         boolean success = parser.parse(symbols);
                         if (success) {
-                            if (outputFileName != null) {
-                                parser.saveTextTreeToFile(outputFileName + ".txt");
-                                parser.saveLatexTreeToFile(outputFileName + ".tex");
+                            if (treeFileName != null) {
+                                parser.saveTextTreeToFile(treeFileName + ".txt");
+                                parser.saveLatexTreeToFile(treeFileName + ".tex");
                                 parser.saveJavascriptToFile("../more/trees/rules.js");
                             }
                             // System.out.println("Parsing done");
