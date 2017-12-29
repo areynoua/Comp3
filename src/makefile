@@ -21,7 +21,7 @@ Main.class: Main.java
 .javadoc: lexer/*.java generator/*.java parser/*.java *.java
 	javadoc -quiet -d ../doc/ $?
 	@touch .javadoc
-	@echo 'maybe you should git add ../doc/ javadoc && git commit -m"Javadoc"'
+	@echo 'maybe you should git add ../doc/ .javadoc && git commit -m"Javadoc"'
 
 ../dist/part3.jar: lexer/*.class parser/*.class generator/*.class Main.class
 	jar cfe ../dist/part3.jar Main lexer/*.class parser/*.class generator/*.class Main.class
