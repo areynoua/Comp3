@@ -78,7 +78,7 @@
 In this work, we implemented an actual compiler for the \imp language.
 Given the unambiguous LL(1) grammar (see previous report on how to produce it and how our program may help you
 to produce it) for the imp language and a source file, 
-the compiler produces an LLVM-assembly language (LLVM IR) \texttt{.ll} file which may be
+the compiler produces an LLVM-assembly language (LLVM IR) file which may be
 compiled to LLVM bitcode using the LLVM assembler \textsf{llvm-as(1)}.
 So we extended the previously given \imp grammar to handle some new features
 and made improvements to the lexer and parser.
@@ -132,7 +132,7 @@ next section.
 \subsection{Randomness}
 
 The ability to use pseudo random numbers was added to the language through the \texttt{rand} keyword.
-The expression \texttt{rand(a)} assigns a pseudo random value between -2,147,483,647 and 2,147,483,647 to the variable \texttt{a}.
+The expression \texttt{rand(a)} assigns a pseudo random value between -2,147,483,648 and 2,147,483,647 to the variable \texttt{a}.
 
 \subsection{Functions}
 
@@ -408,17 +408,32 @@ LL1Parser:
 
 \section{How to use Imp compiler}
 
+The compiler provide many functionalities that will be presented below. Note that the parser require some files located
+in the \texttt{more/} directory. For this reason the compiler can not be called from any work directory. The more
+convenient way to call the compiler is to call it from \texttt{src/} with \texttt{java Main} or from \texttt{dist/} with
+\texttt{java -jar part3.jar}.
+
+To directly execute \imp programs, one have to have \textsf{llvm-as} and \textsf{lli} programs correctly installed and
+executable by the user running the java instance.
+
+{\small
 \begin{lstlisting}
 Arguments :
-	(1) --ru <grammar file> -o <grammar output file> 
-	(2) --ll <grammar file> -o <grammar output file>
-	(3) --at <ll1 unambiguous grammar file> -o <output file>
-	(4) <ll1 unambiguous grammar file> <code> [-o <output file>]
-(1) remove useless rules and symbols
-(2) left factorization and removing of left-recursion
+    (1) --ru <grammar file> -o <grammar output file>
+    (2) --ll <grammar file> -o <grammar output file>
+    (3) --at <ll1 unambiguous grammar file> -o <latex output file>
+    (4) <code file>
+        [-g <input: ll(1) unambiguous grammar file>]
+        [-o <output: LLVM IR code file>]
+        [-t <output: parse tree output file>]
+    (5) -exec <inputFile.imp>
+(1) remove useless
+(2) left factorization and removing of left recursion
 (3) print action table
-(4) save parse tree and output the rules used}
-\end{lstlisting}
+(4) Output the llvm intermediary code (or save it in the file denoted by -o)
+    and optionnaly save the parse tree
+(5) Compile and execute the given Imp program
+\end{lstlisting}}
 
 (1) You don't need to execute this command yourself. <grammar file> is the path to the initial grammar.
 Our parser has been designed to work with any grammar. For this project, we removed useless rules and symbols
@@ -441,8 +456,10 @@ We used it to compile our first sets, follow sets, and action table to LaTex.
 \end{lstlisting}
 
 (4) Run the parser to get the output expected as in the project statement.
-For example, to run the jar on one of out test files (you can obviously use yours), use the following arguments:
-../more/grammars/imp\_ll.grammar ../test/test-1.imp
+
+(5) Compile then run the given \imp program.
+To directly execute \imp programs, one have to have \textsf{llvm-as} and \textsf{lli} programs correctly installed and
+executable by the user running the java instance.
 
 \end{document}
 

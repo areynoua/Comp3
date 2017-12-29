@@ -24,6 +24,8 @@ public class Main {
     private static final int ACTION_TABLE = 2;
     /** Command line argument: default ACTION*/
     private static final int PARSE = 3;
+    /** Command line argument: ACTION -exec */
+    private static final int EXEC = 4;
 
     /** Uncommented command line argument */
     private static String encodingName;
@@ -43,8 +45,9 @@ public class Main {
      */
     public static boolean argParse(String argv[]) {
         if (argv == null) {
-            System.out.println("Arguments :\n	(1) --ru <grammar file> -o <grammar output file>\n	(2) --ll <grammar file> -o <grammar output file>\n	(3) --at <ll1 unambiguous grammar file> -o <latex output file>\n	(4) <code file> [-g <input: ll1 unambiguous grammar file>] [-o <output: LLVM IR code file>] [-t <output: parse tree output file>]");
-            System.out.println("(1) remove useless\n(2) left factorization and removing of left recursion\n(3) print action table\n(4) Output the llvm intermediary code (or save it in the file denoted by -o) and optionnaly save the parse tree");
+            System.out.println("Arguments :\n	(1) --ru <grammar file> -o <grammar output file>\n	(2) --ll <grammar file> -o <grammar output file>\n	(3) --at <ll1 unambiguous grammar file> -o <latex output file>");
+            System.out.println("\t(4) <code file> [-g <input: ll1 unambiguous grammar file>] [-o <output: LLVM IR code file>] [-t <output: parse tree output file>]\n	(5) -exec <inputFile.imp>");
+            System.out.println("(1) remove useless\n(2) left factorization and removing of left recursion\n(3) print action table\n(4) Output the llvm intermediary code (or save it in the file denoted by -o) and optionnaly save the parse tree\n(5) Compile and execute the given Imp program");
             return false;
         }
         encodingName = "UTF-8";
@@ -90,6 +93,12 @@ public class Main {
                     if (i+1 >= argv.length) return false;
                     inputGrammarFileName = argv[i+1];
                     break;
+                case "-exec":
+                    if (i+1 >= argv.length) return false;
+                    if (action != null) return false;
+                    action = EXEC;
+                    inputCodeFileName = argv[i+1];
+                    break;
                 default :
                     if (action != null) return false;
                     action = PARSE;
@@ -100,7 +109,7 @@ public class Main {
                     --i;
             }
         }
-        return action != null && (outputFileName != null || action == PARSE);
+        return action != null && (outputFileName != null || ((action == PARSE || action == EXEC) && inputCodeFileName != null));
     }
 
     /**
@@ -130,6 +139,9 @@ public class Main {
                         parser.saveLatexActionTableToFile(outputFileName);
                         grammar.saveLatexFirstFollowToFile("first_follow.tex");
                         break;
+                    case EXEC :
+                        // TODO: choose here the file used as temporary file for the result when exec
+                        outputFileName = "";
                     case PARSE :
                         java.io.FileInputStream stream = new java.io.FileInputStream(inputCodeFileName);
                         java.io.Reader reader = new java.io.InputStreamReader(stream, encodingName);
@@ -157,7 +169,15 @@ public class Main {
                         }
                         codeGenerator = new CodeGenerator("../more/templates/template.ll");
                         codeGenerator.generate(symbols, parser.getParseTree(), identifiers, outputFileName);
-                        break;
+                        if (action == PARSE) {
+                            break;
+                        }
+                        else { // action = EXEC
+                            // TODO: exec llvm-as outputFileName -o=output2FileName
+                            // TODO: exec lli output2FileName (/!\ input/output streams)
+                            // TODO: remove temporary file
+                            break;
+                        }
                     default :
                         System.out.println("Unknown action");
                         break;
