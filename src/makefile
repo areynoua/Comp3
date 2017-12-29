@@ -18,9 +18,9 @@ parser/%.class: parser/%.java
 Main.class: Main.java
 	javac $<
 
-javadoc: lexer/*.java generator/*.java parser/*.java *.java
+.javadoc: lexer/*.java generator/*.java parser/*.java *.java
 	javadoc -quiet -d ../doc/ $?
-	@touch javadoc
+	@touch .javadoc
 	@echo 'maybe you should git add ../doc/ javadoc && git commit -m"Javadoc"'
 
 ../dist/part3.jar: lexer/*.class parser/*.class generator/*.class Main.class
