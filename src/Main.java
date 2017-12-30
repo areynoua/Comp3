@@ -1,6 +1,15 @@
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.lang.ProcessBuilder;
+import java.lang.Runtime;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
+import java.lang.System;
+
 import lexer.BadTerminalContextException;
 import lexer.BadTerminalException;
 import lexer.LexicalAnalyzer;
@@ -57,7 +66,7 @@ public class Main {
                     if (i+1 >= argv.length) return false;
                     encodingName = argv[i+1];
                     try {
-                        java.nio.charset.Charset.forName(encodingName); // Side-effect: is encodingName valid?
+                        java.nio.charset.Charset.forName(encodingName);
                     } catch (Exception e) {
                         System.out.println("Invalid encoding '" + encodingName + "'");
                         return false;
@@ -123,8 +132,10 @@ public class Main {
             CodeGenerator codeGenerator = null;
 
             try {
+                if (inputGrammarFileName == null) {
+                    inputGrammarFileName = "../more/grammars/imp_ll.grammar";
+                }
                 grammar = new LL1Grammar(inputGrammarFileName);
-
                 switch (action) {
                     case REMOVE_USELESS :
                         grammar.removeUnproductive();
@@ -140,8 +151,6 @@ public class Main {
                         grammar.saveLatexFirstFollowToFile("first_follow.tex");
                         break;
                     case EXEC :
-                        // TODO: choose here the file used as temporary file for the result when exec
-                        outputFileName = "";
                     case PARSE :
                         java.io.FileInputStream stream = new java.io.FileInputStream(inputCodeFileName);
                         java.io.Reader reader = new java.io.InputStreamReader(stream, encodingName);
@@ -168,14 +177,20 @@ public class Main {
                             System.out.println(parser);
                         }
                         codeGenerator = new CodeGenerator("../more/templates/template.ll");
+                        if (action == EXEC) outputFileName = "temp.ll";
                         codeGenerator.generate(symbols, parser.getParseTree(), identifiers, outputFileName);
                         if (action == PARSE) {
                             break;
                         }
-                        else { // action = EXEC
-                            // TODO: exec llvm-as outputFileName -o=output2FileName
-                            // TODO: exec lli output2FileName (/!\ input/output streams)
-                            // TODO: remove temporary file
+                        else {
+                            Runtime runTime = Runtime.getRuntime();
+                            runTime.exec("llvm-as " + outputFileName + " -o=temp.bc");
+                            ProcessBuilder pb = new ProcessBuilder("lli", "temp.bc");
+                            pb.inheritIO();
+                            pb.start();
+                            Process process = pb.start();
+
+                            // runTime.exec("rm -rf temp.ll temp.bc");
                             break;
                         }
                     default :

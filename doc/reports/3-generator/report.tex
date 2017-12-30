@@ -416,6 +416,9 @@ convenient way to call the compiler is to call it from \texttt{src/} with \textt
 To directly execute \imp programs, one have to have \textsf{llvm-as} and \textsf{lli} programs correctly installed and
 executable by the user running the java instance.
 
+\textbf{Imp programs executed using the -exec arg do not support user inputs. For enabling user inputs, 
+please compile the Imp file manually and then run it using lli.}
+
 {\small
 \begin{lstlisting}
 Arguments :
